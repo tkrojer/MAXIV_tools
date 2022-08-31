@@ -6,6 +6,7 @@ import json
 import logging
 import glob
 import sys
+from bz2 import BZ2File as bzopen
 
 
 def init_logger():
@@ -120,7 +121,7 @@ def get_pipeline_path(pipeline):
         log_extension = 'HDF5_1/staraniso_alldata.log'
         cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
     elif pipeline == 'xia2dials':
-        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
+        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
         log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
         cif_extension = 'DataFiles/xia2.mmcif.bz2'
@@ -202,13 +203,21 @@ def add_biomax_mmcif_header_items(wavelength, collection_date):
 def write_mmcif_header(cif, cif_name, collection_date, wavelength):
     cifLines = add_biomax_mmcif_header_items(wavelength, collection_date)
     previous_line = ''
-    for line in open(cif):
-        if line.startswith('_refln.'):
-            break
-        else:
-            cifLines += previous_line
-        previous_line = line
-    f = open(cif_name, 'w')
+    if cif.endswith('*bz2'):
+        for line in bzopen(cif):
+            if '_pdbx_diffrn_unmerged_cell' in line:
+                break
+            else:
+                cifLines += previous_line
+            previous_line = line
+    else:
+        for line in open(cif):
+            if line.startswith('_refln.'):
+                break
+            else:
+                cifLines += previous_line
+            previous_line = line
+    f = open(cif_name.replace('*bz2', ''), 'w')
     f.write(cifLines)
     f.close()
 
