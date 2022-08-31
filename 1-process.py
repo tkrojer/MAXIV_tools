@@ -103,7 +103,7 @@ def main(argv):
     processlib.start_logging(logger)
 
     try:
-        opts, args = getopt.getopt(argv,"i:o:f:c:hso",["input=", "output=", "fragmax=", "crtierion=",
+        opts, args = getopt.getopt(argv,"i:o:f:c:hsx",["input=", "output=", "fragmax=", "crtierion=",
                                                        "help", "select", "overwrite"])
     except getopt.GetoptError:
         processlib.usage()
@@ -123,7 +123,7 @@ def main(argv):
             select = True
         elif opt in ("-c", "--crtierion"):
             select_criterion = arg
-        elif opt in ("-o", "--overwrite"):
+        elif opt in ("-x", "--overwrite"):
             overwrite = True
 
     processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
@@ -133,7 +133,7 @@ def main(argv):
         processlib.check_if_to_continue(logger)
         if select:
             processlib.start_select_results(logger)
-            select_results(logger, projectDir, select_criterion)
+            select_results(logger, projectDir, select_criterion, overwrite)
         else:
             processlib.start_get_autoprocessing_results(logger)
             get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv)
