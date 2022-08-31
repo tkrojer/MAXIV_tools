@@ -217,7 +217,7 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
             else:
                 cifLines += previous_line
             previous_line = line
-    f = open(cif_name..replace(' ', '').replace('bz2', ''), 'w')
+    f = open(cif_name.replace(' ', '').replace('bz2', ''), 'w')
     f.write(cifLines)
     f.close()
 
