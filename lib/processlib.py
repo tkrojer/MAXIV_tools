@@ -217,7 +217,7 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
             else:
                 cifLines += previous_line
             previous_line = line
-    f = open(cif_name.replace(' ', '').replace('bz2', ''), 'w')
+    f = open(cif_name.replace(' ', '').replace('.bz2', ''), 'w')
     f.write(cifLines)
     f.close()
 
@@ -243,7 +243,7 @@ def create_process_symlink(mtz_name, log_name, cif_name):
     if not os.path.isfile('process.log'):
         os.system('ln -s {0!s} process.log'.format(log_name))
     if not os.path.isfile('process.cif'):
-        os.system('ln -s {0!s} process.cif'.format(cif_name.replace('bz2', '')))
+        os.system('ln -s {0!s} process.cif'.format(cif_name.replace('.bz2', '')))
 
 
 
