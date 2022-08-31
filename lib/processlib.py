@@ -605,7 +605,10 @@ def usage():
 
 
 def check_if_to_continue(logger):
-    q = input("\n>>> Do you want to continue? (y/n)")
+    if sys.version[0] == '2':
+        q = raw_input("\n>>> Do you want to continue? (y/n) ")
+    else:
+        q = input("\n>>> Do you want to continue? (y/n)")
     if not q.lower() == 'y':
         logger.info('you chose not to conutinue at this point; exciting program...')
         sys.exit(2)
