@@ -457,6 +457,10 @@ def skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, o
         else:
             logger.warning('you chose to overwrite existing links; will re-select accordingly')
             remove_process_symlinks(logger, projectDir, sample)
+    else:
+        if overwrite:
+            # in case of broken links
+            remove_process_symlinks(logger, projectDir, sample)
     return process_not_exists
 
 
