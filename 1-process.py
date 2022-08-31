@@ -49,12 +49,12 @@ def select_results(logger, projectDir, select_criterion, overwrite):
     processlib.end_select_results(logger)
 
 
-def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status):
+def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status, protein):
     foundMTZ = False
     for runs in glob.glob(os.path.join(sample_folder, '*')):
         run = runs.split('/')[9]
         logger.info('checking run {0!s}'.format(run))
-        processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run)
+        processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein)
         collection_date, master = processlib.get_timestamp_from_master_file(sample_folder, run)
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
@@ -84,7 +84,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv):
             logger.info('SUCCESS: found sample in summary csv file')
             processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
-            parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status)
+            parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status, protein)
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
