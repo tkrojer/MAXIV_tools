@@ -263,7 +263,6 @@ def mtz_info(mtzfile):
 def cif_info(ciffile):
     cifDict = {}
     doc = gemmi.cif.read_file(ciffile)
-    print('>>', ciffile)
     for block in doc:
         if block.find_pair('_symmetry.space_group_name_H-M'):
             cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
@@ -280,7 +279,10 @@ def cif_info(ciffile):
 #        if block.find_pair('_reflns.pdbx_netI_over_sigmaI'):
             cifDict['pdbx_netI_over_sigmaI'] = str(block.find_pair('_reflns.pdbx_netI_over_sigmaI')[1])
             cifDict['pdbx_redundancy'] = str(block.find_pair('_reflns.pdbx_redundancy')[1])
-            cifDict['pdbx_percent_possible_spherical'] = str(block.find_pair('_reflns.pdbx_percent_possible_spherical')[1])
+            if 'staraniso' in ciffile:
+                cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.pdbx_percent_possible_spherical')[1])
+            else:
+                cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.percent_possible_obs')[1])
             cifDict['pdbx_number_measured_all'] = str(block.find_pair('_reflns.pdbx_number_measured_all')[1])
             cifDict['pdbx_CC_half'] = str(block.find_pair('_reflns.pdbx_CC_half')[1])
 
