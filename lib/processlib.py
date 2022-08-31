@@ -207,6 +207,7 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
     if cif_name.endswith('.bz2'):
         print('here')
         for line in bzopen(cif):
+            print(line)
             if '_pdbx_diffrn_unmerged_cell' in line:
                 break
             else:
