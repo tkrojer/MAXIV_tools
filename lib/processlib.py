@@ -203,7 +203,9 @@ def add_biomax_mmcif_header_items(wavelength, collection_date):
 def write_mmcif_header(cif, cif_name, collection_date, wavelength):
     cifLines = add_biomax_mmcif_header_items(wavelength, collection_date)
     previous_line = ''
+    print('>', cif, '>>', cif_name)
     if cif.endswith('*bz2'):
+        print('here')
         for line in bzopen(cif):
             if '_pdbx_diffrn_unmerged_cell' in line:
                 break
