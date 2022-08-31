@@ -263,6 +263,7 @@ def mtz_info(mtzfile):
 def cif_info(ciffile):
     cifDict = {}
     doc = gemmi.cif.read_file(ciffile)
+    print('>>', ciffile)
     for block in doc:
         if block.find_pair('_symmetry.space_group_name_H-M'):
             cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
