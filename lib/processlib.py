@@ -424,20 +424,20 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list
     logger.info('selecting MTZ file based on highest resolution...')
-    best = min(match_list, key=lambda x: x[1])[0]
-    logger.info('--> {0!s}'.format(best))
-    return best
+    bestcif = min(match_list, key=lambda x: x[1])[0]
+    logger.info('--> {0!s}'.format(bestcif))
+    return bestcif
 
 
-def link_process_results(logger, projectDir, sample, best):
+def link_process_results(logger, projectDir, sample, bestcif):
     logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
     os.chdir(os.path.join(projectDir, "1-process", sample))
     if not os.path.isdir('process.mtz'):
-        os.system('ln -s {0!s} .'.format(best))
+        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
     if not os.path.isdir('process.log'):
-        os.system('ln -s {0!s} .'.format(best))
+        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
     if not os.path.isdir('process.cif'):
-        os.system('ln -s {0!s} .'.format(best))
+        os.system('ln -s {0!s} .'.format(bestcif))
 
 
 def remove_process_symlinks(logger, projectDir, sample):
