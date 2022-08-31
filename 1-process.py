@@ -82,7 +82,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv):
         logger.info('current sample - {0!s}'.format(sample))
         if sample in sampleList:
             logger.info('SUCCESS: found sample in summary csv file')
-            processlib.create_sample_folder(projectDir, sample)
+            processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
             parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status)
         else:
