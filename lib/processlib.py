@@ -145,7 +145,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     else:
         logger.error('cannot find CIF file')
     if logfile and ciffile:
-        processlib.copy_files_to_project_folder(projectDir, sample, run, proposal, session, pipeline,
+        copy_files_to_project_folder(projectDir, sample, run, proposal, session, pipeline,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
