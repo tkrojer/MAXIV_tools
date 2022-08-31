@@ -64,7 +64,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                 foundMTZ = True
                 status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
-                                                      mtz_extension, cif_extension, log_extension)
+                                                      mtz_extension, cif_extension, log_extension, status)
         if not foundMTZ:
             logger.warning('could not find any MTZ file!')
             status = processlib.get_status(None, status)
