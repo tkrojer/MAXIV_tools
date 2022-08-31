@@ -366,8 +366,6 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_d
     match_dict = {}
     if ref_dict:
         for f in proc_dict:
-            print('>>>', f)
-            sys.exit()
             pgr_mtz = proc_dict[f]['point_group']
             ucv_mtz = float(proc_dict[f]['unitcell_volume'])
             lat_mtz = proc_dict[f]['lattice']
@@ -478,6 +476,8 @@ def read_data_collection_stats(logger, ciffile, proc_dict):
         cif = cif_info(ciffile)
         mtz.update(cif)
         proc_dict[os.path.join(subfolder, pipeline)] = mtz
+        print('>>>', proc_dict)
+        sys.exit()
     else:
         logger.error('process.mtz does not exist in folder')
     return proc_dict
