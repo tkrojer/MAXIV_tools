@@ -465,9 +465,8 @@ def skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, o
 
 
 def read_data_collection_stats(logger, ciffile, proc_dict):
-    print('---', ciffile)
-    subfolder = ciffile.split('/')[1]
-    pipeline = ciffile.split('/')[2]
+    subfolder = ciffile.split('/')[0]
+    pipeline = ciffile.split('/')[1]
     mtzfile = os.path.join(ciffile.replace('.cif', '.mtz'))
     if os.path.isfile(mtzfile):
         logger.info('found {0!s} file'.format(mtzfile))
@@ -476,9 +475,7 @@ def read_data_collection_stats(logger, ciffile, proc_dict):
         mtz['subfolder'] = subfolder
         cif = cif_info(ciffile)
         mtz.update(cif)
-        proc_dict[os.path.join(subfolder, pipeline)] = mtz
-        print('>>>', proc_dict)
-        sys.exit()
+        proc_dict[os.path.join(ciffile)] = mtz
     else:
         logger.error('process.mtz does not exist in folder')
     return proc_dict
