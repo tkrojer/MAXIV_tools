@@ -247,7 +247,7 @@ def mtz_info(mtzfile):
     mtzDict['resolution_high'] = mtz.resolution_high()
     mtzDict['space_group'] = mtz.spacegroup.hm
     mtzDict['wavelength'] = mtz.dataset(1).wavelength
-    mtzDict['lattice'] = XXX
+    mtzDict['lattice'] = mtz.spacegroup.crystal_system_str()
     return mtzDict
 
 
