@@ -465,6 +465,7 @@ def skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, o
 
 
 def read_data_collection_stats(logger, ciffile, proc_dict):
+    print('---', ciffile)
     subfolder = ciffile.split('/')[1]
     pipeline = ciffile.split('/')[2]
     mtzfile = os.path.join(ciffile.replace('.cif', '.mtz'))
