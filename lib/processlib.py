@@ -128,7 +128,7 @@ def get_pipeline_path(pipeline):
 
 
 def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
-                      run, pipeline, collection_date, mtz_extension, cif_extension, log_extension):
+                      run, pipeline, collection_date, mtz_extension, cif_extension, log_extension, status):
     logfile = None
     ciffile = None
     mtz = mtz_info(mtzfile)
