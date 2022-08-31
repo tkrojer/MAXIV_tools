@@ -5,6 +5,7 @@ from PIL import Image
 import json
 import logging
 import glob
+import sys
 
 
 def init_logger():
@@ -360,7 +361,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_d
                 pgr_pdb = ref_dict[p][0]
                 ucv_pdb = float(ref_dict[p][2])
                 lat_pdb = ref_dict[p][1]
-                ucv_diff = (ucv_mtz-ucv_pdb)/ucv_pdb
+                ucv_diff = abs((ucv_mtz-ucv_pdb))/ucv_pdb
                 if pgr_mtz == pgr_pdb and lat_mtz == lat_pdb and ucv_diff < 0.1:
                     logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(p))
                     match_dict[f] = proc_dict[f]
@@ -417,7 +418,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
 
 
 def link_process_results(logger, projectDir, sample, best):
-    logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample))
+    logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
     os.chdir(os.path.join(projectDir, "1-process", sample))
     if not os.path.isdir('process.mtz'):
         os.system('ln -s {0!s}/process.mtz .'.format(best))
@@ -464,6 +465,12 @@ def read_data_collection_stats(logger, ciffile, proc_dict):
     return proc_dict
 
 
+def start_logging(logger):
+    logger.info('===================================================================================')
+    logger.info('>>>>> starting 1-process.py...')
+    logger.info('===================================================================================')
+
+
 def start_get_autoprocessing_results(logger):
     logger.info('===================================================================================')
     logger.info('>>> START: collating auto-processing results')
@@ -486,3 +493,121 @@ def end_select_results(logger):
     logger.info('===================================================================================')
     logger.info('>>> END: finished selecting auto-processing results')
     logger.info('===================================================================================')
+
+
+def report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite):
+    logger.info('> process directory: {0!s}'.format(processDir))
+    logger.info('> project directory: {0!s}'.format(projectDir))
+    logger.info('> fragmax csv file:  {0!s}'.format(fragmaxcsv))
+    logger.info('> select datasets:   {0!s}'.format(select))
+    logger.info('> select criterion:  {0!s}'.format(select_criterion))
+    logger.info('> overwrite:         {0!s}'.format(overwrite))
+    logger.info('===================================================================================')
+
+
+def check_if_process_directory_exists(logger, processDir, select):
+    passed = True
+    if not select:
+        logger.info('checking process directory: {0!s}'.format(processDir))
+        if os.path.isdir(processDir):
+            logger.info('process directory exists')
+        else:
+            logger.error('process directory does not exist')
+            passed = False
+    return passed
+
+
+def check_if_project_directory_exists(logger, projectDir, passed):
+    logger.info('checking project directory: {0!s}'.format(projectDir))
+    if os.path.isdir(projectDir):
+        logger.info('project directory exists')
+    else:
+        logger.error('project directory does not exist')
+        passed = False
+    return passed
+
+
+def check_if_fragmaxcsv_exists(logger, fragmaxcsv, passed):
+    logger.info('checking fragmaxcsv: {0!s}'.format(fragmaxcsv))
+    if os.path.isfile(fragmaxcsv):
+        logger.info('fragmaxcsv exists')
+    else:
+        logger.error('fragmaxcsv does not exist')
+        passed = False
+    return passed
+
+
+def check_pdbfiles_in_pdbdir(logger, projectDir, passed):
+    logger.info('looking for PDB files in PDB directory...')
+    found = False
+    for pdb in glob.glob(os.path.join(projectDir, '0-model', '*.pdb')):
+        pdbFile = pdb.split('/')[len(pdb.split('/'))-1]
+        logger.info('found {0!s}'.format(pdbFile))
+        foundCryst = False
+        for line in open(pdb):
+            if line.startswith('CRYST'):
+                logger.info('found CRYST card: {0!s}'.format(line.replace('\n', '')))
+                foundCryst = True
+                found = True
+        if not foundCryst:
+            logger.warning('{0!s} does not seem to contain a CRYST card'.format(pdbFile))
+    if found:
+        logger.info('found at least one PDB file with a CRYST card')
+    else:
+        logger.warning('did not find a PDB file with a valid CRYST card')
+        passed = False
+    return passed
+
+
+def check_select_criterion(logger, select_criterion, passed):
+    logger.info('checking selection option: {0!s}'.format(select_criterion))
+    supported_options = ['xia2dials', 'xia2xds', 'autoproc', 'staraniso', 'resolution']
+    if select_criterion in supported_options:
+        logger.info('option exists')
+    else:
+        logger.error('ERROR: option does not exist')
+        passed = False
+    return passed
+
+
+def run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion):
+    logger.info('checking input file and command line options...')
+    passed = check_if_process_directory_exists(logger, processDir, select)
+    passed = check_if_project_directory_exists(logger, projectDir, passed)
+    passed = check_if_fragmaxcsv_exists(logger, fragmaxcsv, passed)
+    passed = check_pdbfiles_in_pdbdir(logger, projectDir, passed)
+    passed = check_select_criterion(logger, select_criterion, passed)
+    logger.info('===================================================================================')
+    return passed
+
+
+def usage():
+    usage = (
+        '\n'
+        'usage:\n'
+        'ccp4-python 1-process.py -i <process_dir> -o <project_dir> -f <fragmax_csv_file>\n'
+        '\n'
+        'additional command line options:\n'
+        '--input, -i\n'
+        '    process directory\n'
+        '--output, -o\n'
+        '    project directory\n'
+        '--fragmaxcsv, -f\n'
+        '    fragmax summary csv file\n'
+        '--select, -r\n'
+        '    select auto-processing results\n'
+        '--crtierion, -c\n'
+        '    selection criterion (resolution [default], xia2dials, xia2xds, autoproc, staraniso)\n'
+        '--overwrite, -o\n'
+        '    flag to overwrite selected files\n'
+    )
+    print(usage)
+
+
+def check_if_to_continue(logger):
+    q = input("\n>>> Do you want to continue? (y/n)")
+    if not q.lower() == 'y':
+        logger.info('you chose not to conutinue at this point; exciting program...')
+        sys.exit(2)
+
+
