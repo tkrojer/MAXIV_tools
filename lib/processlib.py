@@ -463,10 +463,10 @@ def read_data_collection_stats(logger, ciffile, proc_dict):
     mtzfile = os.path.join(ciffile.replace('.cif', '.mtz'))
     if os.path.isfile(mtzfile):
         logger.info('found {0!s} file'.format(mtzfile))
-        mtz = processlib.mtz_info(mtzfile)
+        mtz = mtz_info(mtzfile)
         mtz['pipeline'] = pipeline
         mtz['subfolder'] = subfolder
-        cif = processlib.cif_info(ciffile)
+        cif = cif_info(ciffile)
         mtz.update(cif)
         proc_dict[os.path.join(subfolder, pipeline)] = mtz
     else:
