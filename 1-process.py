@@ -23,14 +23,8 @@ import getopt
 import glob
 import sys
 import os
-import gemmi
-import time
-import json
-import logging
 
-
-sys.path.append('/data/staff/biomax/tobias/script/lib')
-sys.path.append('/Users/tobkro/Scripts/MAXIV_tools/lib')
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import processlib
 
 
@@ -53,8 +47,6 @@ def select_results(logger, projectDir, select_criterion, overwrite):
             processlib.link_process_results(logger, projectDir, sample, best)
         logger.error('could not find any MTZ or CIF in sample folder')
     processlib.end_select_results(logger)
-
-
 
 
 def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status):
