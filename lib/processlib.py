@@ -49,7 +49,7 @@ def create_sample_folder(logger, projectDir, sample):
         os.mkdir(sample)
 
 
-def prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein):
+def prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir):
     create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
     create_image_folder(logger, projectDir, sample, proposal, session, run)
     find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run)
