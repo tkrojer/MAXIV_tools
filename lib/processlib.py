@@ -410,7 +410,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
     backup_list = []
     for f in proc_dict:
         reso_high = proc_dict[f]['reso_high']
-        if select_criterion.startwith('reso'):
+        if select_criterion.startswith('reso'):
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(f, reso_high))
             match_list.append([f, float(reso_high)])
         elif proc_dict[f]['pipeline'] == select_criterion:
