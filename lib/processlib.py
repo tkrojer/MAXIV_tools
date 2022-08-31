@@ -433,11 +433,11 @@ def link_process_results(logger, projectDir, sample, best):
     logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
     os.chdir(os.path.join(projectDir, "1-process", sample))
     if not os.path.isdir('process.mtz'):
-        os.system('ln -s {0!s}/process.mtz .'.format(best))
+        os.system('ln -s {0!s} .'.format(best))
     if not os.path.isdir('process.log'):
-        os.system('ln -s {0!s}/process.log .'.format(best))
+        os.system('ln -s {0!s} .'.format(best))
     if not os.path.isdir('process.cif'):
-        os.system('ln -s {0!s}/process.cif .'.format(best))
+        os.system('ln -s {0!s} .'.format(best))
 
 
 def remove_process_symlinks(logger, projectDir, sample):
