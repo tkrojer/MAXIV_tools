@@ -74,7 +74,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 
 def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv):
-    sampleList = processlib.get_sample_list(fragmaxcsv)
+    sampleList = processlib.get_sample_list(logger, fragmaxcsv)
     proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
     pipelines = processlib.get_processing_pipelines()
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir, '*')))):
