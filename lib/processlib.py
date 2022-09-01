@@ -324,7 +324,8 @@ def get_status(logger, mtzfile, mtz, status):
                     status = 'FAIL - low resolution'
         else:
             status = 'FAIL - no processing result'
-    status = check_if_salt_lattice(logger, mtz, status)
+    if mtzfile:
+        status = check_if_salt_lattice(logger, mtz, status)
     return status
 
 
