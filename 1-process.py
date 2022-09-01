@@ -56,8 +56,6 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
     for runs in glob.glob(os.path.join(sample_folder, '*')):
 #        run = runs.split('/')[9]
         run = runs.split('/')[len(runs.split('/'))-1]
-        print(run)
-        sys.exit()
         logger.info('checking run {0!s}'.format(run))
         processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir)
         collection_date, master = processlib.get_timestamp_from_master_file(sample_folder, run)
