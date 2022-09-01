@@ -55,7 +55,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
     foundMTZ = False
     for runs in glob.glob(os.path.join(sample_folder, '*')):
 #        run = runs.split('/')[9]
-        run = runs.split('/')[len(runs.split('/')-1)]
+        run = runs.split('/')[len(runs.split('/'))-1]
         print(run)
         sys.exit()
         logger.info('checking run {0!s}'.format(run))
