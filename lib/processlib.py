@@ -153,7 +153,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
-    status = get_status(mtzfile, status)
+    status = get_status(logger, mtzfile, mtz, status)
     return status
 
 
@@ -253,7 +253,13 @@ def create_process_symlink(mtz_name, log_name, cif_name):
 def mtz_info(mtzfile):
     mtzDict = {}
     mtz = gemmi.read_mtz_file(mtzfile)
-    mtzDict['unitcell'] = mtz.cell
+    mtzDict['unitcell'] = mtz.cell.parameters
+    mtzDict['a'] = mtz.cell.a
+    mtzDict['b'] = mtz.cell.b
+    mtzDict['c'] = mtz.cell.c
+    mtzDict['alpha'] = mtz.cell.alpha
+    mtzDict['beta'] = mtz.cell.beta
+    mtzDict['gamma'] = mtz.cell.gamma
     mtzDict['unitcell_volume'] = mtz.cell.volume
     mtzDict['point_group'] = mtz.spacegroup.point_group_hm()
     mtzDict['resolution_high'] = mtz.resolution_high()
@@ -268,15 +274,15 @@ def cif_info(ciffile):
     cifDict = {}
     doc = gemmi.cif.read_file(ciffile)
     for block in doc:
-        if block.find_pair('_symmetry.space_group_name_H-M'):
-            cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
-        if block.find_pair('_cell.length_a'):
-            cifDict['a'] = str(block.find_pair('_cell.length_a')[1])
-            cifDict['b'] = str(block.find_pair('_cell.length_b')[1])
-            cifDict['c'] = str(block.find_pair('_cell.length_c')[1])
-            cifDict['alpha'] = str(block.find_pair('_cell.angle_alpha')[1])
-            cifDict['beta'] = str(block.find_pair('_cell.angle_beta')[1])
-            cifDict['gamma'] = str(block.find_pair('_cell.angle_gamma')[1])
+#        if block.find_pair('_symmetry.space_group_name_H-M'):
+#            cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
+#        if block.find_pair('_cell.length_a'):
+#            cifDict['a'] = str(block.find_pair('_cell.length_a')[1])
+#            cifDict['b'] = str(block.find_pair('_cell.length_b')[1])
+#            cifDict['c'] = str(block.find_pair('_cell.length_c')[1])
+#            cifDict['alpha'] = str(block.find_pair('_cell.angle_alpha')[1])
+#            cifDict['beta'] = str(block.find_pair('_cell.angle_beta')[1])
+#            cifDict['gamma'] = str(block.find_pair('_cell.angle_gamma')[1])
         if block.find_pair('_reflns.d_resolution_low'):
             cifDict['reso_low'] = str(round(float(block.find_pair('_reflns.d_resolution_low')[1]), 2))
 #            cifDict['reso_low'] = str(block.find_pair('_reflns.d_resolution_low')[1])
@@ -287,21 +293,24 @@ def cif_info(ciffile):
             if 'staraniso' in ciffile:
                 cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.pdbx_percent_possible_spherical')[1])
             else:
-                cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.percent_possible_obs')[1])
+                if 'xia2' in ciffile:
+                    cifDict['percent_possible_obs'] = str(round(float(block.find_pair('_reflns.percent_possible_obs')[1])*100, 1))
+                else:
+                    cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.percent_possible_obs')[1])
             cifDict['pdbx_number_measured_all'] = str(block.find_pair('_reflns.pdbx_number_measured_all')[1])
             cifDict['pdbx_CC_half'] = str(block.find_pair('_reflns.pdbx_CC_half')[1])
 
         if block.find_loop('_reflns_shell.Rmerge_I_obs'):
             Rmerge_I_obs = list(block.find_loop('_reflns_shell.Rmerge_I_obs'))
-            cifDict['Rmerge_I_obs_low'] = Rmerge_I_obs[0]
+            cifDict['Rmerge_I_obs_low'] = str(round(float(Rmerge_I_obs[0]), 2))
 
         if block.find_loop('_reflns_shell.meanI_over_sigI_obs'):
             meanI_over_sigI_obs = list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))
-            cifDict['meanI_over_sigI_obs_high'] = meanI_over_sigI_obs[len(meanI_over_sigI_obs)-1]
+            cifDict['meanI_over_sigI_obs_high'] = str(round(float(meanI_over_sigI_obs[len(meanI_over_sigI_obs)-1]), 2))
     return cifDict
 
 
-def get_status(mtzfile, status):
+def get_status(logger, mtzfile, mtz, status):
     if not status is 'OK':
         if mtzfile:
             mtzDict = mtz_info(mtzfile)
@@ -315,7 +324,18 @@ def get_status(mtzfile, status):
                     status = 'FAIL - low resolution'
         else:
             status = 'FAIL - no processing result'
+    status = check_if_salt_lattice(logger, mtz, status)
     return status
+
+
+def check_if_salt_lattice(logger, mtz, status):
+    if float(mtz['a']) < 20 or float(mtz['b']) < 20 or float(mtz['c']) < 20:
+        logger.warning('at least one unit cell axis is shorter than 20A (see below); looks like salt or compound...')
+        logger.info('unit cell: {0!s}'.format(mtz['unitcell']))
+        status = 'FAIL - SALT?!'
+    return status
+
+
 
 
 def make_thumbnail(folder, image):

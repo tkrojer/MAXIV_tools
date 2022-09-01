@@ -70,10 +70,10 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                       mtz_extension, cif_extension, log_extension, status)
                 processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                 protein, status, master, pipeline)
-        if not foundMTZ:
-            logger.warning('could not find any MTZ file!')
-            status = processlib.get_status(None, status)
-            processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
+    if not foundMTZ:
+        logger.warning('could not find any MTZ file!')
+        status = processlib.get_status(None, status)
+        processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                         protein, status, master, '')
     logger.info('===================================================================================\n')
 

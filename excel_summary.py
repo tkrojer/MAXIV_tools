@@ -86,14 +86,6 @@ import summarylib
 #def read_project_information():
 
 
-def add_row_to_worksheet(worksheet, cell_format, sample, cif, row):
-    worksheet.write('A' + str(row), sample, cell_format)
-    worksheet.write('B' + str(row), cif['collection_date'], cell_format)
-    worksheet.write('C' + str(row), cif['proposal'], cell_format)
-    worksheet.write('D' + str(row), cif['session'], cell_format)
-    worksheet.write('E' + str(row), cif['reso_low'], cell_format)
-    worksheet.write('F' + str(row), cif['reso_high'], cell_format)
-    worksheet.write('G' + str(row), cif['status'], cell_format)
 
 
 def get_crystal_analysis_dict():
@@ -141,6 +133,22 @@ def number_to_column(n):
     }
     return columnDict[str(n)]
 
+
+def add_row_to_worksheet(worksheet, cell_format, sample, cif, row):
+    worksheet.write('A' + str(row), sample, cell_format)
+    worksheet.write('B' + str(row), cif['collection_date'], cell_format)
+    worksheet.write('C' + str(row), cif['proposal'], cell_format)
+    worksheet.write('D' + str(row), cif['session'], cell_format)
+    worksheet.write('E' + str(row), cif['pipeline'], cell_format)
+    worksheet.write('F' + str(row), cif['reso_low'], cell_format)
+    worksheet.write('G' + str(row), cif['reso_high'], cell_format)
+    worksheet.write('H' + str(row), cif['percent_possible_obs'], cell_format)
+    worksheet.write('I' + str(row), cif['Rmerge_I_obs_low'], cell_format)
+    worksheet.write('J' + str(row), cif['meanI_over_sigI_obs_high'], cell_format)
+    worksheet.write('K' + str(row), cif['status'], cell_format)
+
+
+
 def parse_project_directory(projectDir, fragmaxcsv):
     dataDict = get_crystal_analysis_dict()
     pgDict = get_point_group_dict()
@@ -163,7 +171,7 @@ def parse_project_directory(projectDir, fragmaxcsv):
     worksheet.merge_range('A1:D1', 'Data Collection', merge_format)
     worksheet.merge_range('E1:K1', 'Data Processing', merge_format)
 
-    worksheet.add_table('A2:G{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
+    worksheet.add_table('A2:K{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
                                                                       {'header': 'Date'},
                                                                       {'header': 'Proposal'},
                                                                       {'header': 'Session'},
@@ -237,6 +245,7 @@ def parse_project_directory(projectDir, fragmaxcsv):
         'categories': ['chart data', 3, 0, 3, n],
         'values': ['chart data', 4, 0, 4, n],
         'line': {'color': 'black'},
+        'data_labels': {'value': True},
     })
     print(n+1)
     chart_pg.set_title({'name': 'point group'})
