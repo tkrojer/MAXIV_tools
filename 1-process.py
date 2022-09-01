@@ -45,7 +45,9 @@ def select_results(logger, projectDir, select_criterion, overwrite):
             proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
             best = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
             processlib.link_process_results(logger, projectDir, sample, best)
-        logger.error('could not find any MTZ or CIF in sample folder')
+        else:
+            logger.error('could not find any MTZ or CIF in sample folder')
+            processlib.link_info_json_file(logger, projectDir, sample)
     processlib.end_select_results(logger)
 
 
@@ -68,8 +70,9 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         if not foundMTZ:
             logger.warning('could not find any MTZ file!')
             status = processlib.get_status(None, status)
+            pipeline = ''
         processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
-                                        protein, status, master)
+                                        protein, status, master, pipeline)
     logger.info('===================================================================================\n')
 
 
@@ -99,8 +102,8 @@ def main(argv):
     select = False
     select_criterion = 'resolution'
     overwrite = False
-    logger = processlib.init_logger()
-    processlib.start_logging(logger)
+    logger = processlib.init_logger('1-process.log')
+    processlib.start_logging(logger, '1-process.py')
 
     try:
         opts, args = getopt.getopt(argv,"i:o:f:c:hsx",["input=", "output=", "fragmax=", "crtierion=",

@@ -9,7 +9,7 @@ import sys
 from bz2 import BZ2File as bzopen
 
 
-def init_logger():
+def init_logger(logfile):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s', '%m-%d-%Y %H:%M:%S')
@@ -19,7 +19,7 @@ def init_logger():
     stdout_handler.setFormatter(formatter)
     logger.addHandler(stdout_handler)
 
-    file_handler = logging.FileHandler('1-process.log')
+    file_handler = logging.FileHandler(logfile)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
@@ -256,7 +256,8 @@ def mtz_info(mtzfile):
     mtzDict['resolution_high'] = mtz.resolution_high()
     mtzDict['space_group'] = mtz.spacegroup.hm
     mtzDict['wavelength'] = mtz.dataset(1).wavelength
-    mtzDict['lattice'] = mtz.spacegroup.crystal_system_str()
+#    mtzDict['lattice'] = mtz.spacegroup.crystal_system_str()
+    mtzDict['lattice'] = mtz.spacegroup.hm[0]
     return mtzDict
 
 
@@ -274,8 +275,9 @@ def cif_info(ciffile):
             cifDict['beta'] = str(block.find_pair('_cell.angle_beta')[1])
             cifDict['gamma'] = str(block.find_pair('_cell.angle_gamma')[1])
         if block.find_pair('_reflns.d_resolution_low'):
-            cifDict['reso_low'] = str(block.find_pair('_reflns.d_resolution_low')[1])
-            cifDict['reso_high'] = str(block.find_pair('_reflns.d_resolution_high')[1])
+            cifDict['reso_low'] = str(round(float(block.find_pair('_reflns.d_resolution_low')[1]), 2))
+#            cifDict['reso_low'] = str(block.find_pair('_reflns.d_resolution_low')[1])
+            cifDict['reso_high'] = str(round(float(block.find_pair('_reflns.d_resolution_high')[1]), 2))
 #        if block.find_pair('_reflns.pdbx_netI_over_sigmaI'):
             cifDict['pdbx_netI_over_sigmaI'] = str(block.find_pair('_reflns.pdbx_netI_over_sigmaI')[1])
             cifDict['pdbx_redundancy'] = str(block.find_pair('_reflns.pdbx_redundancy')[1])
@@ -290,11 +292,9 @@ def cif_info(ciffile):
             Rmerge_I_obs = list(block.find_loop('_reflns_shell.Rmerge_I_obs'))
             cifDict['Rmerge_I_obs_low'] = Rmerge_I_obs[0]
 
-
-    cifDict['meanI_over_sigI_obs_high'] = 'x'
-    cifDict['meanI_over_sigI_obs_high'] = 'x'
-
-
+        if block.find_loop('_reflns_shell.meanI_over_sigI_obs'):
+            meanI_over_sigI_obs = list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))
+            cifDict['meanI_over_sigI_obs_high'] = meanI_over_sigI_obs[len(meanI_over_sigI_obs)-1]
     return cifDict
 
 
@@ -326,8 +326,11 @@ def make_thumbnail(folder, image):
     img.save(os.path.join(folder, thumbnail))
 
 
-def write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session, protein, status, master):
+def write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
+                         protein, status, master, pipeline):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run)))
+    if pipeline:
+        os.chdir(pipeline)
     d = {}
     d['sample'] = sample
     d['collection_date'] = collection_date
@@ -337,6 +340,7 @@ def write_json_info_file(logger, projectDir, sample, collection_date, run, propo
     d['protein'] = protein
     d['status'] = status
     d['master'] = master
+    d['pipeline'] = pipeline
     logger.info('saving info.json file...')
     with open("info.json", "w") as outfile:
         json.dump(d, outfile)
@@ -432,19 +436,32 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
 def link_process_results(logger, projectDir, sample, bestcif):
     logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
     os.chdir(os.path.join(projectDir, "1-process", sample))
+    pipeline = bestcif.split('/')[1]
+#    json_info = bestcif.replace(pipeline +'/process.cif', 'info.json')
+    json_info = bestcif.replace('process.cif', 'info.json')
     if not os.path.isdir('process.mtz'):
         os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
     if not os.path.isdir('process.log'):
         os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
     if not os.path.isdir('process.cif'):
         os.system('ln -s {0!s} .'.format(bestcif))
+    if not os.path.isdir('info.json'):
+        os.system('ln -s {0!s} .'.format(json_info))
 
+
+def link_info_json_file(logger, projectDir, sample):
+    os.chdir(os.path.join(projectDir, "1-process", sample))
+    for f in glob.glob(os.path.join('*', 'info.json')):
+        logger.info('linking {0!s} to sample directory')
+        os.system('ln -s {0!s} .'.format(f))
+        
 
 def remove_process_symlinks(logger, projectDir, sample):
     logger.warning('will remove existing process symlinks in {0!s}'.format(os.path.join(
         projectDir, "1-process", sample)))
     os.chdir(os.path.join(projectDir, '1-process', sample))
     os.system('/bin/rm process.*')
+    os.system('/bin/rm info.json')
 
 
 def skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, overwrite):
@@ -481,9 +498,9 @@ def read_data_collection_stats(logger, ciffile, proc_dict):
     return proc_dict
 
 
-def start_logging(logger):
+def start_logging(logger, script):
     logger.info('===================================================================================')
-    logger.info('>>>>> starting 1-process.py...')
+    logger.info('>>>>> starting {0!s}...'.format(script))
     logger.info('===================================================================================')
 
 
