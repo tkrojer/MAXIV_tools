@@ -52,11 +52,11 @@ def ligand_files_exist(logger, cpdID):
 
 def modules_to_load(restraints_program):
     if restraints_program == 'acedrg':
-        module = 'module load gopresto CCP4'
+        module = 'module load gopresto CCP4\n'
     elif restraints_program == 'grade':
-        module = 'module load gopresto BUSTER'
+        module = 'module load gopresto BUSTER\n'
     elif restraints_program == 'elbow':
-        module = 'module load gopresto Phenix'
+        module = 'module load gopresto Phenix\n'
     return module
 
 
@@ -98,6 +98,7 @@ def prepare_script_for_restrains_generation(logger, projectDir, sample, cpdID, s
         script = software + '_' + sample + '.sh'
         backup_existing_script_files(script)
         cmd = maxiv_header(software)
+        cmd += modules_to_load(software)
         cmd += 'cd {0!s}\n'.format(os.path.join(projectDir, '3-compound', sample))
         cmd += restraints_program_cmd(software, cpdID, smiles)
         f = open(script, 'w')
