@@ -153,7 +153,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
-    status = get_status(logger, mtzfile, mtz, status)
+    status = get_status(logger, mtzfile, mtz, ciffile, status)
     return status
 
 
@@ -253,7 +253,7 @@ def create_process_symlink(mtz_name, log_name, cif_name):
 def mtz_info(mtzfile):
     mtzDict = {}
     mtz = gemmi.read_mtz_file(mtzfile)
-    mtzDict['unitcell'] = mtz.cell.parameters
+    mtzDict['unitcell'] = str(mtz.cell.parameters).replace('(', '').replace(')', '')
     mtzDict['a'] = mtz.cell.a
     mtzDict['b'] = mtz.cell.b
     mtzDict['c'] = mtz.cell.c
@@ -292,11 +292,10 @@ def cif_info(ciffile):
             cifDict['pdbx_redundancy'] = str(block.find_pair('_reflns.pdbx_redundancy')[1])
             if 'staraniso' in ciffile:
                 cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.pdbx_percent_possible_spherical')[1])
+            elif 'xia2' in ciffile:
+                cifDict['percent_possible_obs'] = str(round((float(block.find_pair('_reflns.percent_possible_obs')[1])*100), 1))
             else:
-                if 'xia2' in ciffile:
-                    cifDict['percent_possible_obs'] = str(round(float(block.find_pair('_reflns.percent_possible_obs')[1])*100, 1))
-                else:
-                    cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.percent_possible_obs')[1])
+                cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.percent_possible_obs')[1])
             cifDict['pdbx_number_measured_all'] = str(block.find_pair('_reflns.pdbx_number_measured_all')[1])
             cifDict['pdbx_CC_half'] = str(block.find_pair('_reflns.pdbx_CC_half')[1])
 
@@ -310,20 +309,21 @@ def cif_info(ciffile):
     return cifDict
 
 
-def get_status(logger, mtzfile, mtz, status):
-    if not status is 'OK':
-        if mtzfile:
-            mtzDict = mtz_info(mtzfile)
-            if float(mtzDict['resolution_high']) < 2.5:
-                status = 'OK'
-            elif float(mtzDict['resolution_high']) >= 2.8 and float(mtzDict['resolution_high']) < 3.2:
-                if status == 'FAIL - low resolution' or status == 'FAIL - no processing result':
-                    status = 'OK - medium resolution'
-            else:
-                if status == 'FAIL - no processing result':
-                    status = 'FAIL - low resolution'
+def get_status(logger, mtzfile, mtz, ciffile, status):
+    if mtzfile:
+        mtzDict = mtz_info(mtzfile)
+        if float(mtzDict['resolution_high']) < 2.5:
+            status = 'OK'
+            cif = cif_info(ciffile)
+            if float(cif['Rmerge_I_obs_low']) > 0.15:
+                logger.error('Rmerge of {0!s} is too high'.format(cif['Rmerge_I_obs_low']))
+                status = 'FAIL - high Rmerge (low)'
+        elif float(mtzDict['resolution_high']) >= 2.8 and float(mtzDict['resolution_high']) < 3.2:
+            status = 'OK - medium resolution'
         else:
-            status = 'FAIL - no processing result'
+            status = 'FAIL - low resolution'
+    else:
+        status = 'FAIL - no processing result'
     if mtzfile:
         status = check_if_salt_lattice(logger, mtz, status)
     return status
