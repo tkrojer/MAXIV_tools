@@ -20,8 +20,6 @@
 
 import sys
 import os
-import xlsxwriter
-from PIL import Image
 import getopt
 import glob
 
