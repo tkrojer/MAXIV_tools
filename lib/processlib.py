@@ -667,7 +667,7 @@ def check_if_to_continue(logger):
     else:
         q = input("\n>>> Do you want to continue? (y/n)")
     if not q.lower() == 'y':
-        logger.info('you chose not to conutinue at this point; exciting program...')
+        logger.info('you chose not to continue at this point; exciting program...')
         sys.exit(2)
 
 

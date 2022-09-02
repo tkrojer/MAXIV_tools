@@ -29,100 +29,45 @@ import glob
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import processlib
 import summarylib
-
-#with Image.open("hsDHS-x0001_1_1.snapshot.jpeg") as img:
-#    width_100 = img.width
-#    height_100 = img.height
-#    print(width_100, height_100)
-##    print(img.info['dpi'])
-
-# save a smaller version of the image
-#width_30 = int(round(width_100 * 0.3, 0))
-#img = Image.open('local_100_perc.png')
-#wpercent = (width_30/float(width_100))
-#hsize = int((float(height_100)*float(wpercent)))
-#img = img.resize((width_30,hsize), Image.ANTIALIAS)
-#img.save('local_30_perc.png')
+import compoundlib
 
 
-#workbook = xlsxwriter.Workbook('image.xlsx')
-#worksheet = workbook.add_worksheet()
-
-# worksheets
-# Data collection - selected
-# Data collection - all
-
-
-
-
-
-
-#worksheet.add_table('A1:C3', {'columns': [{'header': 'Sample'},
- #                                         {'header': 'Dozor'},
- #                                         {'header': 'tbc'}
- #                                         ]})
-
-#wrap_format = workbook.add_format({'text_wrap': True})
-
-# locks cells; see https://xlsxwriter.readthedocs.io/example_protection.html
-#worksheet.protect()
-
-#worksheet.write('A1', 'sample 1')
-#worksheet.write('A2', 'sample 1', wrap_format)
-#worksheet.set_column('B:B', 80)
-#worksheet.set_row(0, 80)
-#worksheet.insert_image('B2', 'hsDHS-x0001_1_1.snapshot.jpeg', {'object_position': 1})
-#worksheet.insert_image('C1', 'hsDHS-x0001_1_1.snapshot.jpeg')
-#worksheet.insert_image('B8', 'logo.png')
-
-#workbook.close()
-
-
-# input
-# projectDir
-# fragmaxcsv
-# auxcsv - commma separated file with additinal info like "Fail - broken loop", "Fail - empty loop"
-
-#def read_project_information():
-
-
-
-
-
-
-
-def parse_project_directory(projectDir, fragmaxcsv):
-    dataDict = summarylib.get_crystal_analysis_dict()
-    pgDict = summarylib.get_point_group_dict()
-    pgucvDict = summarylib.get_point_group_ucv_dict()
-    workbook = summarylib.init_workbook()
-    n_samples = summarylib.get_n_samples(fragmaxcsv)
-    n_autoproc_results = summarylib.n_autoproc_results(projectDir)
-    summary_worksheet = summarylib.get_summary_worksheet(workbook, n_samples)
-    details_worksheet = summarylib.get_details_worksheet(workbook, n_autoproc_results)
-    pg_ucv_worksheet = summarylib.get_pg_ucv_worksheet(workbook)
-    chart_data = summarylib.get_chart_data_sheet(workbook)
-    summarylib.prepare_summary_worksheet(workbook, summary_worksheet, projectDir, fragmaxcsv, dataDict, pgDict, pgucvDict)
-    summarylib.prepare_details_worksheet(workbook, details_worksheet, projectDir, fragmaxcsv)
-    summarylib.prepare_get_pg_ucv_worksheet(pg_ucv_worksheet)
-    summarylib.prepare_crystal_chart(workbook, chart_data, dataDict)
-    summarylib.prepare_laue_group_chart(workbook, chart_data, pgDict)
-
-    workbook.close()
-
+def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
+    submitList = []
+    for l in open(fragmaxcsv):
+        sample = l.split(',')[0]
+        logger.info('current sample ' + sample)
+        cpdID = l.split(',')[1].replace(' ', '')
+        smiles = l.split(',')[2]
+        processlib.create_sample_folder(logger, projectDir, sample)
+        if cpdID:
+            compoundlib.create_sample_folder(logger, projectDir, sample)
+            if overwrite:
+                compoundlib.empty_sample_folder(logger, projectDir, sample)
+            compoundlib.make_compound_png(logger, projectDir, sample, cpdID, smiles)
+            compoundlib.prepare_script_for_restrains_generation(logger, projectDir, sample, cpdID, smiles, software, submitList)
+        else:
+            logger.warning('sample does not have a compound ID/ smiles assigned; skipping')
+    if submitList:
+        logger.info('there are {0!s} {1!s} jobs to submit'.format(len(submitList), software))
+        processlib.check_if_to_continue(logger)
+        compoundlib.submit_jobs_to_cluster(logger, projectDir, submitList)
+    else:
+        logger.warning('there are no jobs to submit; if this is unexpected, check messages above!')
 
 
 def main(argv):
     projectDir = ''
     fragmaxcsv = ''
-    auxcsv = ''
-    logger = processlib.init_logger('excel_summary.log')
-    processlib.start_logging(logger, 'excel_summary.py')
+    overwrite = False
+    software = 'acedrg'
+    logger = processlib.init_logger('3-compound.log')
+    processlib.start_logging(logger, '3-compound.py')
 
     try:
-        opts, args = getopt.getopt(argv,"p:f:a:h",["project=", "fragmax=", "auxcsvn=", "help"])
+        opts, args = getopt.getopt(argv,"p:f:ho",["project=", "fragmax=", "help", "overwrite"])
     except getopt.GetoptError:
-        processlib.usage()
+#        processlib.usage()
         sys.exit(2)
 
     for opt, arg in opts:
@@ -133,13 +78,13 @@ def main(argv):
             projectDir = os.path.abspath(arg)
         elif opt in ("-f", "--fragmaxcsv"):
             fragmaxcsv = os.path.abspath(arg)
-        elif opt in ("-a", "--auxcsv"):
-            auxcsv = os.path.abspath(arg)
+        elif opt in ("-o", "--overwrite"):
+            overwrite = True
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
-    parse_project_directory(projectDir, fragmaxcsv)
+    make_restraints(logger, projectDir, fragmaxcsv, software, overwrite)
 
 #    if checks_passed:
 #        processlib.check_if_to_continue(logger)
