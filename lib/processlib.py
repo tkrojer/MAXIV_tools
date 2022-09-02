@@ -46,7 +46,7 @@ def get_proposal_and_session_and_protein(processDir):
 def create_sample_folder(logger, projectDir, sample):
     os.chdir(os.path.join(projectDir, '1-process'))
     if not os.path.isdir(sample):
-        logger.info('creating folder {0!s} in 1-process')
+        logger.info('creating folder {0!s} in 1-process'.format(sample))
         os.mkdir(sample)
 
 
