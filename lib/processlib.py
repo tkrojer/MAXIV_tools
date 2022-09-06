@@ -212,7 +212,7 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
                 break
             else:
                 cifLines += previous_line
-            previous_line = str(line)
+            previous_line = line
     else:
         for line in open(cif):
             if line.startswith('_refln.'):
