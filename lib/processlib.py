@@ -131,6 +131,16 @@ def get_pipeline_path(pipeline):
     return mtzpath, mtz_extension, log_extension, cif_extension
 
 
+def process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
+    skip = False
+    process_cif = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run),
+                               pipeline, 'process.cif')
+    if os.path.isfile(process_cif):
+        logger.warning('process.cif exists in {0!s}-{1!s}-{2!s}; skipping...'.format(proposal, session, run))
+        skip = True
+    return skip
+
+
 def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                       run, pipeline, collection_date, mtz_extension, cif_extension, log_extension, status):
     logfile = None

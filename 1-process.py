@@ -51,7 +51,8 @@ def select_results(logger, projectDir, select_criterion, overwrite):
     processlib.end_select_results(logger)
 
 
-def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines, status, protein, processDir):
+def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
+                        status, protein, processDir, overwrite):
     foundMTZ = False
     for runs in glob.glob(os.path.join(sample_folder, '*')):
 #        run = runs.split('/')[9]
@@ -62,6 +63,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
             mtzpath, mtz_extension, log_extension, cif_extension = processlib.get_pipeline_path(pipeline)
+            if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
+                continue
             for mtzfile in glob.glob(os.path.join(sample_folder, '*', mtzpath)):
                 logger.info('found MTZ file')
                 foundMTZ = True
@@ -78,7 +81,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
     logger.info('===================================================================================\n')
 
 
-def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv):
+def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite):
     sampleList = processlib.get_sample_list(logger, fragmaxcsv)
     proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
     pipelines = processlib.get_processing_pipelines()
@@ -90,7 +93,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv):
             processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
             parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                                status, protein, processDir)
+                                status, protein, processDir, overwrite)
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
@@ -141,7 +144,7 @@ def main(argv):
             select_results(logger, projectDir, select_criterion, overwrite)
         else:
             processlib.start_get_autoprocessing_results(logger)
-            get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv)
+            get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite)
     else:
         logger.error('cannot continue; check error messages above and use -h option to get more information')
         logger.info('===================================================================================')
