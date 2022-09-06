@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import glob
+from PIL import Image
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -164,23 +165,44 @@ def cell_format_settings(workbook, cif):
     return cell_format
 
 
-def add_row_to_worksheet(workbook, worksheet, sample, cif, row):
+def get_unit_cell_string(cif):
+    uc = ''
+    if 'alpha' in cif:
+        uc = (
+            '{0!s} '.format(round(float(cif['a']), 1)) +
+            '{0!s} '.format(round(float(cif['b']), 1)) +
+            '{0!s}\n'.format(round(float(cif['c']), 1)) +
+            '{0!s} '.format(round(float(cif['alpha']), 1)) +
+            '{0!s} '.format(round(float(cif['beta']), 1)) +
+            '{0!s}'.format(round(float(cif['gamma']), 1))
+        )
+    return uc
+
+
+def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cpdImg):
+    worksheet.set_row(row, 80)
     cell_format = cell_format_settings(workbook, cif)
+    unitcell = get_unit_cell_string(cif)
     if cif['pipeline'].startswith('xia2'):
         cif['percent_possible_obs'] = str(round(float(cif['percent_possible_obs'])*100, 1))
     worksheet.write('A' + str(row), sample, cell_format)
     worksheet.write('B' + str(row), cif['collection_date'], cell_format)
     worksheet.write('C' + str(row), cif['proposal'], cell_format)
     worksheet.write('D' + str(row), cif['session'], cell_format)
-    worksheet.write('E' + str(row), cif['pipeline'], cell_format)
-    worksheet.write('F' + str(row), cif['reso_low'], cell_format)
-    worksheet.write('G' + str(row), cif['reso_high'], cell_format)
-    worksheet.write('H' + str(row), cif['percent_possible_obs'], cell_format)
-    worksheet.write('I' + str(row), cif['Rmerge_I_obs_low'], cell_format)
-    worksheet.write('J' + str(row), cif['meanI_over_sigI_obs_high'], cell_format)
-    worksheet.write('K' + str(row), cif['space_group'], cell_format)
-    worksheet.write('L' + str(row), cif['unitcell'], cell_format)
-    worksheet.write('M' + str(row), cif['status'], cell_format)
+    if dozor:
+        worksheet.insert_image('E' + str(row), dozor, {'x_scale': 0.195, 'y_scale': 0.22})
+    worksheet.write('F' + str(row), cif['pipeline'], cell_format)
+    worksheet.write('G' + str(row), cif['reso_low'], cell_format)
+    worksheet.write('H' + str(row), cif['reso_high'], cell_format)
+    worksheet.write('I' + str(row), cif['percent_possible_obs'], cell_format)
+    worksheet.write('J' + str(row), cif['Rmerge_I_obs_low'], cell_format)
+    worksheet.write('K' + str(row), cif['meanI_over_sigI_obs_high'], cell_format)
+    worksheet.write('L' + str(row), cif['space_group'], cell_format)
+    worksheet.write('M' + str(row), unitcell, cell_format)
+    worksheet.write('N' + str(row), cif['status'], cell_format)
+    worksheet.write('O' + str(row), cpdID, cell_format)
+    if cpdImg:
+        worksheet.insert_image('P' + str(row), cpdImg, {'x_scale': 0.3, 'y_scale': 0.35})
 
 
 def get_summary_worksheet(workbook, n_samples):
@@ -192,12 +214,14 @@ def get_summary_worksheet(workbook, n_samples):
         'valign': 'vcenter',
         'fg_color': 'yellow'})
     merge_format.set_font_size(20)
-    worksheet.merge_range('A1:D1', 'Data Collection', merge_format)
-    worksheet.merge_range('E1:M1', 'Data Processing', merge_format)
-    worksheet.add_table('A2:M{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
+    worksheet.merge_range('A1:E1', 'Data Collection', merge_format)
+    worksheet.merge_range('F1:N1', 'Data Processing', merge_format)
+    worksheet.merge_range('O1:P1', 'Compound', merge_format)
+    worksheet.add_table('A2:P{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
                                                                       {'header': 'Date'},
                                                                       {'header': 'Proposal'},
                                                                       {'header': 'Session'},
+                                                                      {'header': 'Dozor'},
                                                                       {'header': 'Pipeline'},
                                                                       {'header': 'Reso (Low)'},
                                                                       {'header': 'Reso (High)'},
@@ -206,25 +230,49 @@ def get_summary_worksheet(workbook, n_samples):
                                                                       {'header': 'I/sig(I) (High)'},
                                                                       {'header': 'Spacegroup'},
                                                                       {'header': 'Unit Cell'},
-                                                                      {'header': 'Status'}
+                                                                      {'header': 'Status'},
+                                                                      {'header': 'Compound ID'},
+                                                                      {'header': 'Compound'}
                                                                       ]})
     worksheet.freeze_panes(2, 1)
+    worksheet.set_column('E:E', 17)
+    worksheet.set_column('P:P', 12)
     return worksheet
+
+
+def get_dozor_plot(projectDir, sample, jso, dozor):
+    subfolder = jso['proposal'] + '-' + jso['session'] + '-' + jso['run']
+    plot = os.path.join(projectDir, '1-process', sample, subfolder, 'images', 'dozor.png')
+    if os.path.isfile(plot):
+        dozor = plot
+    return dozor
+
+
+def get_compound_image(projectDir, sample, cpdID):
+    cpdImg = None
+    img = os.path.join(projectDir, '3-compound', sample, cpdID + '.png')
+    if os.path.isfile(img):
+        cpdImg = img
+    return cpdImg
 
 
 def prepare_summary_worksheet(workbook, summary_worksheet, projectDir, fragmaxcsv, dataDict, pgDict, pgucvDict):
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
+        cpdID = line.split(',')[1]
         dataDict = update_crystal_summary(dataDict, 'mounted')
         ciffile = os.path.join(projectDir, '1-process', sample, 'process.cif')
         mtzfile = os.path.join(projectDir, '1-process', sample, 'process.mtz')
         jsofile = os.path.join(projectDir, '1-process', sample, 'info.json')
+        dozor = None
+        cpdImg = get_compound_image(projectDir, sample, cpdID)
         if os.path.isfile(jsofile):
             dataDict = update_crystal_summary(dataDict, 'collected')
+            jso = get_json_as_dict(jsofile)
+            dozor = get_dozor_plot(projectDir, sample, jso, dozor)
         if os.path.isfile(ciffile) and os.path.isfile(mtzfile) and os.path.isfile(jsofile):
             cif = processlib.cif_info(ciffile)
             mtz = processlib.mtz_info(mtzfile)
-            jso = get_json_as_dict(jsofile)
             cif.update(mtz)
             cif.update(jso)
             dataDict = analyse_resolution(dataDict, cif)
@@ -237,7 +285,7 @@ def prepare_summary_worksheet(workbook, summary_worksheet, projectDir, fragmaxcs
         else:
             cif = get_blank_cif()
         row = n + 3
-        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row)
+        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg)
     if pgucvDict:
         print_pg_ucv_distribution(pgucvDict)
 
@@ -383,3 +431,5 @@ def prepare_laue_group_chart(workbook, chart_data, pgDict):
     #    chart_pg.set_legend({'none': True})
     chartsheet_pg.set_chart(chart_pg)
 
+
+#def prepare_dozor_thumbnail()

@@ -57,13 +57,16 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
 def main(argv):
     projectDir = ''
     fragmaxcsv = ''
+    panddaDir = ''
     overwrite = False
+    linkrefine = False
     software = 'acedrg'
     logger = processlib.init_logger('3-compound.log')
     processlib.start_logging(logger, '3-compound.py')
 
+
     try:
-        opts, args = getopt.getopt(argv,"p:f:ho",["project=", "fragmax=", "help", "overwrite"])
+        opts, args = getopt.getopt(argv,"p:f:l:ho",["project=", "fragmax=", "linkpandda=", "help", "overwrite"])
     except getopt.GetoptError:
 #        processlib.usage()
         sys.exit(2)
