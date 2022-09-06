@@ -329,6 +329,7 @@ def get_status(logger, mtzfile, mtz, ciffile, status):
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
+            print('>>>', ciffile)
             cif = cif_info(ciffile)
             if float(cif['Rmerge_I_obs_low']) > 0.15:
                 logger.error('Rmerge of {0!s} is too high'.format(cif['Rmerge_I_obs_low']))
