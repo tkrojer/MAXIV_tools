@@ -222,7 +222,10 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
             if '_pdbx_diffrn_unmerged_cell' in str(line):
                 break
             else:
-                cifLines += previous_line.decode('ASCII')
+                try:
+                    cifLines += previous_line.decode('ASCII')
+                except AttributeError:
+                    cifLines += previous_line
             previous_line = line
 #        sys.exit()
     else:
