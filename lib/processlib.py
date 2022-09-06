@@ -799,10 +799,10 @@ def get_proc_folder(projectDir, sample, proposal, session, run, pipeline):
 def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file):
     if (counter % 2) == 0:
         script_dict[pipeline + '_0.sh'] += 'cd ' + proc_folder + '\n'
-        script_dict[pipeline + '_0.sh'] += pipeline_cmd(pipeline, proc_dict, master_file)
+        script_dict[pipeline + '_0.sh'] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
     else:
         script_dict[pipeline + '_1.sh'] += 'cd ' + proc_folder + '\n'
-        script_dict[pipeline + '_1.sh'] += pipeline_cmd(pipeline, proc_dict, master_file)
+        script_dict[pipeline + '_1.sh'] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
 
 
 def save_proc_scripts(logger, projectDir, script_dict):
