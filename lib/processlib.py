@@ -111,20 +111,20 @@ def get_pipeline_path(pipeline):
     log_extension = None
     cif_extension = None
     if pipeline == 'autoproc':
-#        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
-        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'truncate-unique.mtz')
+        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
+#        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'truncate-unique.mtz')
         mtz_extension = 'HDF5_1/truncate-unique.mtz'
         log_extension = 'HDF5_1/aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
     elif pipeline == 'staraniso':
-#        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
-        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
+        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
+#        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
         mtz_extension = 'HDF5_1/staraniso_alldata-unique.mtz'
         log_extension = 'HDF5_1/staraniso_alldata.log'
         cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
     elif pipeline == 'xia2dials':
-#        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
-        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
+        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
+#        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
         log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
         cif_extension = 'DataFiles/xia2.mmcif.bz2'
