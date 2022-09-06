@@ -103,14 +103,12 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
 def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):
     proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
-    print('sam', sampleList)
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
-        print(sample_folder)
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
         if sample in sampleList:
             logger.info('current sample - {0!s}'.format(sample))
             for mfile in glob.glob(os.path.join(sample_folder, '*_master.h5')):
-                run = mfile[mfile.rfind('/')+1].replace('_master.h5', '')
+                run = mfile[mfile.rfind('/')+1:].replace('_master.h5', '')
                 print(run)
 
     processlib.end_reprocessing(logger)
