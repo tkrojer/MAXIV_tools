@@ -495,11 +495,18 @@ def link_process_results(logger, projectDir, sample, bestcif):
 
 
 def link_info_json_file(logger, projectDir, sample):
+    foundDozor = False
     os.chdir(os.path.join(projectDir, "1-process", sample))
     for f in glob.glob(os.path.join('*', 'info.json')):
-        logger.info('linking {0!s} to sample directory')
+        logger.info('linking {0!s} to sample directory'.format(f))
         os.system('ln -s {0!s} .'.format(f))
-        
+        foundDozor = True
+    if not foundDozor:
+        # this situation may occur if data processing timed out
+        for f in glob.glob(os.path.join('*', '*', 'info.json')):
+            logger.info('linking {0!s} to sample directory'.format(f))
+            os.system('ln -s {0!s} .'.format(f))
+
 
 def remove_process_symlinks(logger, projectDir, sample):
     logger.warning('will remove existing process symlinks in {0!s}'.format(os.path.join(
