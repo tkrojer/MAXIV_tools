@@ -159,7 +159,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     else:
         logger.error('cannot find CIF file')
     if logfile and ciffile:
-        copy_files_to_project_folder(projectDir, sample, run, proposal, session, pipeline,
+        mtzfile, logfile, ciffile = copy_files_to_project_folder(projectDir, sample, run, proposal, session, pipeline,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
@@ -253,7 +253,13 @@ def copy_files_to_project_folder(projectDir, sample, run, proposal, session, pip
     if not os.path.isfile(cif_name):
         write_mmcif_header(cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
-
+    mtz = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+                       'process.mtz')
+    log = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+                       'process.log')
+    cif = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+                       'process.cif')
+    return mtz, log, cif
 
 def create_process_symlink(mtz_name, log_name, cif_name):
     if not os.path.isfile('process.mtz'):
