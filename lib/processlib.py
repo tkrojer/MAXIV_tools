@@ -30,7 +30,7 @@ def init_logger(logfile):
 def get_sample_list(logger, fragmaxcsv):
     sampleList = []
     for line in open(fragmaxcsv):
-        sample = line.split(',')[0]
+        sample = line.split(',')[0].replace('\n', '')
         sampleList.append(sample)
     logger.info('found {0!s} samples in summary csv file\n'.format(len(sampleList)))
     return sampleList
