@@ -148,6 +148,8 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     mtz = mtz_info(mtzfile)
     wavelength = mtz['wavelength']
     create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
+    print('log', mtzfile.replace(mtz_extension, log_extension))
+    print('cif', mtzfile.replace(mtz_extension, cif_extension))
     if os.path.isfile(mtzfile.replace(mtz_extension, log_extension)):
         logger.info('found LOG file')
         logfile = mtzfile.replace(mtz_extension, log_extension)
