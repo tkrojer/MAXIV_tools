@@ -100,19 +100,34 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
     processlib.end_get_autoprocessing_results(logger)
 
 
+def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):
+    proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
+    sampleList = processlib.get_sample_list(logger, reprocesscsv)
+    for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
+        sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
+        if sample in sampleList:
+            logger.info('current sample - {0!s}'.format(sample))
+            for mfile in glob.glob(os.path.join(sample_folder, '*_master.h5')):
+                run = mfile[mfile.rfind('/')+1].replace('_master.h5', '')
+                print(run)
+
+    processlib.end_reprocessing(logger)
+
+
 def main(argv):
     processDir = ''
     projectDir = ''
     fragmaxcsv = ''
     select = False
     select_criterion = 'resolution'
+    reprocesscsv = ''
     overwrite = False
     logger = processlib.init_logger('1-process.log')
     processlib.start_logging(logger, '1-process.py')
 
     try:
-        opts, args = getopt.getopt(argv,"i:o:f:c:hsx",["input=", "output=", "fragmax=", "crtierion=",
-                                                       "help", "select", "overwrite"])
+        opts, args = getopt.getopt(argv,"i:o:f:c:r:hsx",["input=", "output=", "fragmax=", "crtierion=",
+                                                       "help", "select", "overwrite", "reprocess="])
     except getopt.GetoptError:
         processlib.usage()
         sys.exit(2)
@@ -133,6 +148,8 @@ def main(argv):
             select_criterion = arg
         elif opt in ("-x", "--overwrite"):
             overwrite = True
+        elif opt in ("-r", "--reprocess"):
+            reprocesscsv = os.path.abspath(arg)
 
     processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
     checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
@@ -142,6 +159,10 @@ def main(argv):
         if select:
             processlib.start_select_results(logger)
             select_results(logger, projectDir, select_criterion, overwrite)
+        elif reprocesscsv:
+            proc_dict = processlib.ask_for_spg_and_unit_cell(logger)
+            processlib.start_reprocessing(logger)
+            reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict)
         else:
             processlib.start_get_autoprocessing_results(logger)
             get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite)

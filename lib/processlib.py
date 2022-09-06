@@ -580,6 +580,18 @@ def end_select_results(logger):
     logger.info('===================================================================================')
 
 
+def start_reprocessing(logger):
+    logger.info('===================================================================================')
+    logger.info('>>> START: reprocessing selected files')
+    logger.info('===================================================================================')
+
+
+def end_reprocessing(logger):
+    logger.info('===================================================================================')
+    logger.info('>>> END: finished reprocessing selected files')
+    logger.info('===================================================================================')
+
+
 def report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite):
     logger.info('> process directory: {0!s}'.format(processDir))
     logger.info('> project directory: {0!s}'.format(projectDir))
@@ -693,9 +705,43 @@ def check_if_to_continue(logger):
     if sys.version[0] == '2':
         q = raw_input("\n>>> Do you want to continue? (y/n) ")
     else:
-        q = input("\n>>> Do you want to continue? (y/n)")
+        q = input("\n>>> Do you want to continue? (y/n) ")
     if not q.lower() == 'y':
         logger.info('you chose not to continue at this point; exciting program...')
         sys.exit(2)
+
+
+def get_proc_dict():
+    proc_dict = {
+        'pipeline': '',
+        'space_group': '',
+        'unit_cell': ''
+    }
+    return proc_dict
+
+def ask_for_spg_and_unit_cell(logger):
+    proc_dict = get_proc_dict()
+    q = ''
+    if sys.version[0] == '2':
+        q = raw_input("\n>>> specify processing pipeline: ")
+    else:
+        q = input("\n>>> specify processing pipeline: ")
+    if q.replace(' ','') == '':
+        logger.info('you must choose a processing pipeline; exciting program...')
+        sys.exit(2)
+    proc_dict['pipeline'] = q.replace(' ','')
+    q = ''
+    if sys.version[0] == '2':
+        q = raw_input("\n>>> specify space group or press return: ")
+    else:
+        q = input("\n>>> specify space group or press return: ")
+    proc_dict['space_group'] = q.replace(' ','')
+    q = ''
+    if sys.version[0] == '2':
+        q = raw_input("\n>>> specify unit cell or press return: ")
+    else:
+        q = input("\n>>> specify unit cell or press return: ")
+    proc_dict['unit_cell'] = q.replace(' ','')
+    return proc_dict
 
 
