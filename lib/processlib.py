@@ -333,7 +333,7 @@ def cif_info(ciffile):
 
 
 def get_status(logger, mtzfile, mtz, ciffile, status):
-    if mtzfile:
+    if mtzfile and ciffile:
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
