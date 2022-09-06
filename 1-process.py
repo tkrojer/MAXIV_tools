@@ -116,7 +116,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
                 processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
                 processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
                 proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
-                processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder)
+                processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file)
                 counter += 1
     processlib.save_proc_scripts(logger, projectDir, script_dict)
     processlib.end_reprocessing(logger)

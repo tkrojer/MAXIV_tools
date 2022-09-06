@@ -774,7 +774,7 @@ def maxiv_header(pipeline):
     return header
 
 
-def pipeline_cmd(pipeline, proc_dict):
+def pipeline_cmd(pipeline, proc_dict, master_file):
     extra_cmd = ''
     if proc_dict['space_group']:
         extra_cmd += 'space_group=' + proc_dict['space_group'] + ' '
@@ -796,13 +796,13 @@ def get_proc_folder(projectDir, sample, proposal, session, run, pipeline):
     return p
 
 
-def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder):
+def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file):
     if (counter % 2) == 0:
         script_dict[pipeline + '_0.sh'] += 'cd ' + proc_folder + '\n'
-        script_dict[pipeline + '_0.sh'] += pipeline_cmd(pipeline, proc_dict)
+        script_dict[pipeline + '_0.sh'] += pipeline_cmd(pipeline, proc_dict, master_file)
     else:
         script_dict[pipeline + '_1.sh'] += 'cd ' + proc_folder + '\n'
-        script_dict[pipeline + '_1.sh'] += pipeline_cmd(pipeline, proc_dict)
+        script_dict[pipeline + '_1.sh'] += pipeline_cmd(pipeline, proc_dict, master_file)
 
 
 def save_proc_scripts(logger, projectDir, script_dict):
