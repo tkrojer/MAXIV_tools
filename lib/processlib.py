@@ -745,3 +745,69 @@ def ask_for_spg_and_unit_cell(logger):
     return proc_dict
 
 
+def get_script_dict(pipeline):
+    cmd = maxiv_header(pipeline)
+    cmd += modules_to_load(pipeline)
+    script_dict = {}
+    script_dict[pipeline+'_0.sh'] = cmd
+    script_dict[pipeline+'_1.sh'] = cmd
+    return script_dict
+
+def modules_to_load(pipeline):
+    module = ''
+    if pipeline.startswith('xia2'):
+        module = 'module load gopresto CCP4\n'
+    elif pipeline == 'autoproc':
+        module = 'module load gopresto BUSTER\n'
+    return module
+
+
+def maxiv_header(pipeline):
+    header = (
+        '#!/bin/bash\n'
+        '#SBATCH --time=24:00:00\n'
+        '#SBATCH --job-name={0!s}\n'.format(pipeline) +
+        '#SBATCH --cpus-per-task=48\n'
+        '#SBATCH --exclusive\n'
+        '#SBATCH --nodes=1\n'
+    )
+    return header
+
+
+def pipeline_cmd(pipeline, proc_dict):
+    extra_cmd = ''
+    if proc_dict['space_group']:
+        extra_cmd += 'space_group=' + proc_dict['space_group'] + ' '
+    if proc_dict['unit_cell']:
+        extra_cmd += 'unit_cell=' + proc_dict['unit_cell'] + ' '
+
+    cmd = ''
+    if pipeline.startswith('xia2dials'):
+        cmd = 'xia2 pipeline=dials image={0!s} {1!s}'.format(master_file, extra_cmd)
+    elif pipeline.startswith('xia2xds'):
+        cmd = 'xia2 pipeline=3dii image={0!s} {1!s}'.format(master_file, extra_cmd)
+    elif pipeline.startswith('autoproc'):
+        cmd = ''
+    return cmd
+
+
+def get_proc_folder(projectDir, sample, proposal, session, run, pipeline):
+    p = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline)
+    return p
+
+
+def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder):
+    if (counter % 2) == 0:
+        script_dict[pipeline + '_0.sh'] += 'cd ' + proc_folder + '\n'
+        script_dict[pipeline + '_0.sh'] += pipeline_cmd(pipeline, proc_dict)
+    else:
+        script_dict[pipeline + '_1.sh'] += 'cd ' + proc_folder + '\n'
+        script_dict[pipeline + '_1.sh'] += pipeline_cmd(pipeline, proc_dict)
+
+
+def save_proc_scripts(logger, projectDir, script_dict):
+    os.chdir(os.path.join(projectDir, 'tmp'))
+    for script in script_dict:
+        f = open(script, 'w')
+        f.write(script_dict[script])
+        f.close()
