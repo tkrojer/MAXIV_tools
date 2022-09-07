@@ -98,9 +98,13 @@ def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, r
 def get_processing_pipelines():
     pipelines = [
         'autoproc',
+        'autoproc_manual',
         'staraniso',
-        'xia2dials'
-#        'xia2xds'
+        'staraniso_manual',
+        'xia2dials',
+        'xia2dials_manual',
+        'xia2xds',
+        'xia2xds_manual'
     ]
     return pipelines
 
@@ -777,19 +781,22 @@ def maxiv_header(pipeline):
 
 
 def pipeline_cmd(pipeline, proc_dict, master_file):
-    extra_cmd = ''
+    extra_cmd_xia = ''
+    extra_cmd_autoproc = ''
     if proc_dict['space_group']:
-        extra_cmd += 'space_group=' + proc_dict['space_group'] + ' '
+        extra_cmd_xia += 'space_group=' + proc_dict['space_group'] + ' '
+        extra_cmd_autoproc +=  'symm="{0!s}"'.format(proc_dict['space_group']) + ' '
     if proc_dict['unit_cell']:
-        extra_cmd += 'unit_cell=' + proc_dict['unit_cell'] + ' '
+        extra_cmd_xia += 'unit_cell=' + proc_dict['unit_cell'] + ' '
+        extra_cmd_autoproc += 'cell="{0!s}"'.format(proc_dict['unit_cell'].replace(',', ' ')) + ' '
 
     cmd = ''
     if pipeline.startswith('xia2dials'):
-        cmd = 'xia2 pipeline=dials image={0!s} {1!s}'.format(master_file, extra_cmd)
+        cmd = 'xia2 pipeline=dials image={0!s} {1!s}'.format(master_file, extra_cmd_xia)
     elif pipeline.startswith('xia2xds'):
-        cmd = 'xia2 pipeline=3dii image={0!s} {1!s}'.format(master_file, extra_cmd)
+        cmd = 'xia2 pipeline=3dii image={0!s} {1!s}'.format(master_file, extra_cmd_xia)
     elif pipeline.startswith('autoproc'):
-        cmd = ''
+        cmd = 'process -h5 {0!s} {1!s}'.format(master_file, extra_cmd_autoproc)
     return cmd
 
 
