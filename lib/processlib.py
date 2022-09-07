@@ -745,13 +745,15 @@ def ask_for_spg_and_unit_cell(logger):
     return proc_dict
 
 
-def get_script_dict(pipeline):
+def get_script_dict(pipeline, n_jobs):
     cmd = maxiv_header(pipeline)
     cmd += modules_to_load(pipeline)
     script_dict = {}
-    script_dict[pipeline+'_0.sh'] = cmd
-    script_dict[pipeline+'_1.sh'] = cmd
+    for i in range(n_jobs):
+        script_dict[pipeline+'_{0!s}.sh'.format(i)] = cmd
+#    script_dict[pipeline+'_1.sh'] = cmd
     return script_dict
+
 
 def modules_to_load(pipeline):
     module = ''
@@ -797,12 +799,9 @@ def get_proc_folder(projectDir, sample, proposal, session, run, pipeline):
 
 
 def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file):
-    if (counter % 2) == 0:
-        script_dict[pipeline + '_0.sh'] += 'cd ' + proc_folder + '\n'
-        script_dict[pipeline + '_0.sh'] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
-    else:
-        script_dict[pipeline + '_1.sh'] += 'cd ' + proc_folder + '\n'
-        script_dict[pipeline + '_1.sh'] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
+    script_dict[pipeline + '_{0!s}.sh'.format(counter)] += 'cd ' + proc_folder + '\n'
+    script_dict[pipeline + '_{0!s}.sh'.format(counter)] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
+    return script_dict
 
 
 def save_proc_scripts(logger, projectDir, script_dict):

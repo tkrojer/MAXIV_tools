@@ -104,20 +104,24 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
     pipeline = proc_dict['pipeline'] + '_manual'
-    script_dict = processlib.get_script_dict(pipeline)
-    counter = 1
+    n_jobs = 4  # hardcoded so that we don't hog the cluster
+    script_dict = processlib.get_script_dict(pipeline, n_jobs)
+    counter = 0
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
         if sample in sampleList:
             logger.info('current sample - {0!s}'.format(sample))
             processlib.create_sample_folder(logger, projectDir, sample)
             for master_file in glob.glob(os.path.join(sample_folder, '*_master.h5')):
-                run = master_file[master_file.rfind('/')+1:].replace('_master.h5', '')
+                run = 'xds_ + 'master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
                 processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
                 processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
                 proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
-                processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file)
+                script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
+                                                                proc_folder, master_file)
                 counter += 1
+                if counter == n_jobs:
+                    counter = 0
     processlib.save_proc_scripts(logger, projectDir, script_dict)
     processlib.end_reprocessing(logger)
 
