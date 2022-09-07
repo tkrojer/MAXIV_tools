@@ -763,7 +763,7 @@ def modules_to_load(pipeline):
     module = ''
     if pipeline.startswith('xia2'):
         module = 'module load gopresto CCP4\n'
-    elif pipeline == 'autoproc':
+    elif pipeline.startswith('autoproc'):
         module = 'module load gopresto BUSTER\n'
     return module
 
