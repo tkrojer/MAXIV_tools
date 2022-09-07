@@ -113,7 +113,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
             logger.info('current sample - {0!s}'.format(sample))
             processlib.create_sample_folder(logger, projectDir, sample)
             for master_file in glob.glob(os.path.join(sample_folder, '*_master.h5')):
-                run = 'xds_ + 'master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
+                run = 'xds_' + master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
                 processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
                 processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
                 proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
