@@ -73,7 +73,7 @@ def main(argv):
 
     for opt, arg in opts:
         if opt == '-h':
-            processlib.usage()
+            compoundlib.usage()
             sys.exit(2)
         elif opt in ("-p", "--project"):
             projectDir = os.path.abspath(arg)

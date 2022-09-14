@@ -116,6 +116,21 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
         os.system('sbatch ' + script)
 
 
+def usage():
+    usage = (
+        '\n'
+        'usage:\n'
+        'ccp4-python 3-compound.py -p <project_dir> -f <fragmax_csv_file>\n'
+        '\n'
+        'additional command line options:\n'
+        '--project, -p\n'
+        '    project directory\n'
+        '--fragmax, -f\n'
+        '    fragmax summary csv file\n'
+        '--overwrite, -o\n'
+        '    flag to overwrite selected files\n'
+    )
+    print(usage)
 
 
 
