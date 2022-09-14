@@ -124,9 +124,9 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
 def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):
     proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
-    pipeline = proc_dict['pipeline'] + '_manual'
     n_jobs = 4  # hardcoded so that we don't hog the cluster
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    pipeline = proc_dict['pipeline'] + '_' + now
     script_dict = processlib.get_script_dict(pipeline, n_jobs, now)
     counter = 0
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
@@ -137,8 +137,8 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
             for master_file in glob.glob(os.path.join(sample_folder, '*_master.h5')):
                 run = 'xds_' + master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
                 processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
-                processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline + now)
-                proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline + now)
+                processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
+                proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
                 script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
                                                                 proc_folder, master_file, now)
                 counter += 1
