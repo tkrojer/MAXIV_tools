@@ -791,7 +791,7 @@ def modules_to_load(pipeline):
 def maxiv_header(pipeline):
     header = (
         '#!/bin/bash\n'
-        '#SBATCH --time=24:00:00\n'
+        '#SBATCH --time=99:00:00\n'
         '#SBATCH --job-name={0!s}\n'.format(pipeline) +
         '#SBATCH --cpus-per-task=48\n'
         '#SBATCH --exclusive\n'
