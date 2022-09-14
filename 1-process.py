@@ -63,17 +63,13 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
             mtzpath, mtz_extension, log_extension, cif_extension = processlib.get_pipeline_path(pipeline)
-            if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
-                continue
-
-
-
-
-
-#            if 'manual' in pipeline:
-
-            print(sample, mtzpath, pipeline)
+#            if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
+#                continue
             for mtzfile in glob.glob(os.path.join(sample_folder, '*', mtzpath)):
+                if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
+                                                                   pipeline):
+                    continue
+
                 logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
                 status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
@@ -83,6 +79,9 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                 protein, status, master, pipeline)
             # looking for manually processed datasets
             for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', pipeline + '_*', mtz_extension)):
+                if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
+                                                                   pipeline):
+                    continue
                 logger.info('found manually processed MTZ file: ' + mtzfile)
                 foundMTZ = True
                 status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
