@@ -84,7 +84,12 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
             # looking for manually processed datasets
             for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', pipeline + '_*', mtz_extension)):
                 logger.info('found manually processed MTZ file: ' + mtzfile)
-                sys.exit()
+                foundMTZ = True
+                status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
+                                                      run, pipeline, collection_date,
+                                                      mtz_extension, cif_extension, log_extension, status)
+                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
+                                                protein, status, master, pipeline)
 
 
     if not foundMTZ:
