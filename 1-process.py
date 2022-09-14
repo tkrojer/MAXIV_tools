@@ -23,6 +23,7 @@ import getopt
 import glob
 import sys
 import os
+from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import processlib
@@ -31,7 +32,7 @@ import processlib
 def select_results(logger, projectDir, select_criterion, overwrite):
     logger.info('selecting auto-processing results based on {0!s}'.format(select_criterion))
     ref_dict = processlib.read_reference_pdb_files(logger, projectDir)
-    for sample_folder in glob.glob(os.path.join(projectDir, '1-process', '*')):
+    for sample_folder in sorted(glob.glob(os.path.join(projectDir, '1-process', '*'))):
         proc_dict = {}
         os.chdir(sample_folder)
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
@@ -125,7 +126,8 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
     pipeline = proc_dict['pipeline'] + '_manual'
     n_jobs = 4  # hardcoded so that we don't hog the cluster
-    script_dict = processlib.get_script_dict(pipeline, n_jobs)
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    script_dict = processlib.get_script_dict(pipeline, n_jobs, now)
     counter = 0
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
@@ -135,8 +137,8 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
             for master_file in glob.glob(os.path.join(sample_folder, '*_master.h5')):
                 run = 'xds_' + master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
                 processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
-                processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
-                proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
+                processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline + now)
+                proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline + now)
                 script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
                                                                 proc_folder, master_file)
                 counter += 1

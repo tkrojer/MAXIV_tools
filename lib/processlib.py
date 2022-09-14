@@ -7,6 +7,7 @@ import logging
 import glob
 import sys
 from bz2 import BZ2File as bzopen
+from datetime import datetime
 
 
 def init_logger(logfile):
@@ -268,7 +269,6 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
     mtz_name = mtz.split('/')[len(mtz.split('/'))-1]
     log_name = log.split('/')[len(log.split('/'))-1]
     cif_name = cif.split('/')[len(cif.split('/'))-1]
-    logger.info('trying to run command /bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(mtz_name):
         os.system('/bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(log_name):
@@ -360,10 +360,10 @@ def get_status(logger, mtzfile, mtz, ciffile, status):
             status = 'OK'
             cif = cif_info(ciffile)
             if float(cif['Rmerge_I_obs_low']) > 0.15:
-                logger.error('Rmerge of {0!s} is too high'.format(cif['Rmerge_I_obs_low']))
+                logger.error('Rmerge of {0!s} is higher than 15%'.format(cif['Rmerge_I_obs_low']))
                 status = 'FAIL - high Rmerge (low)'
         elif float(mtzDict['resolution_high']) >= 2.8 and float(mtzDict['resolution_high']) < 3.2:
-            status = 'OK - medium resolution'
+            status = 'FAIL - medium resolution'
         else:
             status = 'FAIL - low resolution'
     else:
@@ -742,6 +742,7 @@ def get_proc_dict():
     }
     return proc_dict
 
+
 def ask_for_spg_and_unit_cell(logger):
     proc_dict = get_proc_dict()
     q = ''
@@ -768,12 +769,12 @@ def ask_for_spg_and_unit_cell(logger):
     return proc_dict
 
 
-def get_script_dict(pipeline, n_jobs):
+def get_script_dict(pipeline, n_jobs, now):
     cmd = maxiv_header(pipeline)
     cmd += modules_to_load(pipeline)
     script_dict = {}
     for i in range(n_jobs):
-        script_dict[pipeline+'_{0!s}.sh'.format(i)] = cmd
+        script_dict[pipeline+'_{0!s}_{1!s}.sh'.format(now, i)] = cmd
 #    script_dict[pipeline+'_1.sh'] = cmd
     return script_dict
 

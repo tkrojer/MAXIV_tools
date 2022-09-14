@@ -256,10 +256,12 @@ def get_compound_image(projectDir, sample, cpdID):
     return cpdImg
 
 
-def prepare_summary_worksheet(workbook, summary_worksheet, projectDir, fragmaxcsv, dataDict, pgDict, pgucvDict):
+def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv, dataDict, pgDict, pgucvDict):
+    logger.info('preparing summary worksheet...')
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
         cpdID = line.split(',')[1]
+        logger.info('current sample: ' + sample)
         dataDict = update_crystal_summary(dataDict, 'mounted')
         ciffile = os.path.join(projectDir, '1-process', sample, 'process.cif')
         mtzfile = os.path.join(projectDir, '1-process', sample, 'process.mtz')
@@ -311,13 +313,15 @@ def get_details_worksheet(workbook, n_autoproc_results):
     return worksheet
 
 
-def prepare_details_worksheet(workbook, details_worksheet, projectDir, fragmaxcsv):
+def prepare_details_worksheet(logger, workbook, details_worksheet, projectDir, fragmaxcsv):
+    logger.info('preparing details worksheet...')
     row = 1 # since it has a header
     color_one = '#f2ebeb'
     color_two = '#d9d2d2'
     color = color_one
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
+        logger.info('curren sample: ' + sample)
         for cif in glob.glob(os.path.join(projectDir, '1-process', sample, '*', '*', 'process.cif')):
             ciffile = cif
             mtzfile = cif.replace('process.cif', 'process.mtz')
@@ -376,6 +380,7 @@ def prepare_get_pg_ucv_worksheet(pg_ucv_worksheet):
 def print_pg_ucv_distribution(pgucvDict):
     df = pd.DataFrame(pgucvDict)
     pg_plot = sns.catplot(x="pointgroup", y="unitcell_volume", data=df)
+#    pg_plot = sns.catplot(x="pointgroup", y="unitcell_volume", data=df, kind="violin")
     plt.savefig('pg_ucv_distribution.png', dpi=300)
 
 
