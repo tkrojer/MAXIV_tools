@@ -142,7 +142,8 @@ def process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, s
     process_cif = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run),
                                pipeline, 'process.cif')
     if os.path.isfile(process_cif):
-        logger.warning('process.cif exists in {0!s}-{1!s}-{2!s}; skipping...'.format(proposal, session, run))
+        logger.warning('process.cif for {0!s} exists in {1!s}-{2!s}-{3!s}; skipping...'.format(
+            pipeline, proposal, session, run))
         skip = True
     return skip
 
