@@ -159,6 +159,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.info('found LOG file: ' + logfile)
     else:
         logger.error('cannot find LOG file')
+    logger.info('looking fir ciffile' + mtzfile.replace(mtz_extension, cif_extension))
     if os.path.isfile(mtzfile.replace(mtz_extension, cif_extension)):
         ciffile = mtzfile.replace(mtz_extension, cif_extension)
         logger.info('found CIF file: ' + ciffile)
