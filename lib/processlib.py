@@ -809,7 +809,7 @@ def pipeline_cmd(pipeline, proc_dict, master_file):
     if proc_dict['unit_cell']:
         extra_cmd_xia += 'unit_cell=' + proc_dict['unit_cell'] + ' '
         extra_cmd_autoproc += 'cell="{0!s}"'.format(proc_dict['unit_cell'].replace(',', ' ')) + ' '
-
+    print('pipeline', pipeline)
     cmd = ''
     if pipeline.startswith('xia2dials'):
         cmd = 'xia2 pipeline=dials image={0!s} {1!s}'.format(master_file, extra_cmd_xia)
