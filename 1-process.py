@@ -72,7 +72,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 #            if 'manual' in pipeline:
 
-            print(sample, mtzpath)
+            print(sample, mtzpath, pipeline)
             for mtzfile in glob.glob(os.path.join(sample_folder, '*', mtzpath)):
                 logger.info('found MTZ file')
                 foundMTZ = True

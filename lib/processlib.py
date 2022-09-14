@@ -98,13 +98,9 @@ def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, r
 def get_processing_pipelines():
     pipelines = [
         'autoproc',
-        'autoproc_manual',
         'staraniso',
-        'staraniso_manual',
         'xia2dials',
-        'xia2dials_manual',
         'xia2xds',
-        'xia2xds_manual'
     ]
     return pipelines
 
