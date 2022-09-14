@@ -379,6 +379,7 @@ def prepare_get_pg_ucv_worksheet(pg_ucv_worksheet):
 
 def print_pg_ucv_distribution(pgucvDict):
     df = pd.DataFrame(pgucvDict)
+    print(pgucvDict)
 #    pg_plot = sns.catplot(x="pointgroup", y="unitcell_volume", data=df)
     pg_plot = sns.catplot(x="pointgroup", y="unitcell_volume", data=df, kind="violin")
     plt.savefig('pg_ucv_distribution.png', dpi=300)
