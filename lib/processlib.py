@@ -167,7 +167,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     else:
         logger.error('cannot find CIF file')
     if logfile and ciffile:
-        mtzfile, logfile, ciffile = copy_files_to_project_folder(projectDir, sample, run, proposal, session, pipeline,
+        mtzfile, logfile, ciffile = copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
@@ -249,12 +249,13 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
     f.close()
 
 
-def copy_files_to_project_folder(projectDir, sample, run, proposal, session, pipeline,
+def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
                                  mtz, log, cif, collection_date, wavelength):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline))
     mtz_name = mtz.split('/')[len(mtz.split('/'))-1]
     log_name = log.split('/')[len(log.split('/'))-1]
     cif_name = cif.split('/')[len(cif.split('/'))-1]
+    logger.info('trying to run command /bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(mtz_name):
         os.system('/bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(log_name):
