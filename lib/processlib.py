@@ -105,6 +105,19 @@ def get_processing_pipelines():
     return pipelines
 
 
+def get_manual_pipeline_name(logger, pipeline, mtzfile):
+    manual_pipeline = None
+    tmp = mtzfile.split('/')
+    for item in tmp:
+        if item.startswith(pipeline + '_'):
+            manual_pipeline = item
+            logger.info('manual processing pipeline: ' + manual_pipeline)
+            break
+    if not manual_pipeline:
+        logger.error('cannot identify name of manual processing pipeline in file ' + mtzfile)
+    return manual_pipeline
+
+
 def get_pipeline_path(pipeline):
     mtzpath = None
     mtz_extension = None
