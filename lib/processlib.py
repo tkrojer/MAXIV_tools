@@ -155,13 +155,13 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     wavelength = mtz['wavelength']
     create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
     if os.path.isfile(mtzfile.replace(mtz_extension, log_extension)):
-        logger.info('found LOG file')
         logfile = mtzfile.replace(mtz_extension, log_extension)
+        logger.info('found LOG file: ' + logfile)
     else:
         logger.error('cannot find LOG file')
     if os.path.isfile(mtzfile.replace(mtz_extension, cif_extension)):
-        logger.info('found CIF file')
         ciffile = mtzfile.replace(mtz_extension, cif_extension)
+        logger.info('found CIF file: ' + ciffile)
     else:
         logger.error('cannot find CIF file')
     if logfile and ciffile:
@@ -170,6 +170,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
     status = get_status(logger, mtzfile, mtz, ciffile, status)
+    logger.info('current status: ' + status)
     return status
 
 

@@ -74,7 +74,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
             print(sample, mtzpath, pipeline)
             for mtzfile in glob.glob(os.path.join(sample_folder, '*', mtzpath)):
-                logger.info('found MTZ file')
+                logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
                 status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
@@ -93,7 +93,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 
     if not foundMTZ:
-        logger.warning('could not find any MTZ file!')
+        logger.warning('could not find any MTZ file for sample!')
         status = processlib.get_status(logger, None, None, None, status)
         processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                         protein, status, master, '')
