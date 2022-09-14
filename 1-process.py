@@ -140,7 +140,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
                 processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline + now)
                 proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline + now)
                 script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
-                                                                proc_folder, master_file)
+                                                                proc_folder, master_file, now)
                 counter += 1
                 if counter == n_jobs:
                     counter = 0
