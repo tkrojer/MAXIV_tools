@@ -65,7 +65,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
             mtzpath, mtz_extension, log_extension, cif_extension = processlib.get_pipeline_path(pipeline)
 #            if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
 #                continue
-            logger.info('manual: ' + os.path.join(projectDir, '1-process', sample, '*', pipeline + '_*', mtz_extension))
+#            logger.info('manual: ' + os.path.join(projectDir, '1-process', sample, '*', pipeline + '_*', mtz_extension))
             for mtzfile in glob.glob(os.path.join(sample_folder, '*', mtzpath)):
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
@@ -80,10 +80,10 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                 protein, status, master, pipeline)
             # looking for manually processed datasets
             for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', pipeline + '_*', mtz_extension)):
-                if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
-                                                                   pipeline):
-                    foundMTZ = True
-                    continue
+ #               if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
+ #                                                                  pipeline):
+ #                   foundMTZ = True
+ #                   continue
                 logger.info('found manually processed MTZ file: ' + mtzfile)
                 status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
