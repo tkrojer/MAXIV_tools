@@ -100,7 +100,7 @@ def get_processing_pipelines():
         'autoproc',
         'staraniso',
         'xia2dials',
-        'xia2xds',
+        'xia2xds'
     ]
     return pipelines
 
@@ -128,7 +128,7 @@ def get_pipeline_path(pipeline):
         mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
         log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
         cif_extension = 'DataFiles/xia2.mmcif.bz2'
-    elif pipeline == 'xia2dials':
+    elif pipeline == 'xia2xds':
 #        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtzpath = os.path.join('xia2XDS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
