@@ -127,7 +127,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     n_jobs = 4  # hardcoded so that we don't hog the cluster
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     pipeline = proc_dict['pipeline'] + '_' + now
-    script_dict = processlib.get_script_dict(pipeline, n_jobs, now)
+    script_dict = processlib.get_script_dict(pipeline, n_jobs)
     counter = 0
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
@@ -140,7 +140,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
                 processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
                 proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
                 script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
-                                                                proc_folder, master_file, now)
+                                                                proc_folder, master_file)
                 counter += 1
                 if counter == n_jobs:
                     counter = 0

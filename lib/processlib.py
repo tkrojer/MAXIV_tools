@@ -769,12 +769,12 @@ def ask_for_spg_and_unit_cell(logger):
     return proc_dict
 
 
-def get_script_dict(pipeline, n_jobs, now):
+def get_script_dict(pipeline, n_jobs):
     cmd = maxiv_header(pipeline)
     cmd += modules_to_load(pipeline)
     script_dict = {}
     for i in range(n_jobs):
-        script_dict[pipeline+'_{0!s}_{1!s}.sh'.format(now, i)] = cmd
+        script_dict[pipeline+'_{0!s}.sh'.format(i)] = cmd
 #    script_dict[pipeline+'_1.sh'] = cmd
     return script_dict
 
@@ -825,9 +825,9 @@ def get_proc_folder(projectDir, sample, proposal, session, run, pipeline):
     return p
 
 
-def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file, now):
-    script_dict[pipeline + '_{0!s}_{1!s}.sh'.format(now, counter)] += 'cd ' + proc_folder + '\n'
-    script_dict[pipeline + '_{0!s}_{1!s}.sh'.format(now, counter)] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
+def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file):
+    script_dict[pipeline + '_{0!s}.sh'.format(counter)] += 'cd ' + proc_folder + '\n'
+    script_dict[pipeline + '_{0!s}.sh'.format(counter)] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
     return script_dict
 
 
