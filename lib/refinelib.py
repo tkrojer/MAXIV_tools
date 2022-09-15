@@ -70,7 +70,7 @@ def suitable_reference_file_exists(logger, ref_dict, mtzDict):
         mtzref = ref_dict[pdb][3]
         ucv_diff = abs((ucv_mtz - ucv_pdb)) / ucv_pdb
         if pgr_mtz == pgr_pdb and lat_mtz == lat_pdb and ucv_diff < 0.1:
-            logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(p))
+            logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(pdb))
             pdbref = pdb
             break
     if not pdbin:
