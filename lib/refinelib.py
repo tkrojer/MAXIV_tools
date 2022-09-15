@@ -93,7 +93,7 @@ def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
     return continue_refinement
 
 
-def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter):
+def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter, software):
     logger.info('preparing script for initial refinement')
     cmd = maxiv_header(software)
     cmd += modules_to_load(software)
