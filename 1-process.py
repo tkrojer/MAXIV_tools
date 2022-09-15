@@ -82,7 +82,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
             # looking for manually processed datasets
             manual = pipeline
             if pipeline == 'staraniso':
-                manual = pipeline
+                manual = 'autoproc'
+            logger.info('pipeline: {0!s} - manual: {1!s}'.format(pipeline, manual))
             for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', manual + '_*', mtz_extension)):
                 manual_pipeline = processlib.get_manual_pipeline_name(logger, manual, mtzfile)
                 if pipeline == 'staraniso':
