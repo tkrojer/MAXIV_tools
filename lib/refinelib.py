@@ -73,7 +73,7 @@ def suitable_reference_file_exists(logger, ref_dict, mtzDict):
             logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(pdb))
             pdbref = pdb
             break
-    if not pdbin:
+    if not pdbref:
         logger.error('could not find a suitable reference PDB file for MTZ file')
     return pdbref, mtzref
 
