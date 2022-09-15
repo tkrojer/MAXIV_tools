@@ -92,19 +92,16 @@ def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
     return continue_refinement
 
 
-def prepare_script_for_init_refine(logger, projectDir, sample, pdbin, mtzin, now, submitList):
-    print('hallo')
-
-
-
-def modules_to_load(software):
-    if software == 'dimple':
-        module = 'module load gopresto CCP4\n'
-    elif software == 'pipedream':
-        module = 'module load gopresto BUSTER\n'
-    elif software == 'phenix':
-        module = 'module load gopresto Phenix\n'
-    return module
+def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter):
+    logger.info('preparing script for initial refinement')
+    cmd = maxiv_header(software)
+    cmd += modules_to_load(software)
+    cmd += init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref)
+    os.chdir(os.path.join(projectDir, 'tmp'))
+    submitList.append('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter))
+    f = open('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter), 'w')
+    f.write(cmd)
+    f.close()
 
 
 def maxiv_header(software):
@@ -117,6 +114,16 @@ def maxiv_header(software):
     return header
 
 
+def modules_to_load(software):
+    if software == 'dimple':
+        module = 'module load gopresto CCP4\n'
+    elif software == 'pipedream':
+        module = 'module load gopresto BUSTER\n'
+    elif software == 'phenix':
+        module = 'module load gopresto Phenix\n'
+    return module
+
+
 def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref):
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
@@ -126,3 +133,11 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref):
     elif software == 'phenix':
         cmd += ''
     return cmd
+
+
+def submit_jobs_to_cluster(logger, projectDir, submitList):
+    logger.info('submitting jobs to MAXIV cluster...')
+    os.chdir(os.path.join(projectDir, 'tmp'))
+    for script in submitList:
+        logger.info('submitting ' + script)
+        os.system('sbatch ' + script)

@@ -32,6 +32,7 @@ import processlib
 def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
     ref_dict = refinelib.get_reference_file_information(logger, projectDir)
     submitList = []
+    counter = 0
     for l in open(fragmaxcsv):
         sample = l.split(',')[0]
         logger.info('current sample ' + sample)
@@ -42,7 +43,16 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
             if pdbin:
                 if projectDir.initial_refinement_exists(logger, projectDir, sample, software, overwrite):
                     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                    refinelib.prepare_script_for_init_refine(logger, projectDir, sample, pdbin, mtzin, now, submitList)
+                    refinelib.prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref,
+                                                             now, submitList, counter)
+                    counter += 1
+    if submitList:
+        logger.info('there are {0!s} {1!s} jobs to submit'.format(len(submitList), software))
+        processlib.check_if_to_continue(logger)
+        refinelib.submit_jobs_to_cluster(logger, projectDir, submitList)
+    else:
+        logger.warning('there are no jobs to submit; if this is unexpected, check messages above!')
+
 
 
 
@@ -55,10 +65,8 @@ def main(argv):
     software = 'dimple'
     logger = processlib.init_logger('2-initial_refine.log')
     processlib.start_logging(logger, '2-initial_refine.py')
-
-
     try:
-        opts, args = getopt.getopt(argv,"p:f:s:ho",["project=", "fragmax=", "software=", "help", "overwrite"])
+        opts, args = getopt.getopt(argv, "p:f:s:ho", ["project=", "fragmax=", "software=", "help", "overwrite"])
     except getopt.GetoptError:
         refinelib.usage()
         sys.exit(2)
