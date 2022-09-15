@@ -36,7 +36,7 @@ def get_reference_file_information(logger, projectDir):
     ref_dict = {}
     for pdbfile in glob.glob(os.path.join(projectDir, '0-model', '*pdb')):
         pdb = pdbfile[pdbfile.rfind('/')+1:]
-        mtz = None
+        mtz = ''
         structure = gemmi.read_pdb(pdbfile)
         unitcell = structure.cell
         unitcell_volume = unitcell.volume
