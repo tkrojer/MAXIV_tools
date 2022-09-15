@@ -22,6 +22,15 @@ def usage():
     print(usage)
 
 
+def create_sample_folder(logger, projectDir, sample):
+    os.chdir(os.path.join(projectDir, '2-initial_refine'))
+    if os.path.isdir(sample):
+        logger.warning('sample folder exists')
+    else:
+        logger.info('creating folder {0!s} in 2-initial_refine')
+        os.mkdir(sample)
+
+
 def get_reference_file_information(logger, projectDir):
     logger.info('looking for reference files in {0!s}/0-model...'.format(projectDir))
     ref_dict = {}

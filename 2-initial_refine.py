@@ -43,6 +43,7 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
             if pdbref:
                 if refinelib.initial_refinement_exists(logger, projectDir, sample, software, overwrite):
                     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    refinelib.create_sample_folder(logger, projectDir, sample)
                     refinelib.prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref,
                                                              now, submitList, counter, software)
                     counter += 1
