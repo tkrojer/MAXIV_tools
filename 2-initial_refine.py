@@ -40,7 +40,7 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
             mtzin = os.path.join(projectDir, '1-process', sample, 'process.mtz')
             mtzDict = processlib.mtz_info(mtzin)
             pdbref, mtzref = refinelib.suitable_reference_file_exists(logger, ref_dict, mtzDict)
-            if pdbin:
+            if pdbref:
                 if projectDir.initial_refinement_exists(logger, projectDir, sample, software, overwrite):
                     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
                     refinelib.prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref,
