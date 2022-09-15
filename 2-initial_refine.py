@@ -85,7 +85,7 @@ def main(argv):
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
-    make_restraints(logger, projectDir, fragmaxcsv, software, overwrite)
+    run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
 
 #    if checks_passed:
 #        processlib.check_if_to_continue(logger)

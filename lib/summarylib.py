@@ -119,20 +119,39 @@ def update_point_group_dict(cif, pgDict):
     return pgDict
 
 
-def get_point_group_ucv_dict():
-    pgucvDict = {
+def get_point_group_info_dict():
+    pginfoDict = {
         'pointgroup': [],
-        'unitcell_volume': []
+        'unitcell_volume': [],
+        'Rmerge_I_obs_low': []
     }
-    return pgucvDict
+    return pginfoDict
 
 
-def update_point_group_ucv_dict(cif, pgucvDict):
+def update_point_group_info_dict(cif, pginfoDict):
     pg = cif['lattice'] + cif['point_group']
     ucv = int(cif['unitcell_volume'])
-    pgucvDict['pointgroup'].append(pg)
-    pgucvDict['unitcell_volume'].append(ucv)
-    return pgucvDict
+    rmergelow = float(cif['Rmerge_I_obs_low'])
+    pginfoDict['pointgroup'].append(pg)
+    pginfoDict['unitcell_volume'].append(ucv)
+    pginfoDict['Rmerge_I_obs_low'].append(rmergelow)
+    return pginfoDict
+
+
+#def get_point_group_rmerge_low_dict():
+#    pgrmergelowDict = {
+#        'pointgroup': [],
+#        'Rmerge_I_obs_low': []
+#    }
+#    return pgrmergelowDict
+
+
+#def update_point_group_rmerge_low_dict(cif, pgrmergelowDict):
+#    pg = cif['lattice'] + cif['point_group']
+#    rmergelow = float(cif['Rmerge_I_obs_low'])
+#    pgrmergelowDict['pointgroup'].append(pg)
+#    pgrmergelowDict['Rmerge_I_obs_low'].append(rmergelow)
+#    return pgrmergelowDict
 
 
 def get_crystal_analysis_dict():
@@ -145,6 +164,9 @@ def get_crystal_analysis_dict():
     }
     return dataDict
 
+def get_status_dict():
+    statusDict = {}
+    return statusDict
 
 def update_crystal_summary(dataDict, field):
     dataDict[field] += 1
@@ -256,7 +278,28 @@ def get_compound_image(projectDir, sample, cpdID):
     return cpdImg
 
 
-def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv, dataDict, pgDict, pgucvDict):
+def check_aux_csv_file(auxcsv, sample, cif):
+    if os.path.isfile(auxcsv):
+        for line in open(auxcsv):
+            sampleID = line.split(',')[0]
+            statusEntry = line.split(',')[1].replace('\n', '')
+            if sampleID == sample:
+                cif['status'] = statusEntry
+    return cif
+
+
+def update_status_dict(statusDict, cif):
+    status = cif['status']
+    if cif['status'] == '':
+        status = 'unknown'
+    if status not in statusDict:
+        statusDict[status] = 0
+    statusDict[status] += 1
+    return statusDict
+
+
+def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
+                              dataDict, pgDict, pginfoDict, statusDict, auxcsv):
     logger.info('preparing summary worksheet...')
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
@@ -279,17 +322,21 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
             cif.update(jso)
             dataDict = analyse_resolution(dataDict, cif)
             pgDict = update_point_group_dict(cif, pgDict)
-            pgucvDict = update_point_group_ucv_dict(cif, pgucvDict)
+            pginfoDict = update_point_group_info_dict(cif, pginfoDict)
         elif os.path.isfile(jsofile) and not os.path.isfile(ciffile):
             jso = get_json_as_dict(jsofile)
             cif = get_semi_blank_cif()
             cif.update(jso)
         else:
             cif = get_blank_cif()
+            cif = check_aux_csv_file(auxcsv, sample, cif)
         row = n + 3
         add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg)
-    if pgucvDict:
-        print_pg_ucv_distribution(pgucvDict)
+        statusDict = update_status_dict(statusDict, cif)
+    if pginfoDict:
+        print_pg_ucv_distribution(pginfoDict)
+        print_pg_rmergelow_distribution(pginfoDict)
+    return statusDict
 
 
 def get_details_worksheet(workbook, n_autoproc_results):
@@ -376,12 +423,28 @@ def prepare_get_pg_ucv_worksheet(pg_ucv_worksheet):
         pg_ucv_worksheet.insert_image('A1', 'pg_ucv_distribution.png')
 
 
-
 def print_pg_ucv_distribution(pgucvDict):
     df = pd.DataFrame(pgucvDict)
     pg_plot = sns.catplot(x="pointgroup", y="unitcell_volume", data=df)
 #    pg_plot = sns.catplot(x="pointgroup", y="unitcell_volume", data=df, kind="violin")
     plt.savefig('pg_ucv_distribution.png', dpi=300)
+
+
+def get_pg_rmergelow_worksheet(workbook):
+    worksheet = workbook.add_worksheet('PG-RmergeLow')
+    return worksheet
+
+
+def prepare_get_pg_rmergelow_worksheet(pg_ucv_worksheet):
+    if os.path.isfile('pg_ucv_distribution.png'):
+        pg_ucv_worksheet.insert_image('A1', 'pg_rmergelow_distribution.png')
+
+
+def print_pg_rmergelow_distribution(pgucvDict):
+    df = pd.DataFrame(pgucvDict)
+    pg_plot = sns.catplot(x="pointgroup", y="Rmerge_I_obs_low", data=df)
+#    pg_plot = sns.catplot(x="pointgroup", y="Rmerge_I_obs_low", data=df, kind="violin")
+    plt.savefig('pg_rmergelow_distribution.png', dpi=300)
 
 
 def analyse_resolution(dataDict, cif):
@@ -437,4 +500,21 @@ def prepare_laue_group_chart(workbook, chart_data, pgDict):
     chartsheet_pg.set_chart(chart_pg)
 
 
-#def prepare_dozor_thumbnail()
+def prepare_status_chart(workbook, chart_data, statusDict):
+    n = 0
+    for n, field in enumerate(statusDict):
+        chart_data.write(number_to_column(n + 1) + '7', field)
+        chart_data.write(number_to_column(n + 1) + '8', statusDict[field])
+    chartsheet_status = workbook.add_chartsheet('status')
+    chart_status = workbook.add_chart({'type': 'pie'})
+
+    chart_status.add_series({
+        'categories': ['chart data', 6, 0, 6, n],
+        'values': ['chart data', 7, 0, 7, n],
+        'line': {'color': 'black'},
+        'data_labels': {'value': True},
+    })
+    chart_status.set_title({'name': 'status'})
+    chart_status.set_legend({'font': {'size': 20, 'bold': True}})
+    #    chart_pg.set_legend({'none': True})
+    chartsheet_status.set_chart(chart_status)

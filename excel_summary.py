@@ -31,22 +31,29 @@ import processlib
 import summarylib
 
 
-def parse_project_directory(logger, projectDir, fragmaxcsv):
+def parse_project_directory(logger, projectDir, fragmaxcsv, auxcsv):
     dataDict = summarylib.get_crystal_analysis_dict()
+    statusDict = summarylib.get_status_dict()
     pgDict = summarylib.get_point_group_dict()
-    pgucvDict = summarylib.get_point_group_ucv_dict()
+    pginfoDict = summarylib.get_point_group_info_dict()
+
     workbook = summarylib.init_workbook()
     n_samples = summarylib.get_n_samples(fragmaxcsv)
     n_autoproc_results = summarylib.n_autoproc_results(projectDir)
     summary_worksheet = summarylib.get_summary_worksheet(workbook, n_samples)
     details_worksheet = summarylib.get_details_worksheet(workbook, n_autoproc_results)
     pg_ucv_worksheet = summarylib.get_pg_ucv_worksheet(workbook)
+    pg_rmergelow_worksheet = summarylib.get_pg_rmergelow_worksheet(workbook)
+
     chart_data = summarylib.get_chart_data_sheet(workbook)
-    summarylib.prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv, dataDict, pgDict, pgucvDict)
+    summarylib.prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
+                                         dataDict, pgDict, pginfoDict, statusDict, auxcsv)
     summarylib.prepare_details_worksheet(logger, workbook, details_worksheet, projectDir, fragmaxcsv)
     summarylib.prepare_get_pg_ucv_worksheet(pg_ucv_worksheet)
+    summarylib.prepare_get_pg_rmergelow_worksheet(pg_rmergelow_worksheet)
     summarylib.prepare_crystal_chart(workbook, chart_data, dataDict)
     summarylib.prepare_laue_group_chart(workbook, chart_data, pgDict)
+    summarylib.prepare_status_chart(workbook, chart_data, statusDict)
     workbook.close()
 
 
@@ -77,7 +84,7 @@ def main(argv):
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
-    parse_project_directory(logger, projectDir, fragmaxcsv)
+    parse_project_directory(logger, projectDir, fragmaxcsv, auxcsv)
 
 #    if checks_passed:
 #        processlib.check_if_to_continue(logger)
