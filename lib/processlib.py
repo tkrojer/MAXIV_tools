@@ -456,6 +456,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_d
                     logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(p))
                     match_dict[f] = proc_dict[f]
                     break
+            logger.warning('no match found!')
     else:
         logger.warning('seems like no reference PDB files were provided; skipping this selection step...')
     if match_dict:
