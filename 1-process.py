@@ -45,7 +45,10 @@ def select_results(logger, projectDir, select_criterion, overwrite):
             proc_dict = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict)
             proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
             best = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
-            processlib.link_process_results(logger, projectDir, sample, best)
+            if best:
+                processlib.link_process_results(logger, projectDir, sample, best)
+            else:
+                logger.error('None of MTZ files fulfilled the minimal requirements; check messages aboove')
         else:
             logger.error('could not find any MTZ or CIF in sample folder')
             processlib.link_info_json_file(logger, projectDir, sample)
