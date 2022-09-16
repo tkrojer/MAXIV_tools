@@ -443,6 +443,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_d
     match_dict = {}
     if ref_dict:
         for f in proc_dict:
+            logger.info('current CIF ' + f)
             pgr_mtz = proc_dict[f]['point_group']
             ucv_mtz = float(proc_dict[f]['unitcell_volume'])
             lat_mtz = proc_dict[f]['lattice']
