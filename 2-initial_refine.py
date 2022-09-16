@@ -56,6 +56,21 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
 
 
 
+def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite):
+    for l in open(fragmaxcsv):
+        sample = l.split(',')[0]
+        logger.info('current sample ' + sample)
+        if os.path.isdir(os.path.join(projectDir, '2-initial_refine', sample)):
+            os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
+            if os.path.isfile('init.pdb') and not overwrite:
+                os.system('/bin/rm -f init.*')
+            else:
+                if os.path.isfile(os.path.join(software, 'final.pdb')):
+                    os.system('ln -s {0!s} init.pdb'.format(os.path.join(software, 'final.pdb')))
+                if os.path.isfile(os.path.join(software, 'final.mtz')):
+                    os.system('ln -s {0!s} init.mtz'.format(os.path.join(software, 'final.mtz')))
+                if os.path.isfile(os.path.join(software, 'final.mmcif')):
+                    os.system('ln -s {0!s} init.mmcif'.format(os.path.join(software, 'final.mmcif')))
 
 
 def main(argv):
@@ -67,7 +82,7 @@ def main(argv):
     logger = processlib.init_logger('2-initial_refine.log')
     processlib.start_logging(logger, '2-initial_refine.py')
     try:
-        opts, args = getopt.getopt(argv, "p:f:s:ho", ["project=", "fragmax=", "software=", "help", "overwrite"])
+        opts, args = getopt.getopt(argv, "p:f:s:hol", ["project=", "fragmax=", "software=", "help", "overwrite", "link"])
     except getopt.GetoptError:
         refinelib.usage()
         sys.exit(2)
@@ -82,11 +97,16 @@ def main(argv):
             fragmaxcsv = os.path.abspath(arg)
         elif opt in ("-o", "--overwrite"):
             overwrite = True
+        elif opt in ("-l", "--link"):
+            linkrefine = True
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
-    run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
+    if linkrefine:
+        link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite)
+    else:
+        run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
 
 #    if checks_passed:
 #        processlib.check_if_to_continue(logger)

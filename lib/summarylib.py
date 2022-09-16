@@ -13,6 +13,7 @@ import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import processlib
+import refinelib
 
 
 def init_workbook():
@@ -239,7 +240,8 @@ def get_summary_worksheet(workbook, n_samples):
     worksheet.merge_range('A1:E1', 'Data Collection', merge_format)
     worksheet.merge_range('F1:N1', 'Data Processing', merge_format)
     worksheet.merge_range('O1:P1', 'Compound', merge_format)
-    worksheet.add_table('A2:P{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
+    worksheet.merge_range('Q1:X1', 'Initial Refinement', merge_format)
+    worksheet.add_table('A2:X{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
                                                                       {'header': 'Date'},
                                                                       {'header': 'Proposal'},
                                                                       {'header': 'Session'},
@@ -254,7 +256,15 @@ def get_summary_worksheet(workbook, n_samples):
                                                                       {'header': 'Unit Cell'},
                                                                       {'header': 'Status'},
                                                                       {'header': 'Compound ID'},
-                                                                      {'header': 'Compound'}
+                                                                      {'header': 'Compound'},
+                                                                      {'header': 'Pipeline'},
+                                                                      {'header': 'Spacegroup'},
+                                                                      {'header': 'Resolution'},
+                                                                      {'header': 'Rcryst'},
+                                                                      {'header': 'Rfree'},
+                                                                      {'header': 'rmsd bonds'},
+                                                                      {'header': 'rmsd angles'},
+                                                                      {'header': 'blobs'},
                                                                       ]})
     worksheet.freeze_panes(2, 1)
     worksheet.set_column('E:E', 17)
@@ -309,6 +319,9 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
         ciffile = os.path.join(projectDir, '1-process', sample, 'process.cif')
         mtzfile = os.path.join(projectDir, '1-process', sample, 'process.mtz')
         jsofile = os.path.join(projectDir, '1-process', sample, 'info.json')
+        initrefcif = os.path.join(projectDir, '2-initial_refine', sample, 'init.mmcif')
+        initrefmtz = os.path.join(projectDir, '2-initial_refine', sample, 'init.mtz')
+        initrefpdb = os.path.join(projectDir, '2-initial_refine', sample, 'init.pdb')
         dozor = None
         cpdImg = get_compound_image(projectDir, sample, cpdID)
         if os.path.isfile(jsofile):
@@ -323,6 +336,13 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
             dataDict = analyse_resolution(dataDict, cif)
             pgDict = update_point_group_dict(cif, pgDict)
             pginfoDict = update_point_group_info_dict(cif, pginfoDict)
+            if os.path.isfile(initrefcif) and os.path.isfile(initrefmtz) and os.path.isfile(initrefpdb):
+                cif.update(refinelib.structure_cif_info(initrefcif))
+                blobList = refinelib.find_blobs(initrefmtz, initrefpdb)
+                if blobList:
+                    cif['blobs'] = str(len(blobList))
+                else:
+                    cif['blobs'] = '0'
         elif os.path.isfile(jsofile) and not os.path.isfile(ciffile):
             jso = get_json_as_dict(jsofile)
             cif = get_semi_blank_cif()

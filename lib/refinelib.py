@@ -1,5 +1,7 @@
 import glob
 import os
+import sys
+
 import gemmi
 
 
@@ -151,3 +153,46 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     for script in submitList:
         logger.info('submitting ' + script)
         os.system('sbatch ' + script)
+
+
+def structure_cif_info(cif):
+    cifDict = {
+        'ls_d_res_high': '',
+        'ls_R_factor_R_work': '',
+        'ls_R_factor_R_free': '',
+        'initref_software': '',
+        'initref_spacegroup': '',
+        'r_bond_refined_d': '',
+        'r_angle_refined_deg': ''
+    }
+    doc = gemmi.cif.read_file(cif)
+    for block in doc:
+        if block.find_pair('_refine.ls_d_res_high'):
+            cifDict['ls_d_res_high'] = str(block.find_pair('_refine.ls_d_res_high')[1])
+        if block.find_pair('_refine.ls_R_factor_R_work'):
+            cifDict['ls_R_factor_R_work'] = str(block.find_pair('_refine.ls_R_factor_R_work')[1])
+        if block.find_pair('_refine.ls_R_factor_R_free'):
+            cifDict['ls_R_factor_R_free'] = str(block.find_pair('_refine.ls_R_factor_R_free')[1])
+        if block.find_pair('_software.name'):
+            cifDict['initref_software'] = str(block.find_pair('_software.name')[1])
+        if block.find_pair('_symmetry.space_group_name_H-M'):
+            cifDict['initref_spacegroup'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
+        if block.find_loop('_refine_ls_restr.type'):
+            table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
+            cifDict['r_bond_refined_d'] = str(list(table.find_row('r_bond_refined_d'))[1])
+            cifDict['r_angle_refined_deg'] = str(list(table.find_row('r_angle_refined_deg'))[1])
+    return cifDict
+
+
+def find_blobs(mtzfile, pdbfile):
+    blobList = []
+    mtz = gemmi.read_mtz_file(mtzfile)
+    grid = mtz.transform_f_phi_to_map('FWT', 'PHWT', sample_rate=3)
+    st = gemmi.read_structure(pdbfile)
+    st.remove_waters()
+    masker = gemmi.SolventMasker(gemmi.AtomicRadiiSet.Constant, 1.75)
+    masker.set_to_zero(grid, st[0])
+    blobs = gemmi.find_blobs_by_flood_fill(grid, cutoff=0.6, min_volume=7, min_score=0, min_peak=0)
+    for blob in blobs:
+        blobList.append(blob.volume)
+    return blobList
