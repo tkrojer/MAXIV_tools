@@ -10,6 +10,11 @@ from bz2 import BZ2File as bzopen
 from datetime import datetime
 
 
+def max_allowed_Rmerge_I_obs_low():
+    Rmerge_I_obs_low = 0.25
+    return Rmerge_I_obs_low
+
+
 def init_logger(logfile):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -463,7 +468,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_dict):
     logger.info('checking of auto-processing MTZ files have low resolution Rmerge values below 10%...')
     match_dict = {}
     for f in proc_dict:
-        if float(proc_dict[f]['Rmerge_I_obs_low']) < 0.1:
+        if float(proc_dict[f]['Rmerge_I_obs_low']) < max_allowed_Rmerge_I_obs_low():
             logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
             match_dict[f] = proc_dict[f]
         else:
@@ -471,8 +476,9 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_dict):
     if match_dict:
         proc_dict = match_dict
     else:
-        logger.warning('did not find any MTZ file with Rmerge (low) below 10%')
-        logger.info('will continue anyway...')
+        logger.error('did not find any MTZ file with Rmerge (low) below {0!s}; skipping sample...'.format(
+            max_allowed_Rmerge_I_obs_low()))
+        proc_dict = {}
     return proc_dict
 
 

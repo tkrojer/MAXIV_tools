@@ -11,7 +11,7 @@ def create_sample_folder(logger, projectDir, sample):
     if os.path.isdir(sample):
         logger.warning('sample folder exists')
     else:
-        logger.info('creating folder {0!s} in 1-process')
+        logger.info('creating folder {0!s} in 3-compound')
         os.mkdir(sample)
 
 
