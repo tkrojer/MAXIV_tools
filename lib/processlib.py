@@ -197,6 +197,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
 
 def get_timestamp_from_master_file(sample_folder, run):
     master = None
+    t_stamp = None
     raw_folder = sample_folder.replace("process", "raw")
     master_file = run[4:-1] + "master.h5"
     if os.path.isfile(os.path.join(raw_folder, master_file)):
