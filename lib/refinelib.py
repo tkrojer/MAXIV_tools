@@ -192,7 +192,7 @@ def find_blobs(mtzfile, pdbfile):
     st.remove_waters()
     masker = gemmi.SolventMasker(gemmi.AtomicRadiiSet.Constant, 1.75)
     masker.set_to_zero(grid, st[0])
-    blobs = gemmi.find_blobs_by_flood_fill(grid, cutoff=0.6, min_volume=7, min_score=0, min_peak=0)
+    blobs = gemmi.find_blobs_by_flood_fill(grid, cutoff=0.6, min_volume=8, min_score=0, min_peak=0)
     for blob in blobs:
         blobList.append(blob.volume)
     return blobList

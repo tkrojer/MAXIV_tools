@@ -64,6 +64,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         logger.info('checking run {0!s}'.format(run))
         processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir)
         collection_date, master = processlib.get_timestamp_from_master_file(sample_folder, run)
+        if not master:  # this may happen if there is a run folder, but without image files
+            continue
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
             mtzpath, mtz_extension, log_extension, cif_extension = processlib.get_pipeline_path(pipeline)

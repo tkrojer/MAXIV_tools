@@ -202,7 +202,7 @@ def get_unit_cell_string(cif):
     return uc
 
 
-def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cpdImg):
+def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cpdImg, soaktime):
     worksheet.set_row(row, 80)
     cell_format = cell_format_settings(workbook, cif)
     unitcell = get_unit_cell_string(cif)
@@ -257,6 +257,7 @@ def get_summary_worksheet(workbook, n_samples):
                                                                       {'header': 'Status'},
                                                                       {'header': 'Compound ID'},
                                                                       {'header': 'Compound'},
+                                                                      {'header': 'Soak time (h)'},
                                                                       {'header': 'Pipeline'},
                                                                       {'header': 'Spacegroup'},
                                                                       {'header': 'Resolution'},
@@ -314,6 +315,7 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
         cpdID = line.split(',')[1]
+        soaktime = line.split(',')[5]
         logger.info('current sample: ' + sample)
         dataDict = update_crystal_summary(dataDict, 'mounted')
         ciffile = os.path.join(projectDir, '1-process', sample, 'process.cif')
@@ -351,7 +353,7 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
             cif = get_blank_cif()
             cif = check_aux_csv_file(auxcsv, sample, cif)
         row = n + 3
-        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg)
+        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg, soaktime)
         statusDict = update_status_dict(statusDict, cif)
     if pginfoDict:
         print_pg_ucv_distribution(pginfoDict)
