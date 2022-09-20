@@ -77,7 +77,7 @@ def main(argv):
 
 
     try:
-        opts, args = getopt.getopt(argv,"p:f:l:ho",["project=", "fragmax=", "linkpandda=", "help", "overwrite"])
+        opts, args = getopt.getopt(argv,"p:f:l:d:ho",["project=", "fragmax=", "linkpandda=", "panddadir=", "help", "overwrite"])
     except getopt.GetoptError:
         compoundlib.usage()
         sys.exit(2)
@@ -94,6 +94,8 @@ def main(argv):
             overwrite = True
         elif opt in ("-l", "--linkpandda"):
             linkpandda = True
+        elif opt in ("-d", "--panddadir"):
+            panddaDir = os.path.abspath(arg)
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
