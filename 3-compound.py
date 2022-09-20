@@ -61,8 +61,8 @@ def make_links_to_pandda_folder(logger, projectDir, panddaDir):
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
         logger.info('current sample: ' + sample)
         os.chdir(os.path.join(sample_folder, 'ligand_files'))
-        print('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
-        print('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
+        os.system('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+        os.system('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
 
 
 def main(argv):
