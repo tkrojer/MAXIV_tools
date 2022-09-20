@@ -54,12 +54,23 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
         logger.warning('there are no jobs to submit; if this is unexpected, check messages above!')
 
 
+def make_links_to_pandda_folder(logger, projectDir, panddaDir):
+    logger.info('making links from 3-compounds to {0!s}'.format(panddaDir))
+    os.chdir(os.path.join(panddaDir, 'processed_datasets'))
+    for sample_folder in glob.glob(os.path.join(panddaDir, 'processed_datasets', '*')):
+        sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
+        logger.info('current sample: ' + sample)
+        os.chdir(os.path.join(sample_folder, 'ligand_files'))
+        print('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+        print('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
+
+
 def main(argv):
     projectDir = ''
     fragmaxcsv = ''
     panddaDir = ''
     overwrite = False
-    linkrefine = False
+    linkpandda = False
     software = 'acedrg'
     logger = processlib.init_logger('3-compound.log')
     processlib.start_logging(logger, '3-compound.py')
@@ -81,11 +92,16 @@ def main(argv):
             fragmaxcsv = os.path.abspath(arg)
         elif opt in ("-o", "--overwrite"):
             overwrite = True
+        elif opt in ("-l", "--linkpandda"):
+            linkpandda = True
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
-    make_restraints(logger, projectDir, fragmaxcsv, software, overwrite)
+    if linkpandda:
+        make_links_to_pandda_folder(logger, projectDir, panddaDir)
+    else:
+        make_restraints(logger, projectDir, fragmaxcsv, software, overwrite)
 
 #    if checks_passed:
 #        processlib.check_if_to_continue(logger)

@@ -50,7 +50,15 @@ def get_blank_cif():
         'Rmerge_I_obs_low': '',
         'meanI_over_sigI_obs_high': '',
         'unitcell': '',
-        'space_group': ''
+        'space_group': '',
+        'initref_software': '',
+        'initref_spacegroup': '',
+        'ls_d_res_high': '',
+        'ls_R_factor_R_work': '',
+        'ls_R_factor_R_free': '',
+        'r_bond_refined_d': '',
+        'r_angle_refined_deg': '',
+        'blobs': ''
     }
     return cif
 
@@ -64,7 +72,29 @@ def get_semi_blank_cif():
         'Rmerge_I_obs_low': '',
         'meanI_over_sigI_obs_high': '',
         'unitcell': '',
-        'space_group': ''
+        'space_group': '',
+        'initref_software': '',
+        'initref_spacegroup': '',
+        'ls_d_res_high': '',
+        'ls_R_factor_R_work': '',
+        'ls_R_factor_R_free': '',
+        'r_bond_refined_d': '',
+        'r_angle_refined_deg': '',
+        'blobs': ''
+    }
+    return cif
+
+
+def get_blank_init_refine_cif():
+    cif = {
+        'initref_software': '',
+        'initref_spacegroup': '',
+        'ls_d_res_high': '',
+        'ls_R_factor_R_work': '',
+        'ls_R_factor_R_free': '',
+        'r_bond_refined_d': '',
+        'r_angle_refined_deg': '',
+        'blobs': ''
     }
     return cif
 
@@ -202,7 +232,7 @@ def get_unit_cell_string(cif):
     return uc
 
 
-def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cpdImg, soaktime):
+def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cpdImg):
     worksheet.set_row(row, 80)
     cell_format = cell_format_settings(workbook, cif)
     unitcell = get_unit_cell_string(cif)
@@ -226,6 +256,18 @@ def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cp
     worksheet.write('O' + str(row), cpdID, cell_format)
     if cpdImg:
         worksheet.insert_image('P' + str(row), cpdImg, {'x_scale': 0.3, 'y_scale': 0.35})
+    worksheet.write('Q' + str(row), cif['soaktime'], cell_format)
+
+
+    worksheet.write('R' + str(row), cif['initref_software'], cell_format)
+    worksheet.write('S' + str(row), cif['initref_spacegroup'], cell_format)
+#    worksheet.write('T' + str(row), cif[''], cell_format)
+    worksheet.write('U' + str(row), cif['ls_d_res_high'], cell_format)
+    worksheet.write('V' + str(row), cif['ls_R_factor_R_work'], cell_format)
+    worksheet.write('W' + str(row), cif['ls_R_factor_R_free'], cell_format)
+    worksheet.write('X' + str(row), cif['r_bond_refined_d'], cell_format)
+    worksheet.write('Y' + str(row), cif['r_angle_refined_deg'], cell_format)
+    worksheet.write('Z' + str(row), cif['blobs'], cell_format)
 
 
 def get_summary_worksheet(workbook, n_samples):
@@ -239,12 +281,12 @@ def get_summary_worksheet(workbook, n_samples):
     merge_format.set_font_size(20)
     worksheet.merge_range('A1:E1', 'Data Collection', merge_format)
     worksheet.merge_range('F1:N1', 'Data Processing', merge_format)
-    worksheet.merge_range('O1:P1', 'Compound', merge_format)
-    worksheet.merge_range('Q1:X1', 'Initial Refinement', merge_format)
-    worksheet.add_table('A2:X{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},
-                                                                      {'header': 'Date'},
-                                                                      {'header': 'Proposal'},
-                                                                      {'header': 'Session'},
+    worksheet.merge_range('O1:Q1', 'Compound', merge_format)
+    worksheet.merge_range('R1:Z1', 'Initial Refinement', merge_format)
+    worksheet.add_table('A2:Z{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},                 # A
+                                                                      {'header': 'Date'},                   # B
+                                                                      {'header': 'Proposal'},               # C
+                                                                      {'header': 'Session'},                # D
                                                                       {'header': 'Dozor'},
                                                                       {'header': 'Pipeline'},
                                                                       {'header': 'Reso (Low)'},
@@ -257,15 +299,16 @@ def get_summary_worksheet(workbook, n_samples):
                                                                       {'header': 'Status'},
                                                                       {'header': 'Compound ID'},
                                                                       {'header': 'Compound'},
-                                                                      {'header': 'Soak time (h)'},
-                                                                      {'header': 'Pipeline'},
-                                                                      {'header': 'Spacegroup'},
-                                                                      {'header': 'Resolution'},
-                                                                      {'header': 'Rcryst'},
-                                                                      {'header': 'Rfree'},
-                                                                      {'header': 'rmsd bonds'},
-                                                                      {'header': 'rmsd angles'},
-                                                                      {'header': 'blobs'},
+                                                                      {'header': 'Soak time (h)'},      # Q
+                                                                      {'header': 'Pipeline'},           # R
+                                                                      {'header': 'Spacegroup'},         # S
+                                                                      {'header': 'reference PDB'},      # T
+                                                                      {'header': 'Resolution'},         # U
+                                                                      {'header': 'Rwork'},             # V
+                                                                      {'header': 'Rfree'},              # W
+                                                                      {'header': 'rmsd bonds'},         # X
+                                                                      {'header': 'rmsd angles'},        # Y
+                                                                      {'header': 'blobs'}              # z
                                                                       ]})
     worksheet.freeze_panes(2, 1)
     worksheet.set_column('E:E', 17)
@@ -335,6 +378,7 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
             mtz = processlib.mtz_info(mtzfile)
             cif.update(mtz)
             cif.update(jso)
+            cif['soaktime'] = soaktime
             dataDict = analyse_resolution(dataDict, cif)
             pgDict = update_point_group_dict(cif, pgDict)
             pginfoDict = update_point_group_info_dict(cif, pginfoDict)
@@ -345,15 +389,19 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
                     cif['blobs'] = str(len(blobList))
                 else:
                     cif['blobs'] = '0'
+            else:
+                cif.update(get_blank_init_refine_cif())
         elif os.path.isfile(jsofile) and not os.path.isfile(ciffile):
             jso = get_json_as_dict(jsofile)
             cif = get_semi_blank_cif()
+            cif['soaktime'] = soaktime
             cif.update(jso)
         else:
             cif = get_blank_cif()
+            cif['soaktime'] = soaktime
             cif = check_aux_csv_file(auxcsv, sample, cif)
         row = n + 3
-        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg, soaktime)
+        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg)
         statusDict = update_status_dict(statusDict, cif)
     if pginfoDict:
         print_pg_ucv_distribution(pginfoDict)
