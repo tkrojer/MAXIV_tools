@@ -77,7 +77,7 @@ def main(argv):
 
 
     try:
-        opts, args = getopt.getopt(argv,"p:f:l:d:ho",["project=", "fragmax=", "linkpandda=", "panddadir=", "help", "overwrite"])
+        opts, args = getopt.getopt(argv,"p:f:d:hol",["project=", "fragmax=", "panddadir=", "help", "overwrite", "linkpandda"])
     except getopt.GetoptError:
         compoundlib.usage()
         sys.exit(2)
