@@ -62,15 +62,14 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
         logger.info('current sample ' + sample)
         if os.path.isdir(os.path.join(projectDir, '2-initial_refine', sample)):
             os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
-            if os.path.isfile('init.pdb') and not overwrite:
+            if os.path.isfile('init.pdb') and overwrite:
                 os.system('/bin/rm -f init.*')
-            else:
-                if os.path.isfile(os.path.join(software, 'final.pdb')):
-                    os.system('ln -s {0!s} init.pdb'.format(os.path.join(software, 'final.pdb')))
-                if os.path.isfile(os.path.join(software, 'final.mtz')):
-                    os.system('ln -s {0!s} init.mtz'.format(os.path.join(software, 'final.mtz')))
-                if os.path.isfile(os.path.join(software, 'final.mmcif')):
-                    os.system('ln -s {0!s} init.mmcif'.format(os.path.join(software, 'final.mmcif')))
+            if os.path.isfile(os.path.join(software, 'final.pdb')):
+                os.system('ln -s {0!s} init.pdb'.format(os.path.join(software, 'final.pdb')))
+            if os.path.isfile(os.path.join(software, 'final.mtz')):
+                os.system('ln -s {0!s} init.mtz'.format(os.path.join(software, 'final.mtz')))
+            if os.path.isfile(os.path.join(software, 'final.mmcif')):
+                os.system('ln -s {0!s} init.mmcif'.format(os.path.join(software, 'final.mmcif')))
 
 
 def main(argv):
