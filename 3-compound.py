@@ -36,7 +36,10 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
         sample = l.split(',')[0]
         logger.info('current sample ' + sample)
         cpdID = l.split(',')[1].replace(' ', '')
-        smiles = l.split(',')[2]
+        smiles = l.split(',')[2].replace(' ', '')
+        if smiles == '' or cpdID == '':
+            logger.warning('CompoundID or Smiles field is empty; skipping...')
+            continue
         compoundlib.create_sample_folder(logger, projectDir, sample)
         if cpdID:
             compoundlib.create_sample_folder(logger, projectDir, sample)
