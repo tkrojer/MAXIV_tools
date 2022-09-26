@@ -78,7 +78,7 @@ def make_links_to_pandda_folder(logger, projectDir, panddaDir):
 #            os.system('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
 #            os.system('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
             os.system('/bin/cp {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
-            os.system('/bin/cp {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+            os.system('/bin/cp {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
         else:
             logger.warning('could not find ligand cif file')
 
