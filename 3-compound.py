@@ -64,11 +64,23 @@ def make_links_to_pandda_folder(logger, projectDir, panddaDir):
     logger.info('making links from 3-compounds to {0!s}'.format(panddaDir))
     os.chdir(os.path.join(panddaDir, 'processed_datasets'))
     for sample_folder in glob.glob(os.path.join(panddaDir, 'processed_datasets', '*')):
+        found_cif = False
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
         logger.info('current sample: ' + sample)
-        os.chdir(os.path.join(sample_folder, 'ligand_files'))
-        os.system('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
-        os.system('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
+        for cif in glob.glob(os.path.join(projectDir, '3-compound', sample, '*.cif')):
+            logger.info('found ligand cif file: ' + cif)
+            found_cif = True
+            break
+        if found_cif:
+            os.chdir(os.path.join(sample_folder, 'ligand_files'))
+            os.system('/bin/rm *.cif')
+            os.system('/bin/rm *.pdb')
+#            os.system('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+#            os.system('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
+            os.system('/bin/cp {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+            os.system('/bin/cp {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+        else:
+            logger.warning('could not find ligand cif file')
 
 
 def main(argv):
