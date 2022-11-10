@@ -83,10 +83,37 @@ def make_links_to_pandda_folder(logger, projectDir, panddaDir):
             logger.warning('could not find ligand cif file')
 
 
+def make_links_to_any_folder(logger, projectDir, anyDir):
+    logger.info('making links from 3-compounds to {0!s}'.format(anyDir))
+    os.chdir(anyDir)
+    for sample_folder in glob.glob(os.path.join(anyDir, '*')):
+        found_cif = False
+        sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
+        logger.info('current sample: ' + sample)
+        for cif in glob.glob(os.path.join(projectDir, '3-compound', sample, '*.cif')):
+            logger.info('found ligand cif file: ' + cif)
+            found_cif = True
+            break
+        if found_cif:
+            os.chdir(sample_folder)
+            if not os.path.isdir('ligand_files'):
+                os.mkdir('ligand_files')
+            os.chdir('ligand_files')
+            os.system('/bin/rm *.cif')
+            os.system('/bin/rm *.pdb')
+#            os.system('ln -s {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+#            os.system('ln -s {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
+            os.system('/bin/cp {0!s}/*.pdb .'.format(os.path.join(projectDir, '3-compound', sample)))
+            os.system('/bin/cp {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
+        else:
+            logger.warning('could not find ligand cif file')
+
+
+
 def main(argv):
     projectDir = ''
     fragmaxcsv = ''
-    panddaDir = ''
+    anyDir = ''
     overwrite = False
     linkpandda = False
     software = 'acedrg'
@@ -95,7 +122,7 @@ def main(argv):
 
 
     try:
-        opts, args = getopt.getopt(argv,"p:f:d:hol",["project=", "fragmax=", "panddadir=", "help", "overwrite", "linkpandda"])
+        opts, args = getopt.getopt(argv,"p:f:a:hol",["project=", "fragmax=", "anydir=", "help", "overwrite", "linkfiles"])
     except getopt.GetoptError:
         compoundlib.usage()
         sys.exit(2)
@@ -110,16 +137,17 @@ def main(argv):
             fragmaxcsv = os.path.abspath(arg)
         elif opt in ("-o", "--overwrite"):
             overwrite = True
-        elif opt in ("-l", "--linkpandda"):
+        elif opt in ("-l", "--linkfiles"):
             linkpandda = True
-        elif opt in ("-d", "--panddadir"):
-            panddaDir = os.path.abspath(arg)
+        elif opt in ("-a", "--anydir"):
+            anyDir = os.path.abspath(arg)
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
     if linkpandda:
-        make_links_to_pandda_folder(logger, projectDir, panddaDir)
+#        make_links_to_pandda_folder(logger, projectDir, panddaDir)
+        make_links_to_any_folder(logger, projectDir, anyDir)
     else:
         make_restraints(logger, projectDir, fragmaxcsv, software, overwrite)
 

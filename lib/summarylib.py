@@ -355,6 +355,7 @@ def update_status_dict(statusDict, cif):
 def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
                               dataDict, pgDict, pginfoDict, statusDict, auxcsv):
     logger.info('preparing summary worksheet...')
+    space_group_dict = {}
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
         cpdID = line.split(',')[1]
@@ -384,6 +385,9 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
             pginfoDict = update_point_group_info_dict(cif, pginfoDict)
             if os.path.isfile(initrefcif) and os.path.isfile(initrefmtz) and os.path.isfile(initrefpdb):
                 cif.update(refinelib.structure_cif_info(initrefcif))
+                if cif['initref_spacegroup'] not in space_group_dict:
+                    space_group_dict['initref_spacegroup'] = 0
+                space_group_dict['initref_spacegroup'] += 1
                 blobList = refinelib.find_blobs(initrefmtz, initrefpdb)
                 if blobList:
                     cif['blobs'] = str(len(blobList))
@@ -406,6 +410,8 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
     if pginfoDict:
         print_pg_ucv_distribution(pginfoDict)
         print_pg_rmergelow_distribution(pginfoDict)
+    if space_group_dict:
+        print('space_groups', space_group_dict)
     return statusDict
 
 
