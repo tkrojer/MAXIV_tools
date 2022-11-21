@@ -42,7 +42,7 @@ def backup_existing_script_files(script):
         os.system('/bin/mv {0!s} {1!s}_{2!s}'.format(script, script, now))
 
 
-def ligand_files_exist(logger, cpdID, projectDir):
+def ligand_files_exist(logger, cpdID, projectDir, sample):
     files_exist = False
     if os.path.isfile(os.path.join(projectDir, '3-compound', sample, cpdID + '.cif')) or os.path.isfile(os.path.join(projectDir, '3-compound', sample, cpdID + '.pdb')):
         logger.warning('CIF and PDB files exist for compound; skipping...')
@@ -93,7 +93,7 @@ def prepare_script_for_maxiv(restraints_program, projectDir, sampleID, subdirect
 
 def prepare_script_for_restrains_generation(logger, projectDir, sample, cpdID, smiles, software, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
-    if not ligand_files_exist(logger, cpdID):
+    if not ligand_files_exist(logger, cpdID, projectDir, sample):
         logger.info('creating script for {0!s}'.format(software))
         script = software + '_' + sample + '.sh'
         backup_existing_script_files(script)
