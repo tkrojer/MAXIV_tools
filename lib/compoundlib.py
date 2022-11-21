@@ -42,9 +42,9 @@ def backup_existing_script_files(script):
         os.system('/bin/mv {0!s} {1!s}_{2!s}'.format(script, script, now))
 
 
-def ligand_files_exist(logger, cpdID):
+def ligand_files_exist(logger, cpdID, projectDir):
     files_exist = False
-    if os.path.isfile(cpdID + '.cif') or os.path.isfile(cpdID + '.cif'):
+    if os.path.isfile(os.path.join(projectDir, '3-compound', sample, cpdID + '.cif')) or os.path.isfile(os.path.join(projectDir, '3-compound', sample, cpdID + '.pdb')):
         logger.warning('CIF and PDB files exist for compound; skipping...')
         files_exist = True
     return files_exist
