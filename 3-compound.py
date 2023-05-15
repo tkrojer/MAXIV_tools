@@ -34,7 +34,7 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
     submitList = []
     for l in open(fragmaxcsv):
         sample = l.split(',')[0]
-        if sample == 'SampleID':
+        if sample == 'SampleID' or sample == 'mounted_crystal_code':
             continue
         logger.info('current sample ' + sample)
         cpdID = l.split(',')[1].replace(' ', '')
