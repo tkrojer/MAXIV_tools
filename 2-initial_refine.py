@@ -70,6 +70,8 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
                 os.system('ln -s {0!s} init.mtz'.format(os.path.join(software, 'final.mtz')))
             if os.path.isfile(os.path.join(software, 'final.mmcif')):
                 os.system('ln -s {0!s} init.mmcif'.format(os.path.join(software, 'final.mmcif')))
+            if os.path.isfile(os.path.join(software, 'reindexed.mtz')):
+                os.system('ln -s {0!s} free.mtz'.format(os.path.join(software, 'reindexed.mtz')))
 
 
 def main(argv):
