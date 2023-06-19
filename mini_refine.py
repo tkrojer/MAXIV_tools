@@ -121,7 +121,7 @@ def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mt
     submit(n_jobs)
     for job in cmd_dict:
         if cmd_dict[job]:
-            print(cmd_dict[job])
+            os.system(cmd_dict[job])
 
 def usage():
     usage = (
