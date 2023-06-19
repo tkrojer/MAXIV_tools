@@ -84,8 +84,8 @@ def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mt
                                                                                    reference_pdb,
                                                                                    reference_mtz,
                                                                                    software)
-    cmd_dict['batch_{0!s}'.format(i)] += 'ln -s {0!s}/final.pdb init.pdb;'.format(software)
-    cmd_dict['batch_{0!s}'.format(i)] += 'ln -s {0!s}/final.mtz init.mtz;'.format(software)
+    cmd_dict['batch_{0!s}'.format(i)] += '/bin/ln -s ./{0!s}/final.pdb init.pdb;'.format(software)
+    cmd_dict['batch_{0!s}'.format(i)] += '/bin/ln -s ./{0!s}/final.mtz init.mtz;'.format(software)
     return cmd_dict
 
 def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software):
@@ -121,6 +121,7 @@ def submit(n_jobs):
 
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
     cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
+    print(cmd_dict)
     submit(n_jobs)
     for job in cmd_dict:
         if cmd_dict[job]:
