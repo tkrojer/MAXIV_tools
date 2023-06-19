@@ -22,6 +22,7 @@ import sys
 import os
 import getopt
 import glob
+import subprocess
 
 def reference_fits_mtz(mtzfile, pdbDict):
     compatible = False
@@ -119,9 +120,9 @@ def submit(n_jobs):
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
     cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
     submit(n_jobs)
-    print(cmd_dict)
-#    for job in cmd_dict:
-#        if cmd_dict[job]:
+    for job in cmd_dict:
+        if cmd_dict[job]:
+            subprocess.Popen([cmd_dict[job]])
 #            os.spawnl(os.P_DETACH, cmd_dict[job])
 #            os.system('{0!s} &'.format(cmd_dict[job]))
 
