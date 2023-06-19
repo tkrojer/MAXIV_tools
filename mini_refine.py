@@ -77,7 +77,7 @@ def get_cmd_dict(nproc):
         cmd_dict['batch_{0!s}'.format(i)] = ''
     return cmd_dict
 
-def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software, cmd_dict, i):
+def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software, cmd_dict, i, sample):
     cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s}\n'.format(os.path.join(project_directory, sample))
     cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin,
                                                                                    reference_pdb,
@@ -99,12 +99,12 @@ def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, softwa
         if pdb_dict:
             if reference_mtz(os.path.join(project_directory,sample, mtzin), pdb_dict):
                 cmd_dict = add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software,
-                                                  cmd_dict, i)
+                                                  cmd_dict, i, sample)
                 i += 1
                 n_jobs += 1
         else:
             cmd_dict = add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software,
-                                              cmd_dict, i)
+                                              cmd_dict, i, sample)
             i += 1
             n_jobs += 1
     return cmd_dict, n_jobs
