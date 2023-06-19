@@ -23,6 +23,31 @@ import os
 import getopt
 import glob
 
+def check_if_reference_fits_mtz():
+    try:
+        import gemmi
+        print('hallo')
+    except ModuleNotFoundError:
+        print('WARNING: cannot find gemmi module; cannot check if reference fits mtz file')
+
+def mtz_info(mtzfile):
+    mtzDict = {}
+    mtz = gemmi.read_mtz_file(mtzfile)
+    mtzDict['unitcell_volume'] = mtz.cell.volume
+    mtzDict['point_group'] = mtz.spacegroup.point_group_hm()
+    mtzDict['lattice'] = mtz.spacegroup.hm[0]
+    return mtzDict
+
+def pdb_info():
+    pdbDict = {}
+    structure = gemmi.read_pdb(pdbfile)
+    unitcell = structure.cell
+    sym = gemmi.find_spacegroup_by_name(structure.spacegroup_hm)
+    pdbDict['unitcell_volume'] = unitcell.volume
+    pdbDict['point_group'] = sym.point_group_hm()
+    pdbDict['lattice'] = sym.centring_type()
+    return pdbDict
+
 def get_datasets(project_directory, mtzin):
     mtz_list = []
     for mtz in sorted(glob.glob(os.path.join(project_directory, '*', mtzin))):
@@ -46,7 +71,9 @@ def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, softwa
     cmd_dict = get_cmd_dict(nproc)
     mtz_list = get_datasets(project_directory, mtzin)
     i = 0
+    print('-> preparing initial refine script...')
     for sample in mtz_list:
+        check_if_reference_fits_mtz()
         if i == nproc:
             i = 0
         cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s}\n'.format(os.path.join(project_directory,sample))
@@ -63,7 +90,24 @@ def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mt
         print(cmd_dict[job])
 
 def usage():
-    print('hallo')
+    usage = (
+        '\n'
+        'usage:\n'
+        'python3 mini_refine.py -d <data_dir> -p <reference_pdb>\n'
+        '\n'
+        'additional command line options:\n'
+        '--data, -d\n'
+        '    data directory\n'
+        '--fragmax, -f\n'
+        '    fragmax summary csv file\n'
+        '--overwrite, -o\n'
+        '    flag to overwrite selected files\n'
+        '--software, -s\n'
+        '    initial refinement pipeline (dimple [default], pipedreamo)\n'
+        '\n'
+        'Note: the script only works with python3'
+    )
+    print(usage)
 
 def main(argv):
     project_directory = ''
@@ -74,7 +118,8 @@ def main(argv):
     mtzin = "process.mtz"
 
     try:
-        opts, args = getopt.getopt(argv, "p:r:s:ho", ["project=", "reference=", "software=", "help", "overwrite"])
+        opts, args = getopt.getopt(argv, "d:p:r:m:ho", ["data=", "pdbref=", "mtzref=", "mtzin=",
+                                                        "help", "overwrite"])
     except getopt.GetoptError:
         refinelib.usage()
         sys.exit(2)
@@ -83,12 +128,21 @@ def main(argv):
         if opt == '-h':
             usage()
             sys.exit(2)
-        elif opt in ("-p", "--project"):
+        elif opt in ("-d", "--data"):
             project_directory = os.path.abspath(arg)
-        elif opt in ("-r", "--reference"):
+        elif opt in ("-p", "--pdbref"):
             reference_pdb = os.path.abspath(arg)
+        elif opt in ("-r", "--mtzref"):
+            reference_mtz = os.path.abspath(arg)
+        elif opt in ("-m", "--mtzin"):
+            mtzin = os.path.abspath(arg)
         elif opt in ("-o", "--overwrite"):
             overwrite = True
+
+    if not os.path.isdir(project_directory):
+        print('ERROR: project directory does not exist; use -p flag to specify')
+    elif not os.path.isfile(reference_pdb):
+        print('ERROR: reference pdb file does not exist; use -r flag to specify')
 
     run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software)
 
