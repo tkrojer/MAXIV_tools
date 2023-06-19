@@ -84,6 +84,8 @@ def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mt
                                                                                    reference_pdb,
                                                                                    reference_mtz,
                                                                                    software)
+    cmd_dict['batch_{0!s}'.format(i)] += 'ln -s {0!s}/final.pdb init.pdb;'.format(software))
+    cmd_dict['batch_{0!s}'.format(i)] += 'ln -s {0!s}/final.mtz init.mtz;'.format(software))
     return cmd_dict
 
 def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software):
@@ -117,17 +119,6 @@ def submit(n_jobs):
         logger.info('you chose not to continue at this point; exciting program...')
         sys.exit(2)
 
-def link_results(project_directory, software):
-    print('linking results from initial refinement...')
-    for dirs in sorted(glob.glob(os.path.join(project_directory, '*'))):
-        os.chdir(dirs)
-        pdb = os.path.join(software, 'final.pdb')
-        if os.path.isfile(pdb):
-            os.system('ln -s {0!s} init.pdb')
-        pdb = os.path.join(software, 'final.mtz')
-        if os.path.isfile(pdb):
-            os.system('ln -s {0!s} init.mtz')
-
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
     cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
     submit(n_jobs)
@@ -135,7 +126,6 @@ def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mt
         if cmd_dict[job]:
             script = cmd_dict[job] + ' " &'
             subprocess.run(script, shell=True)
-    link_results(project_directory, software)
     print('done!')
 
 
