@@ -130,7 +130,8 @@ def submit(n_jobs):
     if not q.lower() == 'y':
         sys.exit(2)
 
-def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
+def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software, overwrite):
+    overwrite_previous_init_refine(project_directory, software, overwrite)
     cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
     submit(n_jobs)
     for job in cmd_dict:
