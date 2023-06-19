@@ -113,6 +113,17 @@ def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, softwa
             n_jobs += 1
     return cmd_dict, n_jobs
 
+def overwrite_previous_init_refine(project_directory, software, overwrite):
+    if overwrite:
+        q = input("\n>>> Do you want to overwrite previous initial refinement? (y/n) ")
+        if not q.lower() == 'y':
+            print('-> removing files from initial refinement...')
+            for dirs in sorted(glob.glob(os.path.join(project_directory, '*'))):
+                print('-> removing init.pdb, init.mtz, {0!s} folder in {1!s}'.format(software, dirs))
+                os.system('/bin/rm init.pdb')
+                os.system('/bin/rm init.mtz')
+                os.system('/bin/rm -fr {0!s}'.format(software))
+
 def submit(n_jobs):
     print('found {0!s} mtz files to process'.format(n_jobs))
     q = input("\n>>> Do you want to continue? (y/n) ")
@@ -121,7 +132,6 @@ def submit(n_jobs):
 
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
     cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
-    print(cmd_dict)
     submit(n_jobs)
     for job in cmd_dict:
         if cmd_dict[job]:
@@ -188,7 +198,7 @@ def main(argv):
     elif not os.path.isfile(reference_pdb):
         print('ERROR: reference pdb file does not exist; use -r flag to specify')
     else:
-        run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software)
+        run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software, overwrite)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
