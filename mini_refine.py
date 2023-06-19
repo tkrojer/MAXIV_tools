@@ -125,7 +125,8 @@ def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mt
     for job in cmd_dict:
         if cmd_dict[job]:
             script = cmd_dict[job] + ' " &'
-            print(script)
+#            print(script)
+            subprocess.run(script, shell=True)
 #            subprocess.Popen([cmd_dict[job]])
 #            os.spawnl(os.P_DETACH, cmd_dict[job])
 #            os.system('{0!s} &'.format(cmd_dict[job]))
