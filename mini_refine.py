@@ -84,6 +84,7 @@ def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mt
                                                                                    reference_pdb,
                                                                                    reference_mtz,
                                                                                    software)
+    cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s};'.format(os.path.join(project_directory, sample))
     cmd_dict['batch_{0!s}'.format(i)] += '/bin/ln -s ./{0!s}/final.pdb init.pdb;'.format(software)
     cmd_dict['batch_{0!s}'.format(i)] += '/bin/ln -s ./{0!s}/final.mtz init.mtz;'.format(software)
     return cmd_dict
@@ -116,7 +117,6 @@ def submit(n_jobs):
     print('found {0!s} mtz files to process'.format(n_jobs))
     q = input("\n>>> Do you want to continue? (y/n) ")
     if not q.lower() == 'y':
-        logger.info('you chose not to continue at this point; exciting program...')
         sys.exit(2)
 
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
