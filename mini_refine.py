@@ -23,12 +23,19 @@ import os
 import getopt
 import glob
 
-def check_if_reference_fits_mtz():
+def reference_fits_mtz(mtzfile, pdbDict):
+    compatible = False
     try:
         import gemmi
-        print('hallo')
+        mtzDict = mtz_info(mtzfile)
+        ucv_diff = abs((mtzDict['unitcell_volume'] - pdbDict['unitcell_volume'])) / pdbDict['unitcell_volume']
+        if mtzDict['point_group'] == mtzDict['point_group'] and mtzDict['lattice'] == pdbDict['lattice'] and ucv_diff < 0.1:
+            compatible = True
+        else:
+            print('ERROR: unit_cell volume, point group and lattice of reference and mtz file are too different')
     except ModuleNotFoundError:
         print('WARNING: cannot find gemmi module; cannot check if reference fits mtz file')
+    return compatible
 
 def mtz_info(mtzfile):
     mtzDict = {}
@@ -38,14 +45,18 @@ def mtz_info(mtzfile):
     mtzDict['lattice'] = mtz.spacegroup.hm[0]
     return mtzDict
 
-def pdb_info():
+def pdb_info(pdbfile):
     pdbDict = {}
-    structure = gemmi.read_pdb(pdbfile)
-    unitcell = structure.cell
-    sym = gemmi.find_spacegroup_by_name(structure.spacegroup_hm)
-    pdbDict['unitcell_volume'] = unitcell.volume
-    pdbDict['point_group'] = sym.point_group_hm()
-    pdbDict['lattice'] = sym.centring_type()
+    try:
+        import gemmi
+        structure = gemmi.read_pdb(pdbfile)
+        unitcell = structure.cell
+        sym = gemmi.find_spacegroup_by_name(structure.spacegroup_hm)
+        pdbDict['unitcell_volume'] = unitcell.volume
+        mtzDict['point_group'] = sym.point_group_hm()
+        pdbDict['lattice'] = sym.centring_type()
+    except ModuleNotFoundError:
+        print('WARNING: cannot find gemmi module; cannot check if reference fits mtz file')
     return pdbDict
 
 def get_datasets(project_directory, mtzin):
@@ -66,46 +77,72 @@ def get_cmd_dict(nproc):
         cmd_dict['batch_{0!s}'.format(i)] = ''
     return cmd_dict
 
+def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software, cmd_dict, i):
+    cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s}\n'.format(os.path.join(project_directory, sample))
+    cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin,
+                                                                                   reference_pdb,
+                                                                                   reference_mtz,
+                                                                                   software)
+    return cmd_dict
+
 def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software):
     nproc = get_nproc()
     cmd_dict = get_cmd_dict(nproc)
     mtz_list = get_datasets(project_directory, mtzin)
+    pdb_dict = pdb_info(reference_pdb)
     i = 0
     print('-> preparing initial refine script...')
+    n_jobs = 0
     for sample in mtz_list:
-        check_if_reference_fits_mtz()
         if i == nproc:
             i = 0
-        cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s}\n'.format(os.path.join(project_directory,sample))
-        cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin,
-                                                                                       reference_pdb,
-                                                                                       reference_mtz,
-                                                                                       software)
-        i += 1
-    return cmd_dict
+        if pdb_dict:
+            if reference_mtz(os.path.join(project_directory,sample, mtzin), pdb_dict):
+                cmd_dict = add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software,
+                                                  cmd_dict, i)
+                i += 1
+                n_jobs += 1
+        else:
+            cmd_dict = add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software,
+                                              cmd_dict, i)
+            i += 1
+            n_jobs += 1
+    return cmd_dict, n_jobs
+
+def submit(n_jobs):
+    print('found {0!s} mtz files to process'.format(n_jobs))
+    q = input("\n>>> Do you want to continue? (y/n) ")
+    if not q.lower() == 'y':
+        logger.info('you chose not to continue at this point; exciting program...')
+        sys.exit(2)
 
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
-    cmd_dict = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
+    cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
+    submit(n_jobs)
     for job in cmd_dict:
-        print(cmd_dict[job])
+        if cmd_dict[job]:
+            print(cmd_dict[job])
 
 def usage():
     usage = (
         '\n'
         'usage:\n'
-        'python3 mini_refine.py -d <data_dir> -p <reference_pdb>\n'
+        'python mini_refine.py -d <data_dir> -p <reference_pdb>\n'
         '\n'
         'additional command line options:\n'
         '--data, -d\n'
         '    data directory\n'
-        '--fragmax, -f\n'
-        '    fragmax summary csv file\n'
+        '--pdbref, -p\n'
+        '    reference pdb file\n'
+        '--mtzref, -r\n'
+        '    reference mtz file\n'
+        '--mtzin, -m\n'
+        '    reference mtz file\n'
         '--overwrite, -o\n'
         '    flag to overwrite selected files\n'
-        '--software, -s\n'
-        '    initial refinement pipeline (dimple [default], pipedreamo)\n'
         '\n'
-        'Note: the script only works with python3'
+        'Note: a) the script only works with python3\n'
+        '      b) you need to install gemmi if you want to ensure that mtz and reference pdb file are similar'
     )
     print(usage)
 
@@ -143,8 +180,8 @@ def main(argv):
         print('ERROR: project directory does not exist; use -p flag to specify')
     elif not os.path.isfile(reference_pdb):
         print('ERROR: reference pdb file does not exist; use -r flag to specify')
-
-    run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software)
+    else:
+        run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
