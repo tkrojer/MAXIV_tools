@@ -75,12 +75,14 @@ def get_nproc():
 def get_cmd_dict(nproc):
     cmd_dict = {}
     for i in range(nproc):
-        cmd_dict['batch_{0!s}'.format(i)] = ''
+#        cmd_dict['batch_{0!s}'.format(i)] = ''
+        cmd_dict['batch_{0!s}'.format(i)] = 'bash -c "'
     return cmd_dict
 
 def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software, cmd_dict, i, sample):
-    cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s}\n'.format(os.path.join(project_directory, sample))
-    cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin,
+#    script = 'bash -c "command1; command2; command3; " &'
+    cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s};\n'.format(os.path.join(project_directory, sample))
+    cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s};\n'.format(mtzin,
                                                                                    reference_pdb,
                                                                                    reference_mtz,
                                                                                    software)
@@ -122,7 +124,9 @@ def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mt
     submit(n_jobs)
     for job in cmd_dict:
         if cmd_dict[job]:
-            subprocess.Popen([cmd_dict[job]])
+            script = cmd_dict[job] + ' " &'
+            print(script)
+#            subprocess.Popen([cmd_dict[job]])
 #            os.spawnl(os.P_DETACH, cmd_dict[job])
 #            os.system('{0!s} &'.format(cmd_dict[job]))
 
