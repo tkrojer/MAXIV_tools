@@ -90,6 +90,7 @@ def main(argv):
         elif opt in ("-o", "--overwrite"):
             overwrite = True
 
+    run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
