@@ -75,12 +75,10 @@ def get_nproc():
 def get_cmd_dict(nproc):
     cmd_dict = {}
     for i in range(nproc):
-#        cmd_dict['batch_{0!s}'.format(i)] = ''
         cmd_dict['batch_{0!s}'.format(i)] = 'bash -c "'
     return cmd_dict
 
 def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software, cmd_dict, i, sample):
-#    script = 'bash -c "command1; command2; command3; " &'
     cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s};'.format(os.path.join(project_directory, sample))
     cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s};'.format(mtzin,
                                                                                    reference_pdb,
@@ -119,17 +117,27 @@ def submit(n_jobs):
         logger.info('you chose not to continue at this point; exciting program...')
         sys.exit(2)
 
+def link_results(project_directory, software):
+    print('linking results from initial refinement...')
+    for dirs in sorted(glob.glob(os.path.join(project_directory, '*'))):
+        os.chdir(dirs)
+        pdb = os.path.join(software, 'final.pdb')
+        if os.path.isfile(pdb):
+            os.system('ln -s {0!s} init.pdb')
+        pdb = os.path.join(software, 'final.mtz')
+        if os.path.isfile(pdb):
+            os.system('ln -s {0!s} init.mtz')
+
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
     cmd_dict, n_jobs = make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, software)
     submit(n_jobs)
     for job in cmd_dict:
         if cmd_dict[job]:
             script = cmd_dict[job] + ' " &'
-#            print(script)
             subprocess.run(script, shell=True)
-#            subprocess.Popen([cmd_dict[job]])
-#            os.spawnl(os.P_DETACH, cmd_dict[job])
-#            os.system('{0!s} &'.format(cmd_dict[job]))
+    link_results(project_directory, software)
+    print('done!')
+
 
 def usage():
     usage = (
