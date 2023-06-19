@@ -47,14 +47,14 @@ def make_cmd_dict(project_directory, mtzin, reference_pdb, reference_mtz, softwa
     mtz_list = get_datasets(project_directory, mtzin)
     i = 0
     for sample in mtz_list:
-        if n == nproc:
-            n = 0
+        if i == nproc:
+            i = 0
         cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s}\n'.format(os.path.join(project_directory,sample))
         cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin,
                                                                                        reference_pdb,
                                                                                        reference_mtz,
                                                                                        software)
-        n += 1
+        i += 1
     return cmd_dict
 
 def run_initial_refinement(project_directory, mtzin, reference_pdb, reference_mtz, software):
