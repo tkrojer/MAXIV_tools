@@ -81,8 +81,8 @@ def get_cmd_dict(nproc):
 
 def add_initial_refine_job(project_directory, mtzin, reference_pdb, reference_mtz, software, cmd_dict, i, sample):
 #    script = 'bash -c "command1; command2; command3; " &'
-    cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s};\n'.format(os.path.join(project_directory, sample))
-    cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s};\n'.format(mtzin,
+    cmd_dict['batch_{0!s}'.format(i)] += 'cd {0!s};'.format(os.path.join(project_directory, sample))
+    cmd_dict['batch_{0!s}'.format(i)] += 'dimple {0!s} {1!s} {2!s} {3!s};'.format(mtzin,
                                                                                    reference_pdb,
                                                                                    reference_mtz,
                                                                                    software)
