@@ -73,7 +73,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         collection_date, master = processlib.get_timestamp_from_master_file(sample_folder, run)
 
 
-        d_xray_dataset_table_dict = processdb.get_d_xray_dataset_table_dict(sample, proposal, session, beamline, run, collection_date, master)
+        d_xray_dataset_table_dict = processdb.get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline,
+                                                                            run, collection_date, master)
         if os.path.isfile(db_file):
             processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
 
