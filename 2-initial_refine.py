@@ -31,7 +31,7 @@ import refinedb
 import processlib
 import processdb
 
-sys.path.append('/Users/tobkro/MAXIV/FragMAX/LP3/FragMAX_crystal_preparation')
+sys.path.append('/data/staff/biomax/tobias/software/MAXIV_tools/lib')
 from db import dal
 
 def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
