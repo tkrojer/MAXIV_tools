@@ -46,7 +46,8 @@ def get_proposal_and_session_and_protein(processDir):
     proposal = processDir.split('/')[4]
     session = processDir.split('/')[5]
     protein = processDir.split('/')[7]
-    return proposal, session, protein
+    beamline = processDir.split('/')[3]
+    return proposal, session, protein, beamline
 
 
 def create_sample_folder(logger, projectDir, sample):
@@ -192,7 +193,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.error('MTZ file exists, but either LOG or CIF file missing')
     status = get_status(logger, mtzfile, mtz, ciffile, status)
     logger.info('current status: ' + status)
-    return status
+    return status, logfile
 
 
 def get_timestamp_from_master_file(sample_folder, run):

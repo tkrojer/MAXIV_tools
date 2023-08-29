@@ -27,6 +27,10 @@ from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import processlib
+import processdb
+
+sys.path.append('/Users/tobkro/MAXIV/FragMAX/LP3/FragMAX_crystal_preparation')
+from db import dal
 
 
 def select_results(logger, projectDir, select_criterion, overwrite):
@@ -56,22 +60,28 @@ def select_results(logger, projectDir, select_criterion, overwrite):
 
 
 def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                        status, protein, processDir, overwrite):
+                        status, protein, processDir, overwrite, beamline, dal, db_file):
     foundMTZ = False
     for runs in glob.glob(os.path.join(sample_folder, '*')):
 #        run = runs.split('/')[9]
         run = runs.split('/')[len(runs.split('/'))-1]
         logger.info('checking run {0!s}'.format(run))
+
+
+
         processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir)
         collection_date, master = processlib.get_timestamp_from_master_file(sample_folder, run)
+
+
+        d_xray_dataset_table_dict = processdb.get_d_xray_dataset_table_dict(sample, proposal, session, beamline, run, collection_date, master)
+        if os.path.isfile(db_file):
+            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
+
         if not master:  # this may happen if there is a run folder, but without image files
             continue
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
             mtzpath, mtz_extension, log_extension, cif_extension = processlib.get_pipeline_path(pipeline)
-#            if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
-#                continue
-#            logger.info('manual: ' + os.path.join(projectDir, '1-process', sample, '*', pipeline + '_*', mtz_extension))
             for mtzfile in glob.glob(os.path.join(sample_folder, run, mtzpath)):
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
@@ -79,30 +89,37 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     continue
                 logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
-                status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
+                status, logfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
                                                       mtz_extension, cif_extension, log_extension, status)
                 processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                 protein, status, master, pipeline)
-            # looking for manually processed datasets
-            manual = pipeline
-            if pipeline == 'staraniso':
-                manual = 'autoproc'
-            for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', manual + '_*', mtz_extension)):
-                manual_pipeline = processlib.get_manual_pipeline_name(logger, manual, mtzfile)
-                if pipeline == 'staraniso':
-                    manual_pipeline = manual_pipeline.replace('autoproc', 'staraniso')
+                d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile,
+                                                                                              logfile,
+                                                                                              mounted_crystal_code,
+                                                                                              proposal, session, run)
+                if os.path.isfile(db_file):
+                    processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict)
 
-                if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
-                                                                   manual_pipeline):
-                    foundMTZ = True
-                    continue
-                logger.info('found manually processed MTZ file: ' + mtzfile)
-                status = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
-                                                      run, manual_pipeline, collection_date,
-                                                      mtz_extension, cif_extension, log_extension, status)
-                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
-                                                protein, status, master, manual_pipeline)
+#            # looking for manually processed datasets
+#            manual = pipeline
+#            if pipeline == 'staraniso':
+#                manual = 'autoproc'
+#            for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', manual + '_*', mtz_extension)):
+#                manual_pipeline = processlib.get_manual_pipeline_name(logger, manual, mtzfile)
+#                if pipeline == 'staraniso':
+#                    manual_pipeline = manual_pipeline.replace('autoproc', 'staraniso')
+#
+#                if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
+#                                                                   manual_pipeline):
+#                    foundMTZ = True
+#                    continue
+#                logger.info('found manually processed MTZ file: ' + mtzfile)
+#                status, logfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
+#                                                      run, manual_pipeline, collection_date,
+#                                                      mtz_extension, cif_extension, log_extension, status)
+#                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
+#                                                protein, status, master, manual_pipeline)
 
 
     if not foundMTZ:
@@ -113,9 +130,9 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
     logger.info('===================================================================================\n')
 
 
-def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite):
+def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file):
     sampleList = processlib.get_sample_list(logger, fragmaxcsv)
-    proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
+    proposal, session, protein, beamline = processlib.get_proposal_and_session_and_protein(processDir)
     pipelines = processlib.get_processing_pipelines()
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir, '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
@@ -125,7 +142,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
             processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
             parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                                status, protein, processDir, overwrite)
+                                status, protein, processDir, overwrite, beamline, dal, db_file)
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
@@ -167,11 +184,12 @@ def main(argv):
     select_criterion = 'resolution'
     reprocesscsv = ''
     overwrite = False
+    db_file = ""
     logger = processlib.init_logger('1-process.log')
     processlib.start_logging(logger, '1-process.py')
 
     try:
-        opts, args = getopt.getopt(argv,"i:o:f:c:r:hsx",["input=", "output=", "fragmax=", "crtierion=",
+        opts, args = getopt.getopt(argv,"i:o:f:c:r:d:hsx",["input=", "output=", "fragmax=", "crtierion=", "database=",
                                                        "help", "select", "overwrite", "reprocess="])
     except getopt.GetoptError:
         processlib.usage()
@@ -195,6 +213,8 @@ def main(argv):
             overwrite = True
         elif opt in ("-r", "--reprocess"):
             reprocesscsv = os.path.abspath(arg)
+        elif opt in ("-d", "--database"):
+            db_file = os.path.abspath(arg)
 
     processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
     checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
@@ -210,7 +230,7 @@ def main(argv):
             reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict)
         else:
             processlib.start_get_autoprocessing_results(logger)
-            get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite)
+            get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file)
     else:
         logger.error('cannot continue; check error messages above and use -h option to get more information')
         logger.info('===================================================================================')

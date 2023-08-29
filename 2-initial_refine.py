@@ -23,11 +23,16 @@ import os
 import getopt
 import glob
 from datetime import datetime
+import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import refinelib
+import refinedb
 import processlib
+import processdb
 
+sys.path.append('/Users/tobkro/MAXIV/FragMAX/LP3/FragMAX_crystal_preparation')
+from db import dal
 
 def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
     ref_dict = refinelib.get_reference_file_information(logger, projectDir)
@@ -56,10 +61,18 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
 
 
 
-def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite):
+def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal, db_file):
     for l in open(fragmaxcsv):
         sample = l.split(',')[0]
         logger.info('current sample ' + sample)
+        proc_mtz = os.path.join(projectDir, '2-initial_refine', sample, 'process.mtz')
+        info_jso = proc[:proc.rfind('/')] + '/info.json'
+        if os.path.isfile(info_jso) and db_file:
+            f = open(info_jso)
+            data = json.load(f)
+            d = processdb.get_xray_initial_refinement_table_dict(logger, dal, sample, data)
+            processdb.insert_into_xray_initial_refinement_table(logger, dal, d)
+
         if os.path.isdir(os.path.join(projectDir, '2-initial_refine', sample)):
             os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
             if os.path.isfile('init.pdb') and overwrite:
@@ -80,10 +93,12 @@ def main(argv):
     overwrite = False
     linkrefine = False
     software = 'dimple'
+    db_file = ""
     logger = processlib.init_logger('2-initial_refine.log')
     processlib.start_logging(logger, '2-initial_refine.py')
     try:
-        opts, args = getopt.getopt(argv, "p:f:s:hol", ["project=", "fragmax=", "software=", "help", "overwrite", "link"])
+        opts, args = getopt.getopt(argv, "p:f:s:d:hol", ["project=", "fragmax=", "software=", "database=",
+                                                         "help", "overwrite", "link"])
     except getopt.GetoptError:
         refinelib.usage()
         sys.exit(2)
@@ -100,12 +115,17 @@ def main(argv):
             overwrite = True
         elif opt in ("-l", "--link"):
             linkrefine = True
+        elif opt in ("-d", "--database"):
+            db_file = os.path.abspath(arg)
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
     if linkrefine:
-        link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite)
+        if os.path.isfile(db_file):
+            dal.db_init(db_file)
+        link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal, db_file)
+
     else:
         run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
 
