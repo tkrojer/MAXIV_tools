@@ -5,9 +5,9 @@ from sqlalchemy.sql import select
 from sqlalchemy import and_
 
 def get_mounted_crystal_id(dal, sample):
-    print(dir(dal))
     q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
         dal.mounted_crystals_table.c.mounted_crystal_code == sample)
+    print(dir(dal.connection))
     rp = dal.connection.execute(q)
     result = rp.fetchall()
     return result[0][0]
