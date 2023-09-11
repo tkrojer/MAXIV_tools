@@ -6,8 +6,8 @@ from sqlalchemy import and_
 
 def get_mounted_crystal_id(dal, sample):
     print(dir(dal))
-    q = select([dal.mounted_crystals_table.mounted_crystal_id]).where(
-        dal.mounted_crystals_table.mounted_crystal_code == sample)
+    q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
+        dal.mounted_crystals_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     result = rp.fetchall()
     return result[0][0]
@@ -20,6 +20,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
     # https://docs.h5py.org/en/stable/quick.html
 
     d_xray_dataset_table_dict = {
+        'mounted_crystal_id':   mounted_crystal_id,
         'mounted_crystal_code': sample,
         'beamline':             beamline,
         'proposal':             proposal,
