@@ -39,7 +39,7 @@ def insert_into_xray_dataset_table(logger, dal, d):
         dal.connection.execute(ins)
     except sqlalchemy.exc.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            logger.warning('entry exists (time soaked {0!s}); skipping'.format(d['soak_datetime']))
+            logger.warning('entry exists (time soaked {0!s}); skipping'.format(d['mounted_crystal_code']))
         else:
             logger.error(str(e))
 
