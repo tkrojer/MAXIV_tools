@@ -70,13 +70,13 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 
         processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir)
-        collection_date, master = processlib.get_timestamp_from_master_file(sample_folder, run)
+        collection_date, master, create_date = processlib.get_timestamp_from_master_file(sample_folder, run)
 
 
         d_xray_dataset_table_dict = processdb.get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline,
-                                                                            run, collection_date, master)
+                                                                            run, create_date, master)
         if os.path.isfile(db_file):
-            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
+            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict, )
 
         if not master:  # this may happen if there is a run folder, but without image files
             continue

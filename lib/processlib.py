@@ -204,10 +204,12 @@ def get_timestamp_from_master_file(sample_folder, run):
     if os.path.isfile(os.path.join(raw_folder, master_file)):
         master = os.path.join(raw_folder, master_file)
         t_c = os.path.getctime(master)
+        # need create_date for database because t_stamp has only date for mmcif file
+        create_date = datetime.datetime.fromtimestamp(t_c)
         c_t = time.ctime(t_c)
         t_obj = time.strptime(c_t)
         t_stamp = time.strftime("%Y-%m-%d", t_obj)
-    return t_stamp, master
+    return t_stamp, master, create_date
 
 
 def add_biomax_mmcif_header_items(wavelength, collection_date):

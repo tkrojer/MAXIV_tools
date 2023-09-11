@@ -11,7 +11,7 @@ def get_mounted_crystal_id(dal, sample):
     result = rp.fetchall()
     return result[0][0]
 
-def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, collection_date, master):
+def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master):
     logger.info('getting d_xray_dataset_table_dict for {0!s}'.format(sample))
     mounted_crystal_id = get_mounted_crystal_id(dal, sample)
 
@@ -25,7 +25,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
         'proposal':             proposal,
         'session':              session,
         'run':                  run,
-        'data_collection_date': collection_date,
+        'data_collection_date': create_date,
         'h5_master_file':   master
     }
     print(d_xray_dataset_table_dict)
