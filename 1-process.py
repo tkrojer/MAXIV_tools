@@ -231,6 +231,8 @@ def main(argv):
             reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict)
         else:
             processlib.start_get_autoprocessing_results(logger)
+            logger.info('initializing database: {0!s}'.format(db_file))
+            dal.db_init(db_file)
             get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file)
     else:
         logger.error('cannot continue; check error messages above and use -h option to get more information')
