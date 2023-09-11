@@ -90,12 +90,12 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     continue
                 logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
-                status, logfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
+                status, logfile, ciffile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
                                                       mtz_extension, cif_extension, log_extension, status)
                 processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                 protein, status, master, pipeline)
-                d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile,
+                d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(dal, ciffile, mtzfile,
                                                                                               logfile,
                                                                                               mounted_crystal_code,
                                                                                               proposal, session, run)

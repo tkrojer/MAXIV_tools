@@ -193,7 +193,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.error('MTZ file exists, but either LOG or CIF file missing')
     status = get_status(logger, mtzfile, mtz, ciffile, status)
     logger.info('current status: ' + status)
-    return status, logfile
+    return status, logfile, ciffile
 
 
 def get_timestamp_from_master_file(sample_folder, run):
