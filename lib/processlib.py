@@ -196,12 +196,14 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     return status, logfile, ciffile
 
 
-def get_timestamp_from_master_file(sample_folder, run):
+def get_timestamp_from_master_file(logger, sample_folder, run):
     master = None
     t_stamp = None
     raw_folder = sample_folder.replace("process", "raw")
     master_file = run[4:-1] + "master.h5"
+    logger.info('looking for {0!s}'.format(os.path.join(raw_folder, master_file)))
     if os.path.isfile(os.path.join(raw_folder, master_file)):
+        logger.info('found .h5 master file')
         master = os.path.join(raw_folder, master_file)
         t_c = os.path.getctime(master)
         # need create_date for database because t_stamp has only date for mmcif file
@@ -209,6 +211,8 @@ def get_timestamp_from_master_file(sample_folder, run):
         c_t = time.ctime(t_c)
         t_obj = time.strptime(c_t)
         t_stamp = time.strftime("%Y-%m-%d", t_obj)
+    else:
+        logger.error('cannot find .h5 master file...')
     return t_stamp, master, create_date
 
 
