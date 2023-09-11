@@ -97,7 +97,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                 protein, status, master, pipeline)
                 d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(dal, ciffile, mtzfile,
                                                                                               logfile,
-                                                                                              mounted_crystal_code,
+                                                                                              sample,
                                                                                               proposal, session, run)
                 if os.path.isfile(db_file):
                     processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict)
