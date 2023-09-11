@@ -33,6 +33,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
 
 def insert_into_xray_dataset_table(logger, dal, d):
     logger.info('trying to insert into xray_dataset_table')
+    print(d)
     try:
         ins = dal.xray_dataset_table.insert().values(d)
         dal.connection.execute(ins)
