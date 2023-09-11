@@ -19,7 +19,6 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
     # https://docs.h5py.org/en/stable/quick.html
 
     d_xray_dataset_table_dict = {
-        'mounted_crystal_id':   mounted_crystal_id,
         'mounted_crystal_code': sample,
         'beamline':             beamline,
         'proposal':             proposal,
