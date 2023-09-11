@@ -7,7 +7,6 @@ from sqlalchemy import and_
 def get_mounted_crystal_id(dal, sample):
     q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
         dal.mounted_crystals_table.c.mounted_crystal_code == sample)
-    print(dir(dal.connection))
     rp = dal.connection.execute(q)
     result = rp.fetchall()
     return result[0][0]
@@ -29,6 +28,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
         'data_collection_date': collection_date,
         'h5_master_file':   master
     }
+    print(d_xray_dataset_table_dict)
     return d_xray_dataset_table_dict
 
 def insert_into_xray_dataset_table(logger, dal, d):
