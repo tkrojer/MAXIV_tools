@@ -95,11 +95,12 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                       mtz_extension, cif_extension, log_extension, status)
                 processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                 protein, status, master, pipeline)
-                d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(dal, ciffile, mtzfile,
+                if ciffile:
+                    d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(dal, ciffile, mtzfile,
                                                                                               logfile,
                                                                                               sample,
                                                                                               proposal, session, run)
-                if os.path.isfile(db_file):
+                if os.path.isfile(db_file) and ciffile:
                     processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict)
 
 #            # looking for manually processed datasets
