@@ -59,7 +59,7 @@ def get_cell_sym_info(mtz, d):
     return d
 
 def get_software_info(block, d):
-    data_reduction_software_list = ['XDS'. 'DIALS']
+    data_reduction_software_list = ['XDS', 'DIALS']
     data_scaling_software_list = ['AIMLESS', 'DIALS']
     autoproc_pipeline_list = ['autoPROC', 'xia2']
     if block.find_loop('_software.name'):
