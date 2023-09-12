@@ -87,8 +87,8 @@ def create_image_folder(logger, projectDir, sample, proposal, session, run):
 
 
 def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run, category, beamline):
-    snapshot_dir = os.path.join('data', 'staff', 'ispybstorage', category, beamline, category, proposal, session, 'raw',
-                                protein)
+    snapshot_dir = os.path.join('/data', 'staff', 'ispybstorage', category, beamline, category, proposal, session, 'raw',
+                                protein, sample)
     logger.info('looking for crystal snapshots in {0!s}'.format(snapshot_dir))
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), 'images'))
 
