@@ -47,7 +47,8 @@ def get_proposal_and_session_and_protein(processDir):
     session = processDir.split('/')[5]
     protein = processDir.split('/')[7]
     beamline = processDir.split('/')[3]
-    return proposal, session, protein, beamline
+    category = processDir.split('/')[2]
+    return proposal, session, protein, beamline, category
 
 
 def create_sample_folder(logger, projectDir, sample):
@@ -57,10 +58,10 @@ def create_sample_folder(logger, projectDir, sample):
         os.mkdir(sample)
 
 
-def prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir):
+def prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir, category, beamline):
     create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
     create_image_folder(logger, projectDir, sample, proposal, session, run)
-    find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run)
+    find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run, category, beamline)
     dozor_plot = find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, run)
     return dozor_plot
 
@@ -85,11 +86,17 @@ def create_image_folder(logger, projectDir, sample, proposal, session, run):
         os.mkdir('images')
 
 
-def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run):
-    logger.info('looking for crystal snapshots...')
+def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run, category, beamline):
+    snapshot_dir = os.path.join('data', 'staff', 'ispybstorage', category, beamline, category, proposal, session, 'raw',
+                                protein)
+    logger.info('looking for crystal snapshots in {0!s}'.format(snapshot_dir))
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), 'images'))
-    for img in glob.glob('/data/staff/ispybstorage/pyarch/visitors/{0!s}/{1!s}/raw/{2!s}/{3!s}/*.snapshot.jpeg'.format(
-            proposal, session, protein, sample)):
+
+    #/data/staff/ispybstorage/proprietary/biomax/proprietary/20230893/20230624/raw/GEN2110_A/GEN2110_A-x0112/GEN2110_A-x0112_1_1.snapshot.jpeg
+
+#    for img in glob.glob('/data/staff/ispybstorage/pyarch/visitors/{0!s}/{1!s}/raw/{2!s}/{3!s}/*.snapshot.jpeg'.format(
+#            proposal, session, protein, sample)):
+    for img in glob.glob(os.path.join(snapshot_dir, '*.snapshot.jpeg'.format(run))):
         logger.info('copying {0!s}'.format(img))
         os.system('/bin/cp {0!s} .'.format(img))
 
@@ -101,7 +108,7 @@ def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, r
     for img in glob.glob(os.path.join(processDir, sample, run, 'ImgQIndicator_proc', 'cn*', 'ControlPyDozor*', 'dozor_*.png')):
         logger.info('copying {0!s}'.format(img))
         os.system('/bin/cp {0!s} dozor.png'.format(img))
-        dozor_plot = img
+        dozor_plot = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), 'images', 'dozor.png')
     return dozor_plot
 
 

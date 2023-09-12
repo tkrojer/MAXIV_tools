@@ -60,7 +60,7 @@ def select_results(logger, projectDir, select_criterion, overwrite):
 
 
 def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                        status, protein, processDir, overwrite, beamline, dal, db_file):
+                        status, protein, processDir, overwrite, beamline, dal, db_file, category):
     foundMTZ = False
     for runs in glob.glob(os.path.join(sample_folder, '*')):
 #        run = runs.split('/')[9]
@@ -69,7 +69,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 
 
-        dozor_plot = processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir)
+        dozor_plot = processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir, category, beamline)
         collection_date, master, create_date = processlib.get_timestamp_from_master_file(logger, sample_folder, run)
 
 
@@ -134,7 +134,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file):
     sampleList = processlib.get_sample_list(logger, fragmaxcsv)
-    proposal, session, protein, beamline = processlib.get_proposal_and_session_and_protein(processDir)
+    proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     pipelines = processlib.get_processing_pipelines()
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir, '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
@@ -144,7 +144,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
             processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
             parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                                status, protein, processDir, overwrite, beamline, dal, db_file)
+                                status, protein, processDir, overwrite, beamline, dal, db_file, category)
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
