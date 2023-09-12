@@ -175,6 +175,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         d = get_overall_stats(block, d)
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
+        break   # only interested in first block; xia2 has a second, somewhat redundant block
 
     return d
 
