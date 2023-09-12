@@ -78,7 +78,6 @@ def get_software_info(block, d):
             elif item in autoproc_pipeline_list:
                 d['autoproc_pipeline'] = item
                 d['autoproc_pipeline_version'] = version[n]
-    print(d)
     return d
 
 def get_overall_stats(block, d):
@@ -179,6 +178,8 @@ def get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile, logfile, mounted_
 
 def insert_into_xray_processing_table(logger, dal, d):
     logger.info('saving xray_processing_table to database')
+    print(dir(dal.xray_processing_table))
+    print(d)
     try:
         ins = dal.xray_processing_table.insert().values(d)
         dal.connection.execute(ins)
