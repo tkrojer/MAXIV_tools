@@ -82,7 +82,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
             continue
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
-            mtzpath, mtz_extension, log_extension, cif_extension = processlib.get_pipeline_path(pipeline)
+            mtzpath, mtz_extension, log_extension, cif_extension, mtz_unmerged = processlib.get_pipeline_path(pipeline)
             for mtzfile in glob.glob(os.path.join(sample_folder, run, mtzpath)):
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
@@ -92,7 +92,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                 foundMTZ = True
                 status, logfile, ciffile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
-                                                      mtz_extension, cif_extension, log_extension, status)
+                                                      mtz_extension, cif_extension, log_extension, status, mtz_unmerged)
                 processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                 protein, status, master, pipeline)
                 if ciffile:

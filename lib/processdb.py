@@ -59,20 +59,25 @@ def get_cell_sym_info(mtz, d):
     return d
 
 def get_software_info(block, d):
-    data_reduction_software_list = ['XDS']
-    data_scaling_software_list = ['AIMLESS']
-    autoproc_pipeline_list = ['autoPROC']
+    data_reduction_software_list = ['XDS'. 'DIALS']
+    data_scaling_software_list = ['AIMLESS', 'DIALS']
+    autoproc_pipeline_list = ['autoPROC', 'xia2']
     if block.find_loop('_software.name'):
         software = list(block.find_loop('_software.name'))
-        for item in software:
+        version = list(block.find_loop('_software.version'))
+        for n,item in enumerate(software):
             if item in data_reduction_software_list and item != "STARANISO":
                 d['data_reduction_software'] = item
+                d['data_reduction_software_version'] = version[n]
             elif item == "STARANISO":
                 d['staraniso'] = True
+                d['staraniso_version'] = version[n]
             elif item in data_scaling_software_list:
                 d['data_scaling_software'] = item
+                d['data_scaling_software_version'] = version[n]
             elif item in autoproc_pipeline_list:
                 d['autoproc_pipeline'] = item
+                d['autoproc_pipeline_version'] = version[n]
     return d
 
 def get_overall_stats(block, d):
@@ -100,42 +105,50 @@ def get_dataset_id(dal, mounted_crystal_code, proposal, session, run):
     return idx
 
 def get_highres_stats(block, d):
-    print('hallo')
-    #        if block.find_loop('_reflns_shell.Rmerge_I_obs'):
-    #            Rmerge_I_obs = list(block.find_loop('_reflns_shell.Rmerge_I_obs'))
-    #            cifDict['Rmerge_I_obs_low'] = str(round(float(Rmerge_I_obs[0]), 2))
-    #
-    #        if block.find_loop('_reflns_shell.meanI_over_sigI_obs'):
-    #            meanI_over_sigI_obs = list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))
-    #            cifDict['meanI_over_sigI_obs_high'] = str(round(float(meanI_over_sigI_obs[len(meanI_over_sigI_obs)-1]), 2))
-    """
-        Column('reflns_inner_d_resolution_high', Numeric(12, 2)),
-        Column('reflns_inner_d_resolution_low', Numeric(12, 2)),
-        Column('reflns_inner_number_obs', Integer()),
-        Column('reflns_inner_percent_possible_obs', Numeric(12, 2)),
-        Column('reflns_inner_pdbx_redundancy', Numeric(12, 2)),
-        Column('reflns_inner_pdbx_Rmerge_I_obs', Numeric(12, 2)),
-        Column('reflns_inner_pdbx_netI_over_sigmaI', Numeric(12, 2)),
-        Column('reflns_inner_pdbx_pdbx_Rrim_I_all', Numeric(12, 2)),
-        Column('reflns_inner_Rmeas_all', Numeric(12, 2)),
-        Column('reflns_inner_pdbx_CC_half', Numeric(12, 2)),
-    """
-
+    if block.find_loop('_reflns_shell.pdbx_ordinal'):
+        high = len(list(block.find_loop('_reflns_shell.pdbx_ordinal'))) - 1
+        if block.find_loop('_reflns_shell.d_res_high'):
+            d['reflns_inner_d_resolution_high'] = list(block.find_loop('_reflns_shell.d_res_high'))[high]
+        if block.find_loop('_reflns_shell.d_res_low'):
+            d['reflns_inner_d_resolution_low'] = list(block.find_loop('_reflns_shell.d_res_low'))[high]
+        if block.find_loop('_reflns_shell.number_measured_obs'):
+            d['reflns_inner_number_obs'] = list(block.find_loop('_reflns_shell.number_measured_obs'))[high]
+        if block.find_loop('_reflns_shell.percent_possible_all'):
+            d['reflns_inner_percent_possible_obs'] = list(block.find_loop('_reflns_shell.percent_possible_all'))[high]
+        if block.find_loop('_reflns_shell.pdbx_redundancy'):
+            d['reflns_inner_pdbx_redundancy'] = list(block.find_loop('_reflns_shell.pdbx_redundancy'))[high]
+        if block.find_loop('_reflns_shell.Rmerge_I_obs'):
+            d['reflns_inner_pdbx_Rmerge_I_obs'] = list(block.find_loop('_reflns_shell.Rmerge_I_obs'))[high]
+        if block.find_loop('_reflns_shell.meanI_over_sigI_obs'):
+            d['reflns_inner_pdbx_netI_over_sigmaI'] = list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))[high]
+        if block.find_loop('_reflns_shell.pdbx_Rrim_I_all'):
+            d['reflns_inner_pdbx_pdbx_Rrim_I_all'] = list(block.find_loop('_reflns_shell.pdbx_Rrim_I_all'))[high]
+        if block.find_loop('_reflns_shell.pdbx_CC_half'):
+            d['reflns_inner_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[high]
+    return d
+    
 
 def get_lowres_stats(block, d):
-    print('hallo')
-    """
-        Column('reflns_outer_d_resolution_high', Numeric(12, 2)),
-        Column('reflns_outer_d_resolution_low', Numeric(12, 2)),
-        Column('reflns_outer_number_obs', Integer()),
-        Column('reflns_outer_percent_possible_obs', Numeric(12, 2)),
-        Column('reflns_outer_pdbx_redundancy', Numeric(12, 2)),
-        Column('reflns_outer_pdbx_Rmerge_I_obs', Numeric(12, 2)),
-        Column('reflns_outer_pdbx_netI_over_sigmaI', Numeric(12, 2)),
-        Column('reflns_outer_pdbx_pdbx_Rrim_I_all', Numeric(12, 2)),
-        Column('reflns_outer_Rmeas_all', Numeric(12, 2)),
-        Column('reflns_outer_pdbx_CC_half', Numeric(12, 2)),
-    """
+    if block.find_loop('_reflns_shell.pdbx_ordinal'):
+        if block.find_loop('_reflns_shell.d_res_high'):
+            d['reflns_outer_d_resolution_high'] = list(block.find_loop('_reflns_shell.d_res_high'))[0]
+        if block.find_loop('_reflns_shell.d_res_low'):
+            d['reflns_outer_d_resolution_low'] = list(block.find_loop('_reflns_shell.d_res_low'))[0]
+        if block.find_loop('_reflns_shell.number_measured_obs'):
+            d['reflns_outer_number_obs'] = list(block.find_loop('_reflns_shell.number_measured_obs'))[0]
+        if block.find_loop('_reflns_shell.percent_possible_all'):
+            d['reflns_outer_percent_possible_obs'] = list(block.find_loop('_reflns_shell.percent_possible_all'))[0]
+        if block.find_loop('_reflns_shell.pdbx_redundancy'):
+            d['reflns_outer_pdbx_redundancy'] = list(block.find_loop('_reflns_shell.pdbx_redundancy'))[0]
+        if block.find_loop('_reflns_shell.Rmerge_I_obs'):
+            d['reflns_outer_pdbx_Rmerge_I_obs'] = list(block.find_loop('_reflns_shell.Rmerge_I_obs'))[0]
+        if block.find_loop('_reflns_shell.meanI_over_sigI_obs'):
+            d['reflns_outer_pdbx_netI_over_sigmaI'] = list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))[0]
+        if block.find_loop('_reflns_shell.pdbx_Rrim_I_all'):
+            d['reflns_outer_pdbx_pdbx_Rrim_I_all'] = list(block.find_loop('_reflns_shell.pdbx_Rrim_I_all'))[0]
+        if block.find_loop('_reflns_shell.pdbx_CC_half'):
+            d['reflns_outer_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[0]
+    return d
 
 def get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
 
@@ -157,6 +170,8 @@ def get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile, logfile, mounted_
     for block in doc:
         d = get_software_info(block, d)
         d = get_overall_stats(block, d)
+        d = get_lowres_stats(block, d)
+        d = get_highres_stats(block, d)
 
     return d
 

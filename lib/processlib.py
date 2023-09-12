@@ -130,31 +130,36 @@ def get_pipeline_path(pipeline):
     mtz_extension = None
     log_extension = None
     cif_extension = None
+    mtz_unmerged = None
     if pipeline == 'autoproc':
 #        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
         mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'truncate-unique.mtz')
         mtz_extension = 'HDF5_1/truncate-unique.mtz'
         log_extension = 'HDF5_1/aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
+        mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
     elif pipeline == 'staraniso':
 #        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
         mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
         mtz_extension = 'HDF5_1/staraniso_alldata-unique.mtz'
         log_extension = 'HDF5_1/staraniso_alldata.log'
         cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
+        mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
     elif pipeline == 'xia2dials':
 #        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
         log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
         cif_extension = 'DataFiles/xia2.mmcif.bz2'
+        mtz_unmerged = 'DataFiles/AUTOMATIC_DEFAULT_scaled_unmerged.mtz'
     elif pipeline == 'xia2xds':
 #        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtzpath = os.path.join('xia2XDS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
         log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
         cif_extension = 'DataFiles/xia2.mmcif.bz2'
-    return mtzpath, mtz_extension, log_extension, cif_extension
+        mtz_unmerged = 'DataFiles/AUTOMATIC_DEFAULT_scaled_unmerged.mtz'
+    return mtzpath, mtz_extension, log_extension, cif_extension, mtz_unmerged
 
 
 def process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run, pipeline):
@@ -169,9 +174,10 @@ def process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, s
 
 
 def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
-                      run, pipeline, collection_date, mtz_extension, cif_extension, log_extension, status):
+                      run, pipeline, collection_date, mtz_extension, cif_extension, log_extension, status, mtz_unmerged):
     logfile = None
     ciffile = None
+    unm_mtz = None
     mtz = mtz_info(mtzfile)
     wavelength = mtz['wavelength']
     create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
@@ -186,9 +192,16 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.info('found CIF file: ' + ciffile)
     else:
         logger.error('cannot find CIF file')
+
+    if os.path.isfile(mtz_unmerged):
+        unm_mtz = mtz_unmerged
+        logger.info('found UNMERGED MTZ file: ' + unm_mtz)
+    else:
+        logger.error('cannot find UNMERGED MTZ file')
+
     if logfile and ciffile:
         mtzfile, logfile, ciffile = copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
-                                                mtzfile, logfile, ciffile, collection_date, wavelength)
+                                                mtzfile, logfile, ciffile, collection_date, wavelength, unm_mtz)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
     status = get_status(logger, mtzfile, mtz, ciffile, status)
@@ -280,7 +293,7 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
 
 
 def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
-                                 mtz, log, cif, collection_date, wavelength):
+                                 mtz, log, cif, collection_date, wavelength, unm_mtz):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline))
     mtz_name = mtz.split('/')[len(mtz.split('/'))-1]
     log_name = log.split('/')[len(log.split('/'))-1]
@@ -289,6 +302,9 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
         os.system('/bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(log_name):
         os.system('/bin/cp {0!s} .'.format(log))
+    if unm_mtz:
+        if not os.path.isfile(unm_mtz):
+            os.system('/bin/cp {0!s} .'.format(unm_mtz))
     if not os.path.isfile(cif_name):
         write_mmcif_header(cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
