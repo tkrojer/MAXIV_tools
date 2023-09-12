@@ -60,7 +60,7 @@ def get_cell_sym_info(mtz, d):
     d['sym_Int_Tables_number'] = mtz.spacegroup.number
     return d
 
-def get_software_info(block, d):
+def get_software_info(logger, block, d):
     data_reduction_software_list = ['XDS', 'DIALS']
     data_scaling_software_list = ['AIMLESS', 'DIALS']
     autoproc_pipeline_list = ['autoPROC', 'xia2']
@@ -153,7 +153,7 @@ def get_lowres_stats(block, d):
             d['reflns_outer_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[0]
     return d
 
-def get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
+def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
 
     dataset_id = get_dataset_id(dal, mounted_crystal_code, proposal, session, run)
 
@@ -171,7 +171,7 @@ def get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile, logfile, mounted_
     d = get_cell_sym_info(mtz, d)
 
     for block in doc:
-        d = get_software_info(block, d)
+        d = get_software_info(logger, block, d)
         d = get_overall_stats(block, d)
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
