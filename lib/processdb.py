@@ -178,7 +178,7 @@ def get_process_stats_from_mmcif_as_dict(dal,ciffile, mtzfile, logfile, mounted_
 
 def insert_into_xray_processing_table(logger, dal, d):
     logger.info('saving xray_processing_table to database')
-    print(dir(dal.xray_processing_table))
+    print(dir(dal.xray_processing_table.columns))
     print(d)
     try:
         ins = dal.xray_processing_table.insert().values(d)
