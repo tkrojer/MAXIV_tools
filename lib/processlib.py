@@ -61,9 +61,9 @@ def create_sample_folder(logger, projectDir, sample):
 def prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir, category, beamline):
     create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
     create_image_folder(logger, projectDir, sample, proposal, session, run)
-    find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run, category, beamline)
+    crystal_snapshot_list = find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run, category, beamline)
     dozor_plot = find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, run)
-    return dozor_plot
+    return dozor_plot, crystal_snapshot_list
 
 def create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run):
     os.chdir(os.path.join(projectDir, '1-process', sample))
@@ -87,10 +87,12 @@ def create_image_folder(logger, projectDir, sample, proposal, session, run):
 
 
 def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run, category, beamline):
+    crystal_snapshot_list = []
     snapshot_dir = os.path.join('/data', 'staff', 'ispybstorage', category, beamline, category, proposal, session, 'raw',
                                 protein, sample)
     logger.info('looking for crystal snapshots in {0!s}'.format(snapshot_dir))
-    os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), 'images'))
+    image_dir = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), 'images')
+    os.chdir(image_dir)
 
     #/data/staff/ispybstorage/proprietary/biomax/proprietary/20230893/20230624/raw/GEN2110_A/GEN2110_A-x0112/GEN2110_A-x0112_1_1.snapshot.jpeg
 
@@ -99,6 +101,10 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
     for img in glob.glob(os.path.join(snapshot_dir, '*.snapshot.jpeg'.format(run))):
         logger.info('copying {0!s}'.format(img))
         os.system('/bin/cp {0!s} .'.format(img))
+        img_name = img[img.rfind('/') + 1:]
+        if len(crystal_snapshot_list) <= 4:
+            crystal_snapshot_list.append(os.path.join(image_dir, img_name))
+    return crystal_snapshot_list
 
 
 def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, run):

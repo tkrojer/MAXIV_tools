@@ -11,7 +11,7 @@ def get_mounted_crystal_id(dal, sample):
     result = rp.fetchall()
     return result[0][0]
 
-def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master, dozor_plot):
+def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master, dozor_plot, crystal_snapshot_list):
     logger.info('getting d_xray_dataset_table_dict for {0!s}'.format(sample))
     mounted_crystal_id = get_mounted_crystal_id(dal, sample)
 
@@ -31,6 +31,11 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
 
     if dozor_plot:
         d_xray_dataset_table_dict['dozor_plot'] = dozor_plot
+
+    key = ['crystal_snapshot_1', 'crystal_snapshot_2', 'crystal_snapshot_3', 'crystal_snapshot_3']
+    if crystal_snapshot_list:
+        for n, img in enumerate(crystal_snapshot_list):
+            d[key[n]] = img
 
     return d_xray_dataset_table_dict
 
