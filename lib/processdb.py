@@ -35,7 +35,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
     key = ['crystal_snapshot_1', 'crystal_snapshot_2', 'crystal_snapshot_3', 'crystal_snapshot_3']
     if crystal_snapshot_list:
         for n, img in enumerate(crystal_snapshot_list):
-            d[key[n]] = img
+            d_xray_dataset_table_dict[key[n]] = img
 
     return d_xray_dataset_table_dict
 
