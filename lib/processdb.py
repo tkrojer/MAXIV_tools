@@ -78,6 +78,7 @@ def get_software_info(block, d):
             elif item in autoproc_pipeline_list:
                 d['autoproc_pipeline'] = item
                 d['autoproc_pipeline_version'] = version[n]
+    print(d)
     return d
 
 def get_overall_stats(block, d):
