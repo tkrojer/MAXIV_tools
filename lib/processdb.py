@@ -11,7 +11,7 @@ def get_mounted_crystal_id(dal, sample):
     result = rp.fetchall()
     return result[0][0]
 
-def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master):
+def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master, dozor_plot):
     logger.info('getting d_xray_dataset_table_dict for {0!s}'.format(sample))
     mounted_crystal_id = get_mounted_crystal_id(dal, sample)
 
@@ -28,12 +28,14 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
         'data_collection_date': create_date,
         'h5_master_file':   master
     }
-    print(d_xray_dataset_table_dict)
+
+    if dozor_plot:
+        d_xray_dataset_table_dict['dozor_plot'] = dozor_plot
+
     return d_xray_dataset_table_dict
 
 def insert_into_xray_dataset_table(logger, dal, d):
     logger.info('trying to insert into xray_dataset_table')
-    print(d)
     try:
         ins = dal.xray_dataset_table.insert().values(d)
         dal.connection.execute(ins)
@@ -65,6 +67,7 @@ def get_software_info(block, d):
     if block.find_loop('_software.name'):
         software = list(block.find_loop('_software.name'))
         version = list(block.find_loop('_software.version'))
+        logger.info('software list: {0!s}'.format(list(block.find_loop('_software.name'))))
         for n,item in enumerate(software):
             if item in data_reduction_software_list and item != "STARANISO":
                 d['data_reduction_software'] = item

@@ -61,8 +61,8 @@ def prepare_folders_and_files(logger, projectDir, sample, proposal, session, run
     create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
     create_image_folder(logger, projectDir, sample, proposal, session, run)
     find_crystal_snapshots(logger, projectDir, sample, proposal, session, protein, run)
-    find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, run)
-
+    dozor_plot = find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, run)
+    return dozor_plot
 
 def create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run):
     os.chdir(os.path.join(projectDir, '1-process', sample))
@@ -96,10 +96,13 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
 
 def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, run):
     logger.info('looking for dozor plots...')
+    dozor_plot = None
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), 'images'))
     for img in glob.glob(os.path.join(processDir, sample, run, 'ImgQIndicator_proc', 'cn*', 'ControlPyDozor*', 'dozor_*.png')):
         logger.info('copying {0!s}'.format(img))
         os.system('/bin/cp {0!s} dozor.png'.format(img))
+        dozor_plot = img
+    return dozor_plot
 
 
 def get_processing_pipelines():
@@ -181,21 +184,25 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     mtz = mtz_info(mtzfile)
     wavelength = mtz['wavelength']
     create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
+
+    logger.info('looking for logfile: {0!s}'.format(mtzfile.replace(mtz_extension, log_extension)))
     if os.path.isfile(mtzfile.replace(mtz_extension, log_extension)):
         logfile = mtzfile.replace(mtz_extension, log_extension)
         logger.info('found LOG file: ' + logfile)
     else:
         logger.error('cannot find LOG file')
-    logger.info('looking fir ciffile' + mtzfile.replace(mtz_extension, cif_extension))
+
+    logger.info('looking for ciffile' + mtzfile.replace(mtz_extension, cif_extension))
     if os.path.isfile(mtzfile.replace(mtz_extension, cif_extension)):
         ciffile = mtzfile.replace(mtz_extension, cif_extension)
         logger.info('found CIF file: ' + ciffile)
     else:
         logger.error('cannot find CIF file')
 
-    if os.path.isfile(mtz_unmerged):
-        unm_mtz = mtz_unmerged
-        logger.info('found UNMERGED MTZ file: ' + unm_mtz)
+    logger.info('looking for unmerged mtz file: {0!s}'.format(mtzfile.replace(mtz_extension, mtz_unmerged)))
+    if os.path.isfile(mtzfile.replace(mtz_extension, mtz_unmerged)):
+        unm_mtz = mtzfile.replace(mtz_extension, mtz_unmerged)
+        logger.info('found UNMERGED MTZ file: ' + mtzfile.replace(mtz_extension, mtz_unmerged))
     else:
         logger.error('cannot find UNMERGED MTZ file')
 
