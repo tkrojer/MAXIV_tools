@@ -98,12 +98,13 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
 
 #    for img in glob.glob('/data/staff/ispybstorage/pyarch/visitors/{0!s}/{1!s}/raw/{2!s}/{3!s}/*.snapshot.jpeg'.format(
 #            proposal, session, protein, sample)):
-    for img in glob.glob(os.path.join(snapshot_dir, '*.snapshot.jpeg'.format(run))):
+    for img in sorted(glob.glob(os.path.join(snapshot_dir, '*.snapshot.jpeg'.format(run)))):
         logger.info('copying {0!s}'.format(img))
         os.system('/bin/cp {0!s} .'.format(img))
         img_name = img[img.rfind('/') + 1:]
         if len(crystal_snapshot_list) <= 4:
             crystal_snapshot_list.append(os.path.join(image_dir, img_name))
+
     return crystal_snapshot_list
 
 
@@ -535,6 +536,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
     logger.info('selecting auto-processing results based on {0!s}...'.format(select_criterion))
     match_list = []
     backup_list = []
+    found_selected_pipeline = False
     for f in proc_dict:
         reso_high = proc_dict[f]['reso_high']
         if select_criterion.startswith('reso'):
@@ -542,6 +544,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
             match_list.append([f, float(reso_high)])
         elif proc_dict[f]['pipeline'] == select_criterion:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(f, reso_high))
+            found_selected_pipeline = True
             match_list.append([f, float(reso_high)])
         else:
             logger.warning('MTZ does not match criteria, but added {0!s} with high resolution limit of {1!s} A'.format(
@@ -555,8 +558,42 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
         logger.info('--> {0!s}'.format(bestcif))
     else:
         bestcif = None
-    return bestcif
+    return bestcif, found_selected_pipeline
 
+def check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion):
+    pipeline_list = ['xia2dials', 'autoproc', 'xia2xds', 'staraniso']
+    if select_criterion in pipeline_list:
+        if not found_selected_pipeline:
+            logger.warning('found a reasonable data processing result, but not for the selected auto-processing pipeline')
+            not_fitting_pipeline_list.append(sample)
+    return not_fitting_pipeline_list
+
+def report_not_fitting_pipelines(logger, not_fitting_pipeline_list, processDir, projectDir, fragmaxcsv):
+    csv_out = ''
+    logger.warning('the following samples do not have a matching result from the selected auto-processing pipeline:')
+    for sample in not_fitting_pipeline_list:
+        logger.info(' --> {0!s}'.format(sample))
+        csv_out += sample + ',\n'
+    save_reprocess_csv_file(logger, csv_out, processDir, projectDir, fragmaxcsv)
+
+def save_reprocess_csv_file(logger, csv_out, processDir, projectDir, fragmaxcsv):
+    logger.info('saving reprocess.csv file as ')
+    os.chdir(os.path.join(projectDir, 'script'))
+    f = open('reprocess.csv', 'w')
+    f.write(csv_out)
+    f.close()
+    suggest_reprocessing_input(logger, processDir, projectDir, fragmaxcsv, "reprocess.csv")
+
+def suggest_reprocessing_input(logger, processDir, projectDir, fragmaxcsv, reprocesscsv):
+    cmd = (
+        'python /data/staff/biomax/tobias/software/MAXIV_tools/1-process.py '
+        '-i {0!s} '.format(processDir) +
+        '-o {0!s} '.format(projectDir) +
+        '-f {0!s} '.format(fragmaxcsv) +
+        '-r {0!s}'.format(reprocesscsv)
+    )
+    logger.info('try running the following command to reprocess the datasets with the selected pipeline:')
+    logger.info(cmd)
 
 def link_process_results(logger, projectDir, sample, bestcif):
     logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))

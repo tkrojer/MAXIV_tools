@@ -33,9 +33,10 @@ sys.path.append('/data/staff/biomax/tobias/software/MAXIV_tools/lib')
 from db import dal
 
 
-def select_results(logger, projectDir, select_criterion, overwrite):
+def select_results(logger, projectDir, select_criterion, overwrite, processDir, fragmaxcsv):
     logger.info('selecting auto-processing results based on {0!s}'.format(select_criterion))
     ref_dict = processlib.read_reference_pdb_files(logger, projectDir)
+    not_fitting_pipeline_list = []
     for sample_folder in sorted(glob.glob(os.path.join(projectDir, '1-process', '*'))):
         proc_dict = {}
         os.chdir(sample_folder)
@@ -48,14 +49,16 @@ def select_results(logger, projectDir, select_criterion, overwrite):
         if proc_dict:
             proc_dict = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict)
             proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
-            best = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
+            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
             if best:
                 processlib.link_process_results(logger, projectDir, sample, best)
+                not_fitting_pipeline_list = processlib.check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion)
             else:
                 logger.error('None of MTZ files fulfilled the minimal requirements; check messages aboove')
         else:
             logger.error('could not find any MTZ or CIF in sample folder')
             processlib.link_info_json_file(logger, projectDir, sample)
+    processlib.report_not_fitting_pipelines(logger, not_fitting_pipeline_list, processDir, projectDir, fragmaxcsv)
     processlib.end_select_results(logger)
 
 
@@ -209,7 +212,7 @@ def main(argv):
             fragmaxcsv = os.path.abspath(arg)
         elif opt in ("-s", "--select"):
             select = True
-        elif opt in ("-c", "--crtierion"):
+        elif opt in ("-c", "--criterion"):
             select_criterion = arg
         elif opt in ("-x", "--overwrite"):
             overwrite = True
@@ -225,7 +228,7 @@ def main(argv):
         processlib.check_if_to_continue(logger)
         if select:
             processlib.start_select_results(logger)
-            select_results(logger, projectDir, select_criterion, overwrite)
+            select_results(logger, projectDir, select_criterion, overwrite, processDir, fragmaxcsv)
         elif reprocesscsv:
             proc_dict = processlib.ask_for_spg_and_unit_cell(logger)
             processlib.start_reprocessing(logger)
