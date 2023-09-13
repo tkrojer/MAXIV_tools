@@ -155,7 +155,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
 
 
 def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):
-    proposal, session, protein = processlib.get_proposal_and_session_and_protein(processDir)
+    proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
     n_jobs = 4  # hardcoded so that we don't hog the cluster
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
