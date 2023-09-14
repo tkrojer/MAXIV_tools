@@ -538,7 +538,8 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
                     match_list.append(d)
 #                    match_dict[f] = proc_dict[f]
                     break
-            logger.warning('no match found!')
+                else:
+                    logger.warning('no match found!')
     else:
         logger.warning('seems like no reference PDB files were provided; skipping this selection step...')
 #    if match_dict:
