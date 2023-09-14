@@ -518,7 +518,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
     match_list = []
     if ref_dict:
         for d in proc_list:
-            logger.info('current CIF ' + f)
+            logger.info('current file {0!s}'.format(d['processing_cif_file']))
 #            pgr_mtz = proc_dict[f]['point_group']
             pgr_mtz = d['sym_point_group']
 #            ucv_mtz = float(proc_dict[f]['unitcell_volume'])
