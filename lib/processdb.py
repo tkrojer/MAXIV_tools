@@ -225,10 +225,13 @@ def get_processing_results_for_sample(logger, dal, sample):
                 ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
-    print(dir(dal.xray_processing_table.c.cell_volume))
-    print(dal.xray_processing_table.c.cell_volume.type)
-    sys.exit()
+#    print(dir(dal.xray_processing_table.c.cell_volume))
+#    print(dal.xray_processing_table.c.cell_volume.type)
+#    sys.exit()
     result_list = get_result_list_of_dicts(r)
+    for l in result_list:
+        print(result_list[l]['cell_volume'])
+    sys.exit()
     return result_list
 
 
