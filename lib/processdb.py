@@ -231,7 +231,7 @@ def get_processing_results_for_sample(logger, dal, sample):
     result_list = get_result_list_of_dicts(r)
     for l in result_list:
         print(result_list[l]['cell_volume'])
-    sys.exit()
+#    sys.exit()
     return result_list
 
 
