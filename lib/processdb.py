@@ -4,6 +4,8 @@ import sqlalchemy
 from sqlalchemy.sql import select
 from sqlalchemy import and_
 
+import sys
+
 def get_mounted_crystal_id(dal, sample):
     q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
         dal.mounted_crystals_table.c.mounted_crystal_code == sample)
@@ -196,6 +198,24 @@ def insert_into_xray_processing_table(logger, dal, d):
         else:
             logger.error(str(e))
 
+def get_processing_results_for_sample(logger, dal, sample):
+    logger.info('selecting all auto-processing results from database for {0!s}'.format(sample))
+    q = select([dal.xray_processing_table.c.processing_id,
+                dal.xray_processing_table.c.cell_volume,
+                dal.xray_processing_table.c.sym_lattice_point_group,
+                dal.xray_processing_table.c.reflns_d_resolution_high,
+                dal.xray_processing_table.c.reflns_inner_pdbx_Rmerge_I_obs,
+                dal.xray_processing_table.c.processing_mtz_file,
+                dal.xray_processing_table.c.processing_log_file,
+                dal.xray_processing_table.c.processing_cif_file
+                ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
+    rp = dal.connection.execute(q)
+    r = rp.fetchall()
+    print(r)
+    sys.exit()
+    idx = r[0][0]
+    return idx
+
 
 def unselected_autoprocessing_result(logger, dal, sample):
     logger.info('step 1: unselecting all auto-processing results for {0!s}'.format(sample))
@@ -205,8 +225,19 @@ def unselected_autoprocessing_result(logger, dal, sample):
         dal.xray_processing_table.c.mounted_crystal_code == sample)
     dal.connection.execute(u)
 
+
 def set_selected_autoprocessing_result(logger, dal, sample, data_reduction_software, data_scaling_software, autoproc_pipeline, automatic_processed, staraniso):
     logger.info('step 2: set auto-processing results for {0!s}'.format(sample))
+
+#    >> > session = x.split('-')[1]
+#    >> > proposal = x.split('-')[0]
+#    >> > sample = "GEN2110_A-x0066"
+#    >> > pipeline = x.split('/')[1]
+
+    # first need to get dataset_id from xray_dataset_table
+    dataset_id = get_dataset_id(dal, sample, proposal, session, run)
+
+
     d = {}
     d['selected'] = True
     u = dal.xray_processing_table.update().values(d).where(and_(

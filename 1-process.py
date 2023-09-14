@@ -41,6 +41,11 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
         proc_dict = {}
         os.chdir(sample_folder)
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
+
+
+
+
+
         logger.info('current sample - {0!s}'.format(sample))
         if processlib.skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, overwrite):
             continue
