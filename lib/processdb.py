@@ -212,10 +212,12 @@ def get_processing_results_for_sample(logger, dal, sample):
                 ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
-    print(q.compile(dialect=sqlite.dialect()))
-    sys.exit()
-    idx = r[0][0]
-    return idx
+    if sample == "GEN2110_A-x0034":
+        print(r)
+        #print(q.compile(dialect=sqlite.dialect()))
+        sys.exit()
+#    idx = r[0][0]
+#    return idx
 
 
 def unselected_autoprocessing_result(logger, dal, sample):
