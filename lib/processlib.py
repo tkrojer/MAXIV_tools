@@ -571,6 +571,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
     logger.info('checking of auto-processing MTZ files have low resolution Rmerge values below 10%...')
     match_list = []
     for d in proc_list:
+        logger.info('current pipeline: {0!s}'.format(d['autoproc_pipeline']))
         if float(d['reflns_inner_pdbx_Rmerge_I_obs']) < max_allowed_Rmerge_I_obs_low():
 #            logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
             match_list.append(d)
