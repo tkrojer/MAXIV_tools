@@ -41,8 +41,8 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
         proc_dict = {}
         os.chdir(sample_folder)
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
-        processdb.get_processing_results_for_sample(logger, dal, sample)
-
+        result_list = processdb.get_processing_results_for_sample(logger, dal, sample)
+        logger.info(result_list)
 
 
 

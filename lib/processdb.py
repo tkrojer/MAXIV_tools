@@ -4,8 +4,8 @@ import sqlalchemy
 from sqlalchemy.sql import select
 from sqlalchemy import and_
 
-from sqlalchemy.dialects import sqlite
-import sys
+#from sqlalchemy.dialects import sqlite
+#import sys
 
 def get_mounted_crystal_id(dal, sample):
     q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
@@ -199,6 +199,19 @@ def insert_into_xray_processing_table(logger, dal, d):
         else:
             logger.error(str(e))
 
+def get_result_list_of_dicts(result):
+    result_list = []
+    for entry in result:
+        value_dict = {}
+        for n, key in enumerate(entry.keys()):
+            if entry[n] == None:
+                value_dict[key] = ''
+            else:
+                value_dict[key] = entry[n]
+        result_list.append(value_dict)
+    return result_list
+
+
 def get_processing_results_for_sample(logger, dal, sample):
     logger.info('selecting all auto-processing results from database for {0!s}'.format(sample))
     q = select([dal.xray_processing_table.c.processing_id,
@@ -212,12 +225,8 @@ def get_processing_results_for_sample(logger, dal, sample):
                 ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
-    if sample == "GEN2110_A-x0034":
-        print(r)
-        #print(q.compile(dialect=sqlite.dialect()))
-        sys.exit()
-#    idx = r[0][0]
-#    return idx
+    result_list = query.get_result_list_of_dicts(r)
+    return result_list
 
 
 def unselected_autoprocessing_result(logger, dal, sample):
