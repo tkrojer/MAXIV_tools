@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy.sql import select
 from sqlalchemy import and_
 
+from sqlalchemy.dialects import sqlite
 import sys
 
 def get_mounted_crystal_id(dal, sample):
@@ -211,7 +212,7 @@ def get_processing_results_for_sample(logger, dal, sample):
                 ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
-    print(r)
+    print(q.compile(dialect=sqlite.dialect()))
     sys.exit()
     idx = r[0][0]
     return idx
