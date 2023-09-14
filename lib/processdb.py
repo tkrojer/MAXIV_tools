@@ -225,6 +225,7 @@ def get_processing_results_for_sample(logger, dal, sample):
                 ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
+    print(r)
     result_list = get_result_list_of_dicts(r)
     return result_list
 
