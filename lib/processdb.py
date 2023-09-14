@@ -229,8 +229,8 @@ def get_processing_results_for_sample(logger, dal, sample):
 #    print(dal.xray_processing_table.c.cell_volume.type)
 #    sys.exit()
     result_list = get_result_list_of_dicts(r)
-    for l in result_list:
-        print(result_list[l]['cell_volume'])
+    for d in result_list:
+        print(d['cell_volume'])
 #    sys.exit()
     return result_list
 
