@@ -195,3 +195,25 @@ def insert_into_xray_processing_table(logger, dal, d):
             logger.warning('entry exists (time soaked {0!s}); skipping'.format(d['soak_datetime']))
         else:
             logger.error(str(e))
+
+
+def unselected_autoprocessing_result(logger, dal, sample):
+    logger.info('step 1: unselecting all auto-processing results for {0!s}'.format(sample))
+    d = {}
+    d['selected'] = False
+    u = dal.xray_processing_table.update().values(d).where(
+        dal.xray_processing_table.c.mounted_crystal_code == sample)
+    dal.connection.execute(u)
+
+def set_selected_autoprocessing_result(logger, dal, sample, data_reduction_software, data_scaling_software, autoproc_pipeline, automatic_processed, staraniso):
+    logger.info('step 2: set auto-processing results for {0!s}'.format(sample))
+    d = {}
+    d['selected'] = True
+    u = dal.xray_processing_table.update().values(d).where(and_(
+        dal.xray_processing_table.c.mounted_crystal_code == sample,
+        dal.xray_processing_table.c.data_reduction_software == xxx,
+        dal.xray_processing_table.c.data_scaling_software == xxx,
+        dal.xray_processing_table.c.autoproc_pipeline == xxx,
+        dal.xray_processing_table.c.automatic_processed == xxx,
+        dal.xray_processing_table.c.staraniso == xxx))
+    dal.connection.execute(u)

@@ -554,6 +554,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_dict, select_crite
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list
     if proc_dict:
+        logger.info('current list of matching auto-processing results: {0!s}'.format(match_list))
         bestcif = min(match_list, key=lambda x: x[1])[0]
         logger.info('--> {0!s}'.format(bestcif))
     else:
