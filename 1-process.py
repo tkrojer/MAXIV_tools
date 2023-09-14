@@ -41,20 +41,20 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
         proc_dict = {}
         os.chdir(sample_folder)
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
-        result_list = processdb.get_processing_results_for_sample(logger, dal, sample)
-        logger.info(result_list)
-
-
-
         logger.info('current sample - {0!s}'.format(sample))
         if processlib.skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, overwrite):
             continue
-        for ciffile in glob.glob(os.path.join('*', '*', 'process.cif')):
-            proc_dict = processlib.read_data_collection_stats(logger, ciffile, proc_dict)
-        if proc_dict:
-            proc_dict = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict)
-            proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
-            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
+#        for ciffile in glob.glob(os.path.join('*', '*', 'process.cif')):
+#            proc_dict = processlib.read_data_collection_stats(logger, ciffile, proc_dict)
+        proc_list = processdb.get_processing_results_for_sample(logger, dal, sample)
+#        if proc_dict:
+        if proc_list:
+#            proc_dict = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict)
+            proc_list = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_dict)
+#            proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
+            proc_list = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_list)
+#            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
+            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_list, select_criterion)
             if best:
                 processlib.link_process_results(logger, projectDir, sample, best)
                 not_fitting_pipeline_list = processlib.check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion)

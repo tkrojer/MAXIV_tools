@@ -486,15 +486,45 @@ def read_reference_pdb_files(logger, projectDir):
     return ref_dict
 
 
-def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict):
+#def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict):
+#    logger.info('checking if PDB files in 0-model folder are similar to the processing MTZ files...')
+#    match_dict = {}
+#    if ref_dict:
+#        for f in proc_dict:
+#            logger.info('current CIF ' + f)
+#            pgr_mtz = proc_dict[f]['point_group']
+#            ucv_mtz = float(proc_dict[f]['unitcell_volume'])
+#            lat_mtz = proc_dict[f]['lattice']
+#            for p in ref_dict:
+#                pgr_pdb = ref_dict[p][0]
+#                ucv_pdb = float(ref_dict[p][2])
+#                lat_pdb = ref_dict[p][1]
+#                ucv_diff = abs((ucv_mtz-ucv_pdb))/ucv_pdb
+#                if pgr_mtz == pgr_pdb and lat_mtz == lat_pdb and ucv_diff < 0.1:
+#                    logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(p))
+#                    match_dict[f] = proc_dict[f]
+#                    break
+#            logger.warning('no match found!')
+#    else:
+#        logger.warning('seems like no reference PDB files were provided; skipping this selection step...')
+#    if match_dict:
+#        proc_dict = match_dict
+#    else:
+#        logger.warning('none of the PDB files appears to be similar to any of the auto-processing MTZ files')
+#    return proc_dict
+
+def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_dict):
     logger.info('checking if PDB files in 0-model folder are similar to the processing MTZ files...')
-    match_dict = {}
+    match_list = []
     if ref_dict:
-        for f in proc_dict:
+        for d in proc_list:
             logger.info('current CIF ' + f)
-            pgr_mtz = proc_dict[f]['point_group']
-            ucv_mtz = float(proc_dict[f]['unitcell_volume'])
-            lat_mtz = proc_dict[f]['lattice']
+#            pgr_mtz = proc_dict[f]['point_group']
+            pgr_mtz = d['sym_point_group']
+#            ucv_mtz = float(proc_dict[f]['unitcell_volume'])
+            ucv_mtz = float(d['cell_volume'])
+#            lat_mtz = proc_dict[f]['lattice']
+            lat_mtz = d['sym_lattice']
             for p in ref_dict:
                 pgr_pdb = ref_dict[p][0]
                 ucv_pdb = float(ref_dict[p][2])
@@ -502,64 +532,117 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_d
                 ucv_diff = abs((ucv_mtz-ucv_pdb))/ucv_pdb
                 if pgr_mtz == pgr_pdb and lat_mtz == lat_pdb and ucv_diff < 0.1:
                     logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(p))
-                    match_dict[f] = proc_dict[f]
+                    match_list.append(d)
+#                    match_dict[f] = proc_dict[f]
                     break
             logger.warning('no match found!')
     else:
         logger.warning('seems like no reference PDB files were provided; skipping this selection step...')
-    if match_dict:
-        proc_dict = match_dict
+#    if match_dict:
+#        proc_dict = match_dict
+    if match_list:
+        proc_list = match_list
     else:
         logger.warning('none of the PDB files appears to be similar to any of the auto-processing MTZ files')
-    return proc_dict
+    return proc_list
 
 
-def retain_results_with_good_low_reso_rmerge(logger, proc_dict):
+#def retain_results_with_good_low_reso_rmerge(logger, proc_dict):
+#    logger.info('checking of auto-processing MTZ files have low resolution Rmerge values below 10%...')
+#    match_dict = {}
+#    for f in proc_dict:
+#        if float(proc_dict[f]['Rmerge_I_obs_low']) < max_allowed_Rmerge_I_obs_low():
+#            logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
+#            match_dict[f] = proc_dict[f]
+#        else:
+#            logger.error('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
+#    if match_dict:
+#        proc_dict = match_dict
+#    else:
+#        logger.error('did not find any MTZ file with Rmerge (low) below {0!s}; skipping sample...'.format(
+#            max_allowed_Rmerge_I_obs_low()))
+#        proc_dict = {}
+#    return proc_dict
+
+
+def retain_results_with_good_low_reso_rmerge(logger, proc_list):
     logger.info('checking of auto-processing MTZ files have low resolution Rmerge values below 10%...')
-    match_dict = {}
-    for f in proc_dict:
-        if float(proc_dict[f]['Rmerge_I_obs_low']) < max_allowed_Rmerge_I_obs_low():
-            logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
-            match_dict[f] = proc_dict[f]
+    match_list = []
+    for d in proc_list:
+        if float(d['reflns_inner_pdbx_Rmerge_I_obs']) < max_allowed_Rmerge_I_obs_low():
+#            logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
+            match_list.append(d)
         else:
-            logger.error('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
-    if match_dict:
-        proc_dict = match_dict
+#            logger.error('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
+            logger.error('low resolution Rmerge is too high: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
+    if match_list:
+        proc_list = match_list
     else:
         logger.error('did not find any MTZ file with Rmerge (low) below {0!s}; skipping sample...'.format(
             max_allowed_Rmerge_I_obs_low()))
-        proc_dict = {}
-    return proc_dict
+        proc_list = []
+    return proc_list
 
 
-def retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion):
+#def retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion):
+#    logger.info('selecting auto-processing results based on {0!s}...'.format(select_criterion))
+#    match_list = []
+#    backup_list = []
+#    found_selected_pipeline = False
+#    for f in proc_dict:
+#        reso_high = proc_dict[f]['reso_high']
+#        if select_criterion.startswith('reso'):
+#            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(f, reso_high))
+#            match_list.append([f, float(reso_high)])
+#        elif proc_dict[f]['pipeline'] == select_criterion:
+#            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(f, reso_high))
+#            found_selected_pipeline = True
+#            match_list.append([f, float(reso_high)])
+#        else:
+#            logger.warning('MTZ does not match criteria, but added {0!s} with high resolution limit of {1!s} A'.format(
+#                f, reso_high))
+#            backup_list.append([f, float(reso_high)])
+#    if not match_list:
+#        logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
+#        match_list = backup_list
+#    if proc_dict:
+#        logger.info('current list of matching auto-processing results: {0!s}'.format(match_list))
+#        bestcif = min(match_list, key=lambda x: x[1])[0]
+#        logger.info('--> {0!s}'.format(bestcif))
+#    else:
+#        bestcif = None
+#    return bestcif, found_selected_pipeline
+
+def retain_results_which_fit_selection_criterion(logger, proc_list, select_criterion):
     logger.info('selecting auto-processing results based on {0!s}...'.format(select_criterion))
     match_list = []
     backup_list = []
     found_selected_pipeline = False
-    for f in proc_dict:
-        reso_high = proc_dict[f]['reso_high']
+    for d in proc_list:
+        reso_high = d['reflns_d_resolution_high']
         if select_criterion.startswith('reso'):
-            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(f, reso_high))
-            match_list.append([f, float(reso_high)])
-        elif proc_dict[f]['pipeline'] == select_criterion:
-            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(f, reso_high))
+            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
+            match_list.append([d, float(reso_high)])
+        elif d['autoproc_pipeline'] == select_criterion:
+            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
-            match_list.append([f, float(reso_high)])
+            match_list.append([d, float(reso_high)])
         else:
             logger.warning('MTZ does not match criteria, but added {0!s} with high resolution limit of {1!s} A'.format(
-                f, reso_high))
-            backup_list.append([f, float(reso_high)])
+                d['autoproc_pipeline'], reso_high))
+            backup_list.append([d, float(reso_high)])
     if not match_list:
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list
-    if proc_dict:
+    if proc_list:
         logger.info('current list of matching auto-processing results: {0!s}'.format(match_list))
-        bestcif = min(match_list, key=lambda x: x[1])[0]
-        logger.info('--> {0!s}'.format(bestcif))
+        best = min(match_list, key=lambda x: x[1])[0]
+        logger.info('--> {0!s}'.format(best['autoproc_pipeline']))
     else:
-        bestcif = None
-    return bestcif, found_selected_pipeline
+        best = None
+    return best, found_selected_pipeline
+
+
 
 def check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion):
     pipeline_list = ['xia2dials', 'autoproc', 'xia2xds', 'staraniso']
@@ -596,18 +679,38 @@ def suggest_reprocessing_input(logger, processDir, projectDir, fragmaxcsv, repro
     logger.info('try running the following command to reprocess the datasets with the selected pipeline:')
     logger.info(cmd)
 
-def link_process_results(logger, projectDir, sample, bestcif):
+#def link_process_results(logger, projectDir, sample, bestcif):
+#    logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
+#    os.chdir(os.path.join(projectDir, "1-process", sample))
+#    pipeline = bestcif.split('/')[1]
+##    json_info = bestcif.replace(pipeline +'/process.cif', 'info.json')
+#    json_info = bestcif.replace('process.cif', 'info.json')
+#    if not os.path.isdir('process.mtz'):
+#        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
+#    if not os.path.isdir('process.log'):
+#        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
+#    if not os.path.isdir('process.cif'):
+#        os.system('ln -s {0!s} .'.format(bestcif))
+#    if not os.path.isdir('info.json'):
+#        os.system('ln -s {0!s} .'.format(json_info))
+
+
+def link_process_results(logger, projectDir, sample, best):
     logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
     os.chdir(os.path.join(projectDir, "1-process", sample))
     pipeline = bestcif.split('/')[1]
 #    json_info = bestcif.replace(pipeline +'/process.cif', 'info.json')
-    json_info = bestcif.replace('process.cif', 'info.json')
+#    json_info = bestcif.replace('process.cif', 'info.json')
+    json_info = os.path.relpath(best['processing_cif_file']).replace('process.cif', 'info.json')
     if not os.path.isdir('process.mtz'):
-        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
+#        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
+        os.system('ln -s {0!s} .'.format(os.path.relpath(best['processing_mtz_file'])))
     if not os.path.isdir('process.log'):
-        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
+#        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
+        os.system('ln -s {0!s} .'.format(os.path.relpath(best['processing_log_file'])))
     if not os.path.isdir('process.cif'):
-        os.system('ln -s {0!s} .'.format(bestcif))
+#        os.system('ln -s {0!s} .'.format(bestcif))
+        os.system('ln -s {0!s} .'.format(os.path.relpath(best['processing_cif_file'])))
     if not os.path.isdir('info.json'):
         os.system('ln -s {0!s} .'.format(json_info))
 
