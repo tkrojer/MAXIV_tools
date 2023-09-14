@@ -5,7 +5,7 @@ from sqlalchemy.sql import select
 from sqlalchemy import and_
 
 #from sqlalchemy.dialects import sqlite
-#import sys
+import sys
 
 def get_mounted_crystal_id(dal, sample):
     q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
@@ -225,7 +225,8 @@ def get_processing_results_for_sample(logger, dal, sample):
                 ]).where(dal.xray_processing_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
-    print(r)
+    print(dir(dal.xray_processing_table.c.cell_volume))
+    sys.exit()
     result_list = get_result_list_of_dicts(r)
     return result_list
 
