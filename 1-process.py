@@ -33,7 +33,7 @@ sys.path.append('/data/staff/biomax/tobias/software/MAXIV_tools/lib')
 from db import dal
 
 
-def select_results(logger, projectDir, select_criterion, overwrite, processDir, fragmaxcsv):
+def select_results(logger, projectDir, select_criterion, overwrite, processDir, fragmaxcsv, dal):
     logger.info('selecting auto-processing results based on {0!s}'.format(select_criterion))
     ref_dict = processlib.read_reference_pdb_files(logger, projectDir)
     not_fitting_pipeline_list = []
@@ -41,7 +41,7 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
         proc_dict = {}
         os.chdir(sample_folder)
         sample = sample_folder.split('/')[len(sample_folder.split('/'))-1]
-
+        processdb.get_processing_results_for_sample(logger, dal, sample)
 
 
 
@@ -232,17 +232,17 @@ def main(argv):
 
     if checks_passed:
         processlib.check_if_to_continue(logger)
+        logger.info('initializing database: {0!s}'.format(db_file))
+        dal.db_init(db_file)
         if select:
             processlib.start_select_results(logger)
-            select_results(logger, projectDir, select_criterion, overwrite, processDir, fragmaxcsv)
+            select_results(logger, projectDir, select_criterion, overwrite, processDir, fragmaxcsv, dal)
         elif reprocesscsv:
             proc_dict = processlib.ask_for_spg_and_unit_cell(logger)
             processlib.start_reprocessing(logger)
             reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict)
         else:
             processlib.start_get_autoprocessing_results(logger)
-            logger.info('initializing database: {0!s}'.format(db_file))
-            dal.db_init(db_file)
             get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file)
     else:
         logger.error('cannot continue; check error messages above and use -h option to get more information')
