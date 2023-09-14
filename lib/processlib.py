@@ -525,10 +525,12 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
             ucv_mtz = float(d['cell_volume'])
 #            lat_mtz = proc_dict[f]['lattice']
             lat_mtz = d['sym_lattice']
+            logger.info('CIF -> lat: {0!s} - pg: {1!s} - ucv: {2!s}'.format(lat_mtz, pgr_mtz, ucv_mtz))
             for p in ref_dict:
                 pgr_pdb = ref_dict[p][0]
                 ucv_pdb = float(ref_dict[p][2])
                 lat_pdb = ref_dict[p][1]
+                logger.info('CIF -> lat: {0!s} - pg: {1!s} - ucv: {2!s}'.format(lat_pdb, pgr_pdb, ucv_pdb))
                 ucv_diff = abs((ucv_mtz-ucv_pdb))/ucv_pdb
                 if pgr_mtz == pgr_pdb and lat_mtz == lat_pdb and ucv_diff < 0.1:
                     logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(p))
