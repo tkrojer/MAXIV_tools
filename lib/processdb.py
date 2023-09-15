@@ -62,14 +62,14 @@ def read_master_file(logger, master_file, d_xray_dataset_table_dict):
     d_xray_dataset_table_dict['omega_range_total'] = dset['sample']['goniometer']['omega_range_total'].value
     if d_xray_dataset_table_dict['omega_range_total'] > 30.0:
         d_xray_dataset_table_dict['is_dataset'] = True
-
+    return d_xray_dataset_table_dict
 
 def insert_into_xray_dataset_table(logger, dal, d):
     logger.info('trying to insert into xray_dataset_table')
     try:
-        print(d)
+#        print(d)
         ins = dal.xray_dataset_table.insert().values(d)
-        print(ins.compile(dialect=sqlite.dialect()))
+#        print(ins.compile(dialect=sqlite.dialect()))
         dal.connection.execute(ins)
     except sqlalchemy.exc.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
