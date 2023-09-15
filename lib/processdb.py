@@ -222,12 +222,15 @@ def get_highres_stats(block, d):
 
 def assign_dataset_outcome(logger, d):
     logger.info('assigning dataset outcome based on high resolution limit of datasets...')
-    if d['reflns_d_resolution_high'] < 2.0:
-        d['data_collection_outcome'] = "success - high resolution"
-    elif d['reflns_d_resolution_high'] >= 2.0 and d['reflns_d_resolution_high'] <= 2.0:
-        d['data_collection_outcome'] = "success - medium resolution"
-    else:
-        d['data_collection_outcome'] = "success - low resolution"
+    try:
+        if d['reflns_d_resolution_high'] < 2.0:
+            d['data_collection_outcome'] = "success - high resolution"
+        elif d['reflns_d_resolution_high'] >= 2.0 and d['reflns_d_resolution_high'] <= 2.0:
+            d['data_collection_outcome'] = "success - medium resolution"
+        else:
+            d['data_collection_outcome'] = "success - low resolution"
+    except KeyError:
+        logger.error("cannot find 'reflns_d_resolution_high' in cif file")
     return d
 
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
