@@ -16,7 +16,7 @@ def get_mounted_crystal_id(dal, sample):
     result = rp.fetchall()
     return result[0][0]
 
-def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master, dozor_plot, crystal_snapshot_list):
+def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline, run, create_date, master, dozor_plot, crystal_snapshot_list, foundDataset):
     logger.info('getting d_xray_dataset_table_dict for {0!s}'.format(sample))
     mounted_crystal_id = get_mounted_crystal_id(dal, sample)
 
@@ -45,11 +45,11 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
             else:
                 d_xray_dataset_table_dict[key[n]] = img
 
-    d_xray_dataset_table_dict = read_master_file(logger, master, d_xray_dataset_table_dict)
+    d_xray_dataset_table_dict, foundDataset = read_master_file(logger, master, d_xray_dataset_table_dict, foundDataset)
 
-    return d_xray_dataset_table_dict
+    return d_xray_dataset_table_dict, foundDataset
 
-def read_master_file(logger, master_file, d_xray_dataset_table_dict):
+def read_master_file(logger, master_file, d_xray_dataset_table_dict, foundDataset):
     logger.info('reading master .h5 file: {0!s}'.format(master_file))
     if master_file:
         f = h5py.File(master_file, 'r')
@@ -63,9 +63,10 @@ def read_master_file(logger, master_file, d_xray_dataset_table_dict):
         d_xray_dataset_table_dict['omega_range_total'] = dset['sample']['goniometer']['omega_range_total'].value
         if d_xray_dataset_table_dict['omega_range_total'] > 30.0:
             d_xray_dataset_table_dict['is_dataset'] = True
+            foundDataset = True
     else:
         logger.error('master file does not exist!')
-    return d_xray_dataset_table_dict
+    return d_xray_dataset_table_dict, foundDataset
 
 def insert_into_xray_dataset_table(logger, dal, d):
     logger.info('trying to insert into xray_dataset_table')

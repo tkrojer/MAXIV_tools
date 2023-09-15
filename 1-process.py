@@ -71,7 +71,8 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
 
 
 def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                        status, protein, processDir, overwrite, beamline, dal, db_file, category):
+                        status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict):
+    foundDataset = False
     foundMTZ = False
     for runs in glob.glob(os.path.join(sample_folder, '*')):
 #        run = runs.split('/')[9]
@@ -83,8 +84,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         dozor_plot, crystal_snapshot_list = processlib.prepare_folders_and_files(logger, projectDir, sample, proposal, session, run, protein, processDir, category, beamline)
         collection_date, master, create_date = processlib.get_timestamp_from_master_file(logger, sample_folder, run)
 
-        d_xray_dataset_table_dict = processdb.get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline,
-                                                                            run, create_date, master, dozor_plot, crystal_snapshot_list)
+        d_xray_dataset_table_dict, foundDataset = processdb.get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline,
+                                                                            run, create_date, master, dozor_plot, crystal_snapshot_list, foundDataset)
 
         if os.path.isfile(db_file):
             processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
@@ -135,18 +136,26 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 #                                                protein, status, master, manual_pipeline)
 
 
-    if not foundMTZ:
+    if not foundDataset:
+        logger.werning('could not find any DATASET for sample')
+        missing_dict['dataset'].append(sample)
+    if foundDataset and not foundMTZ:
+        missing_dict['mtz_file'].append(sample)
         logger.warning('could not find any MTZ file for sample!')
         status = processlib.get_status(logger, None, None, None, status)
         processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                         protein, status, master, '')
     logger.info('===================================================================================\n')
-
+    return missing_dict
 
 def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file):
     sampleList = processlib.get_sample_list(logger, fragmaxcsv)
     proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     pipelines = processlib.get_processing_pipelines()
+    missing_dict = {
+        'dataset': [],
+        'mtz_file': []
+    }
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir, '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
         logger.info('current sample - {0!s}'.format(sample))
@@ -154,11 +163,13 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
             logger.info('SUCCESS: found sample in summary csv file')
             processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
-            parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                                status, protein, processDir, overwrite, beamline, dal, db_file, category)
+            missing_dict = parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
+                                status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict)
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
+    logger.warning('missing datasets: {0!s}'.format(missing_dict['dataset']))
+    logger.warning('missing MTZ file: {0!s}'.format(missing_dict['mtz_file']))
     processlib.end_get_autoprocessing_results(logger)
 
 
