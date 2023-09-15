@@ -264,6 +264,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
 def insert_into_xray_processing_table(logger, dal, d):
     logger.info('saving xray_processing_table to database')
     try:
+        print(d)
         ins = dal.xray_processing_table.insert().values(d)
         print(ins.compile(dialect=sqlite.dialect()))
         dal.connection.execute(ins)
