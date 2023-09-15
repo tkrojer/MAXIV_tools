@@ -259,9 +259,9 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
 def insert_into_xray_processing_table(logger, dal, d):
     logger.info('saving xray_processing_table to database')
     try:
-        print(d)
+#        print(d)
         ins = dal.xray_processing_table.insert().values(d)
-        print(ins.compile(dialect=sqlite.dialect()))
+#        print(ins.compile(dialect=sqlite.dialect()))
         dal.connection.execute(ins)
     except sqlalchemy.exc.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
@@ -308,7 +308,7 @@ def get_processing_results_for_sample(logger, dal, sample):
     result_list = get_result_list_of_dicts(r)
     for d in result_list:
         x = float(d['cell_volume'])
-        print(x)
+#        print(x)
 #    sys.exit()
     return result_list
 
