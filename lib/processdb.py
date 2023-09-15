@@ -221,7 +221,7 @@ def get_highres_stats(block, d):
     return d
 
 def assign_dataset_outcome(logger, dal, mounted_crystal_code):
-    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high])).where(
+    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high)]).where(
         dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
