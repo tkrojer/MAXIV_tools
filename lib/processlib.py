@@ -1106,5 +1106,5 @@ def annotate_failed_datasets(logger, missing_dict, dal):
     logger.info('here are samples where no datasets were collectied')
     for category in missing_dict:
         for dataset in missing_dict[category]:
-            enter_score(logger, dataset, fail_dict)
+            enter_score(logger, dal, dataset, fail_dict)
 
