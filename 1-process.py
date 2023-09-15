@@ -137,7 +137,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 
     if not foundDataset:
-        logger.werning('could not find any DATASET for sample')
+        logger.warning('could not find any DATASET for sample')
         missing_dict['dataset'].append(sample)
     if foundDataset and not foundMTZ:
         missing_dict['mtz_file'].append(sample)
