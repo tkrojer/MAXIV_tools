@@ -6,6 +6,7 @@ from sqlalchemy import and_
 
 #from sqlalchemy.dialects import sqlite
 import sys
+import h5py
 
 def get_mounted_crystal_id(dal, sample):
     q = select([dal.mounted_crystals_table.c.mounted_crystal_id]).where(
@@ -43,7 +44,22 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
             else:
                 d_xray_dataset_table_dict[key[n]] = img
 
+    d_xray_dataset_table_dict = read_master_file(logger, master, d_xray_dataset_table_dict)
+
     return d_xray_dataset_table_dict
+
+def read_master_file(logger, master_file, d_xray_dataset_table_dict):
+    logger('reading master .h5 file: {0!s}'.format(master_file))
+    f = h5py.File(master_file, 'r')
+    #    list(f.keys()) there is most likely only 1 key 'entry'
+    dset = f['entry']
+    d_xray_dataset_table_dict['detector_distance'] = dset['instrument']['detector']['distance'].value
+    d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'].value
+    d_xray_dataset_table_dict['n_images'] = dset['sample']['goniometer']['omega'].shape[0]
+    d_xray_dataset_table_dict['omega_range_total'] = dset['sample']['goniometer']['omega_range_total'].value
+    if omega_range_total > 30:
+        d_xray_dataset_table_dict['is_dataset'] = True
+
 
 def insert_into_xray_dataset_table(logger, dal, d):
     logger.info('trying to insert into xray_dataset_table')
