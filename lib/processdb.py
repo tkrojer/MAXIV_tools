@@ -68,7 +68,7 @@ def insert_into_xray_dataset_table(logger, dal, d):
     logger.info('trying to insert into xray_dataset_table')
     try:
         ins = dal.xray_dataset_table.insert().values(d)
-        print(ins.compile(dialect=sqlite.dialect()))
+#        print(ins.compile(dialect=sqlite.dialect()))
         dal.connection.execute(ins)
     except sqlalchemy.exc.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):

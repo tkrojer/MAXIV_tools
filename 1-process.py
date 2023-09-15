@@ -87,7 +87,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                                             run, create_date, master, dozor_plot, crystal_snapshot_list)
 
         if os.path.isfile(db_file):
-            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict, )
+            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
 
         if not master:  # this may happen if there is a run folder, but without image files
             continue
