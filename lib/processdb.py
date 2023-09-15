@@ -49,8 +49,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
     return d_xray_dataset_table_dict
 
 def read_master_file(logger, master_file, d_xray_dataset_table_dict):
-    print(master_file)
-    logger('reading master .h5 file: {0!s}'.format(master_file))
+    logger.info('reading master .h5 file: {0!s}'.format(master_file))
     f = h5py.File(master_file, 'r')
     #    list(f.keys()) there is most likely only 1 key 'entry'
     dset = f['entry']
