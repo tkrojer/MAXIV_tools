@@ -74,7 +74,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                         status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict):
     foundDataset = False
     foundMTZ = False
-    for runs in glob.glob(os.path.join(sample_folder, '*')):
+    for runs in sorted(glob.glob(os.path.join(sample_folder, '*'))):
 #        run = runs.split('/')[9]
         run = runs.split('/')[len(runs.split('/'))-1]
         logger.info('checking run {0!s}'.format(run))
@@ -136,11 +136,12 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 #                                                protein, status, master, manual_pipeline)
 
 
-    if not foundDataset:
-        logger.warning('could not find any DATASET for sample')
-        missing_dict['dataset'].append(sample)
+    if not foundDataset :
+        logger.warning('could not find any DATASET for sample, will create dummy entry in database...')
+        processdb.create_dummy_dataset_entry(dal, sample, proposal, session)
+        missing_dict['dataset'].append([sample, proposal, session])
     if foundDataset and not foundMTZ:
-        missing_dict['mtz_file'].append(sample)
+        missing_dict['mtz_file'].append([sample, proposal, session])
         logger.warning('could not find any MTZ file for sample!')
         status = processlib.get_status(logger, None, None, None, status)
         processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
@@ -168,9 +169,20 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
-    logger.warning('missing datasets: {0!s}'.format(missing_dict['dataset']))
-    logger.warning('missing MTZ file: {0!s}'.format(missing_dict['mtz_file']))
+    review_missing_datasets(logger, missing_dict, dal)
     processlib.end_get_autoprocessing_results(logger)
+
+
+def review_missing_datasets(logger, missing_dict, dal):
+    logger.warning('the following samples have either no dataset collected or the dataset did not result in a MTZ file:')
+    logger.info('missing datasets:')
+    for i in missing_dict['dataset']:
+        logger.info(' --> {0!s}'.format(i[0]))
+    logger.info('missing MTZ file:')
+    for i in missing_dict['mtz_file']:
+        logger.info(' --> {0!s}'.format(i[0]))
+    processlib.check_if_to_annotate(logger, missing_dict, dal)
+
 
 
 def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):

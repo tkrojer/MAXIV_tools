@@ -9,6 +9,9 @@ import sys
 from bz2 import BZ2File as bzopen
 from datetime import datetime
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
+import processdb
+
 
 def max_allowed_Rmerge_I_obs_low():
     Rmerge_I_obs_low = 0.25
@@ -1043,3 +1046,65 @@ def save_proc_scripts(logger, projectDir, script_dict):
         f = open(script, 'w')
         f.write(script_dict[script])
         f.close()
+
+def check_if_to_annotate(logger, missing_dict, dal):
+    if sys.version[0] == '2':
+        q = raw_input("\n>>> Do you want to annotate the affected samples? (y/n) ")
+    else:
+        q = input("\n>>> Do you want to annotate the affected samples? (y/n) ")
+    if not q.lower() == 'y':
+        logger.info('you chose not to manually annotate the affected samples!')
+        logger.info('OK, then we are done here for the moment... bye, bye!')
+        sys.exit(2)
+    else:
+        annotate_failed_datasets(logger, missing_dict, dal)
+
+def get_fail_dict(logger):
+    fail_dict = {
+        '1': 'fail - no diffraction',
+        '2': 'fail - misaligned',
+        '3': 'fail - loop broke',
+        '4': 'fail - loop empty',
+        '5': 'fail - no X-rays',
+        '6': 'fail - no matching model'
+    }
+    show_scoring_option(logger, fail_dict)
+    return fail_dict
+
+def show_scoring_option(logger, fail_dict):
+    logger.info('scores - overview')
+    for i in fail_dict:
+        logger.info(' -> {0!s} == {1!s}'.format(i, fail_dict[i]))
+
+def enter_score(logger, dal, dataset, fail_dict):
+    sample = dataset[0]
+    proposal = dataset[1]
+    session = dataset[2]
+    accepted_scores = ['1', '2', '3', '4', '5', '6']
+    if sys.version[0] == '2':
+        q = raw_input(">>> {0!s}: ".format(sample))
+    else:
+        q = input(">>> {0!s}: ".format(sample))
+    if not accepted_scores:
+        logger.eror('entry not in allowed scores; skipping...')
+    else:
+        mounted_crystal_id = get_mounted_crystal_id(dal, sample)
+        d = {
+            'mounted_crystal_id': mounted_crystal_id,
+            'mounted_crystal_code': sample,
+            'proposal': proposal,
+            'session': session,
+            'run': 'dummy',
+            'is_dataset': True,
+            'data_collection_comment': 'dummy entry - no dataset collected after x-ray alignment',
+            'data_collection_outcome': fail_dict[q]
+        }
+        processdb.update_xray_dataset_table_with_dataset_outcome(logger, dal, d)
+
+def annotate_failed_datasets(logger, missing_dict, dal):
+    fail_dict = get_fail_dict(logger)
+    logger.info('here are samples where no datasets were collectied')
+    for category in missing_dict:
+        for dataset in missing_dict[category]:
+            enter_score(logger, dataset, fail_dict)
+

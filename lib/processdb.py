@@ -64,6 +64,9 @@ def read_master_file(logger, master_file, d_xray_dataset_table_dict, foundDatase
         if d_xray_dataset_table_dict['omega_range_total'] > 30.0:
             d_xray_dataset_table_dict['is_dataset'] = True
             foundDataset = True
+            d_xray_dataset_table_dict['data_collection_outcome'] = "unkown"
+        else:
+            d_xray_dataset_table_dict['data_collection_outcome'] = "X-ray centring"
     else:
         logger.error('master file does not exist!')
     return d_xray_dataset_table_dict, foundDataset
@@ -80,6 +83,34 @@ def insert_into_xray_dataset_table(logger, dal, d):
             logger.warning('entry exists (time soaked {0!s}); skipping'.format(d['mounted_crystal_code']))
         else:
             logger.error(str(e))
+
+def update_xray_dataset_table_with_dataset_outcome(logger, dal, d):
+    logger.info('updating xray_dataset table')
+    u = dal.xray_dataset_table.update().values(d).where(and_(
+        dal.xray_dataset_table.c.mounted_crystal_code == sample,
+        dal.xray_dataset_table.c.mounted_crystal_id == best['mounted_crystal_id'],
+        dal.xray_dataset_table.c.proposal == d['proposal'],
+        dal.xray_dataset_table.c.session == d['session'],
+        dal.xray_dataset_table.c.run == d['run'],
+        dal.xray_dataset_table.c.is_dataset == d['is_dataset'],
+        dal.xray_dataset_table.c.data_collection_comment == d['data_collection_comment'],
+        dal.xray_dataset_table.c.data_collection_outcome == d['data_collection_outcome']))
+    dal.connection.execute(u)
+
+
+def create_dummy_dataset_entry(dal, sample, proposal, session):
+    mounted_crystal_id = get_mounted_crystal_id(dal, sample)
+    d = {
+        'mounted_crystal_id': mounted_crystal_id,
+        'mounted_crystal_code': sample,
+        'proposal': proposal,
+        'session': session,
+        'run': 'dummy',
+        'is_dataset': True,
+        'data_collection_comment': 'dummy entry - no dataset collected after x-ray alignment'
+    }
+    insert_into_xray_dataset_table(logger, dal, d)
+
 
 def get_cell_sym_info(mtz, d):
     d['cell_length_a'] = mtz.cell.a
@@ -189,6 +220,16 @@ def get_highres_stats(block, d):
             d['reflns_outer_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[high]
     return d
 
+def assign_dataset_outcome(logger, d):
+    logger.info('assigning dataset outcome based on high resolution limit of datasets...')
+    if d['reflns_d_resolution_high'] < 2.0:
+        d['data_collection_outcome'] = "success - high resolution"
+    elif d['reflns_d_resolution_high'] >= 2.0 and d['reflns_d_resolution_high'] <= 2.0:
+        d['data_collection_outcome'] = "success - medium resolution"
+    else:
+        d['data_collection_outcome'] = "success - low resolution"
+    return d
+
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
 
     dataset_id = get_dataset_id(dal, mounted_crystal_code, proposal, session, run)
@@ -211,6 +252,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         d = get_overall_stats(block, d)
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
+        d = assign_dataset_outcome(logger, d)
 #        break   # only interested in first block; xia2 has a second, somewhat redundant block
 
     return d
