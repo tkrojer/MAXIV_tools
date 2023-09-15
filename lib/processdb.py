@@ -224,6 +224,10 @@ def get_processing_results_for_sample(logger, dal, sample):
                 dal.xray_processing_table.c.sym_point_group,
                 dal.xray_processing_table.c.reflns_d_resolution_high,
                 dal.xray_processing_table.c.autoproc_pipeline,
+                dal.xray_processing_table.c.automatic_processed,
+                dal.xray_processing_table.c.staraniso,
+                dal.xray_processing_table.c.data_reduction_software,
+                dal.xray_processing_table.c.data_scaling_software,
                 dal.xray_processing_table.c.reflns_inner_pdbx_Rmerge_I_obs,
                 dal.xray_processing_table.c.processing_mtz_file,
                 dal.xray_processing_table.c.processing_log_file,
@@ -251,7 +255,7 @@ def unselected_autoprocessing_result(logger, dal, sample):
     dal.connection.execute(u)
 
 
-def set_selected_autoprocessing_result(logger, dal, sample, data_reduction_software, data_scaling_software, autoproc_pipeline, automatic_processed, staraniso):
+def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info('step 2: set auto-processing results for {0!s}'.format(sample))
 
 #    >> > session = x.split('-')[1]
@@ -259,17 +263,17 @@ def set_selected_autoprocessing_result(logger, dal, sample, data_reduction_softw
 #    >> > sample = "GEN2110_A-x0066"
 #    >> > pipeline = x.split('/')[1]
 
-    # first need to get dataset_id from xray_dataset_table
-    dataset_id = get_dataset_id(dal, sample, proposal, session, run)
+#    # first need to get dataset_id from xray_dataset_table
+#    dataset_id = get_dataset_id(dal, sample, proposal, session, run)
 
 
     d = {}
     d['selected'] = True
     u = dal.xray_processing_table.update().values(d).where(and_(
         dal.xray_processing_table.c.mounted_crystal_code == sample,
-        dal.xray_processing_table.c.data_reduction_software == xxx,
-        dal.xray_processing_table.c.data_scaling_software == xxx,
-        dal.xray_processing_table.c.autoproc_pipeline == xxx,
-        dal.xray_processing_table.c.automatic_processed == xxx,
-        dal.xray_processing_table.c.staraniso == xxx))
+        dal.xray_processing_table.c.data_reduction_software == best['data_reduction_software'],
+        dal.xray_processing_table.c.data_scaling_software == best['data_scaling_software'],
+        dal.xray_processing_table.c.autoproc_pipeline == best['autoproc_pipeline'],
+        dal.xray_processing_table.c.automatic_processed == best['automatic_processed'],
+        dal.xray_processing_table.c.staraniso == best['staraniso']))
     dal.connection.execute(u)

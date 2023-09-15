@@ -59,7 +59,8 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
             if best:
                 processlib.link_process_results(logger, projectDir, sample, best)
                 not_fitting_pipeline_list = processlib.check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion)
-
+                processdb.unselected_autoprocessing_result(logger, dal, sample)
+                processdb.set_selected_autoprocessing_result(logger, dal, sample, best)
             else:
                 logger.error('None of MTZ files fulfilled the minimal requirements; check messages aboove')
         else:
