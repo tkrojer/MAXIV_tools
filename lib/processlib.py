@@ -227,7 +227,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.error('MTZ file exists, but either LOG or CIF file missing')
     status = get_status(logger, mtzfile, mtz, ciffile, status)
     logger.info('current status: ' + status)
-    return status, logfile, ciffile
+    return status, logfile, ciffile, mtzfile
 
 
 def get_timestamp_from_master_file(logger, sample_folder, run):
@@ -518,7 +518,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
     match_list = []
     if ref_dict:
         for d in proc_list:
-            logger.info('current file {0!s}'.format(d['processing_cif_file']))
+            logger.info('current pipeline {0!s}'.format(d['autoproc_pipeline']))
 #            pgr_mtz = proc_dict[f]['point_group']
             pgr_mtz = d['sym_point_group']
 #            ucv_mtz = float(proc_dict[f]['unitcell_volume'])
@@ -576,6 +576,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
         logger.info('current pipeline: {0!s}'.format(d['autoproc_pipeline']))
         if float(d['reflns_inner_pdbx_Rmerge_I_obs']) < max_allowed_Rmerge_I_obs_low():
 #            logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
+            logger.error('acceptable low resolution Rmerge: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
             match_list.append(d)
         else:
 #            logger.error('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
@@ -619,7 +620,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
 #    return bestcif, found_selected_pipeline
 
 def retain_results_which_fit_selection_criterion(logger, proc_list, select_criterion):
-    logger.info('selecting auto-processing results based on {0!s}...'.format(select_criterion))
+    logger.info('selecting auto-processing results based on: {0!s}'.format(select_criterion))
     match_list = []
     backup_list = []
     found_selected_pipeline = False
@@ -628,7 +629,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
         if select_criterion.startswith('reso'):
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             match_list.append([d, float(reso_high)])
-        elif d['autoproc_pipeline'] == select_criterion:
+        elif lower(d['autoproc_pipeline']) == select_criterion:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
             match_list.append([d, float(reso_high)])
@@ -640,13 +641,12 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list
     if proc_list:
-        logger.info('current list of matching auto-processing results: {0!s}'.format(match_list))
+#        logger.info('current list of matching auto-processing results: {0!s}'.format(match_list))
         best = min(match_list, key=lambda x: x[1])[0]
-        logger.info('--> {0!s}'.format(best['autoproc_pipeline']))
+        logger.info('best match --> {0!s}'.format(best['autoproc_pipeline']))
     else:
         best = None
     return best, found_selected_pipeline
-
 
 
 def check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion):
@@ -709,13 +709,16 @@ def link_process_results(logger, projectDir, sample, best):
     json_info = os.path.relpath(best['processing_cif_file']).replace('process.cif', 'info.json')
     if not os.path.isdir('process.mtz'):
 #        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
-        os.system('ln -s {0!s} .'.format(os.path.relpath(best['processing_mtz_file'])))
+    # note: need to wrap path into realpath/ relpath, because,
+    # /data/visitors/... really is /gpfs/offline/visitors and the relpath statement alone will turn
+    # into ../../../../../../../../data/... but once a realpath come first it will be ./...
+        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(best['processing_mtz_file']))))
     if not os.path.isdir('process.log'):
 #        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
-        os.system('ln -s {0!s} .'.format(os.path.relpath(best['processing_log_file'])))
+        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(best['processing_log_file']))))
     if not os.path.isdir('process.cif'):
 #        os.system('ln -s {0!s} .'.format(bestcif))
-        os.system('ln -s {0!s} .'.format(os.path.relpath(best['processing_cif_file'])))
+        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(best['processing_cif_file']))))
     if not os.path.isdir('info.json'):
         os.system('ln -s {0!s} .'.format(json_info))
 
