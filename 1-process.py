@@ -135,6 +135,10 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 #                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
 #                                                protein, status, master, manual_pipeline)
 
+    if foundDataset and foundMTZ:
+        logger.info('finding highest resolution')
+        processdb.assign_dataset_outcome(logger, dal, sample)
+
 
     if not foundDataset :
         logger.warning('could not find any DATASET for sample, will create dummy entry in database...')

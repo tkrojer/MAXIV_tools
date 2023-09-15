@@ -1,7 +1,7 @@
 import gemmi
 
 import sqlalchemy
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, func
 from sqlalchemy import and_
 
 from sqlalchemy.dialects import sqlite
@@ -220,18 +220,14 @@ def get_highres_stats(block, d):
             d['reflns_outer_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[high]
     return d
 
-def assign_dataset_outcome(logger, d):
-    logger.info('assigning dataset outcome based on high resolution limit of datasets...')
-    try:
-        if d['reflns_d_resolution_high'] < 2.0:
-            d['data_collection_outcome'] = "success - high resolution"
-        elif d['reflns_d_resolution_high'] >= 2.0 and d['reflns_d_resolution_high'] <= 2.0:
-            d['data_collection_outcome'] = "success - medium resolution"
-        else:
-            d['data_collection_outcome'] = "success - low resolution"
-    except KeyError:
-        logger.error("cannot find 'reflns_d_resolution_high' in cif file")
-    return d
+def assign_dataset_outcome(logger, dal, mounted_crystal_code):
+    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high])).where(
+        dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
+    rp = dal.connection.execute(q)
+    r = rp.fetchall()
+    logger.error('{0!s}'.format(r))
+#    idx = r[0][0]
+
 
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
 
@@ -255,7 +251,6 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         d = get_overall_stats(block, d)
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
-        d = assign_dataset_outcome(logger, d)
 #        break   # only interested in first block; xia2 has a second, somewhat redundant block
 
     return d
