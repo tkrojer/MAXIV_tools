@@ -142,7 +142,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
     if not foundDataset :
         logger.warning('could not find any DATASET for sample, will create dummy entry in database...')
-        processdb.create_dummy_dataset_entry(dal, sample, proposal, session)
+        processdb.create_dummy_dataset_entry(logger, dal, sample, proposal, session)
         missing_dict['dataset'].append([sample, proposal, session])
     if foundDataset and not foundMTZ:
         missing_dict['mtz_file'].append([sample, proposal, session])

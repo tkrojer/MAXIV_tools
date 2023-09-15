@@ -98,7 +98,7 @@ def update_xray_dataset_table_with_dataset_outcome(logger, dal, d):
     dal.connection.execute(u)
 
 
-def create_dummy_dataset_entry(dal, sample, proposal, session):
+def create_dummy_dataset_entry(logger, dal, sample, proposal, session):
     mounted_crystal_id = get_mounted_crystal_id(dal, sample)
     d = {
         'mounted_crystal_id': mounted_crystal_id,
