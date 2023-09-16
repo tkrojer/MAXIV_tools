@@ -224,7 +224,11 @@ def assign_dataset_outcome(logger, dal, mounted_crystal_code):
     rp = dal.connection.execute(q)
     r = rp.fetchall()
     logger.error('{0!s}'.format(r))
-#    idx = r[0][0]
+    print('xxx', len(r))
+    print('yyy', r['0'])
+    logger.error('{0!s}'.format(r))
+#      
+#    dataset_id = idx = r[0][0]
 
 
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
