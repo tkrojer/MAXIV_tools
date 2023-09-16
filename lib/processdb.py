@@ -218,24 +218,28 @@ def get_highres_stats(block, d):
     return d
 
 def assign_dataset_outcome(logger, dal, mounted_crystal_code):
+    d = {}
     q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high),
                 dal.xray_processing_table.c.dataset_id]).where(
         dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
     rp = dal.connection.execute(q)
     r = rp.fetchall()
-    logger.error('{0!s}'.format(r))
-    print('xxx', len(r))
-    print('yyy', r[0])
-    print('zzz', r[0][0])
-    print('aaa', r[0][1])
-    print('bbb', r[1])
-    logger.error('{0!s}'.format(r))
-#
-#    dataset_id = idx = r[0][0]
+    resolution = r[0][0]
+    dataset_id = r[0][1]
+    logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
+    if resolution < 2.0:
+        d['data_collection_outcome'] = "success - high resolution"
+    elif resolution >= 2.0 and resolution <= 2.8:
+        d['data_collection_outcome'] = "success - medium resolution"
+    else:
+        d['data_collection_outcome'] = "success - low resolution"
+    logger.info('updating data_collection_outcome accordingly')
+    u = dal.xray_dataset_table.update().values(d).where(
+        dal.xray_dataset_table.c.dataset_id == dataset_id)
+    dal.connection.execute(u)
 
 
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
-
     dataset_id = get_dataset_id(dal, mounted_crystal_code, proposal, session, run)
 
     d = {   'dataset_id':           dataset_id,
@@ -329,16 +333,6 @@ def unselected_autoprocessing_result(logger, dal, sample):
 
 def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info('step 2: set auto-processing results for {0!s}'.format(sample))
-
-#    >> > session = x.split('-')[1]
-#    >> > proposal = x.split('-')[0]
-#    >> > sample = "GEN2110_A-x0066"
-#    >> > pipeline = x.split('/')[1]
-
-#    # first need to get dataset_id from xray_dataset_table
-#    dataset_id = get_dataset_id(dal, sample, proposal, session, run)
-
-
     d = {}
     d['selected'] = True
     u = dal.xray_processing_table.update().values(d).where(and_(
