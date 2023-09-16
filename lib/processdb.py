@@ -225,9 +225,12 @@ def assign_dataset_outcome(logger, dal, mounted_crystal_code):
     r = rp.fetchall()
     logger.error('{0!s}'.format(r))
     print('xxx', len(r))
-    print('yyy', r['0'])
+    print('yyy', r[0])
+    print('zzz', r[0][0])
+    print('aaa', r[0][1])
+    print('bbb', r[1])
     logger.error('{0!s}'.format(r))
-#      
+#
 #    dataset_id = idx = r[0][0]
 
 
