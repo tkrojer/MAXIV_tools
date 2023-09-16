@@ -227,12 +227,15 @@ def assign_dataset_outcome(logger, dal, mounted_crystal_code):
     resolution = r[0][0]
     dataset_id = r[0][1]
     logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
-    if resolution < 2.0:
-        d['data_collection_outcome'] = "success - high resolution"
-    elif resolution >= 2.0 and resolution <= 2.8:
-        d['data_collection_outcome'] = "success - medium resolution"
-    else:
-        d['data_collection_outcome'] = "success - low resolution"
+    try:
+        if resolution < 2.0:
+            d['data_collection_outcome'] = "success - high resolution"
+        elif resolution >= 2.0 and resolution <= 2.8:
+            d['data_collection_outcome'] = "success - medium resolution"
+        else:
+            d['data_collection_outcome'] = "success - low resolution"
+    except TypeError:
+        d['data_collection_outcome'] = "unknown"
     logger.info('updating data_collection_outcome accordingly')
     u = dal.xray_dataset_table.update().values(d).where(
         dal.xray_dataset_table.c.dataset_id == dataset_id)
