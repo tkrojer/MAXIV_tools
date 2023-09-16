@@ -91,7 +91,6 @@ def update_xray_dataset_table_with_dataset_outcome(logger, dal, d, w):
         dal.xray_dataset_table.c.mounted_crystal_id == w['mounted_crystal_id'],
         dal.xray_dataset_table.c.proposal == w['proposal'],
         dal.xray_dataset_table.c.session == w['session'],
-        dal.xray_dataset_table.c.run == w['run'],
         dal.xray_dataset_table.c.is_dataset == w['is_dataset']))
     dal.connection.execute(u)
 
@@ -219,7 +218,8 @@ def get_highres_stats(block, d):
     return d
 
 def assign_dataset_outcome(logger, dal, mounted_crystal_code):
-    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high)]).where(
+    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high),
+                dal.xray_processing_table.c.dataset_id]).where(
         dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
     rp = dal.connection.execute(q)
     r = rp.fetchall()

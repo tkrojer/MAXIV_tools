@@ -1076,7 +1076,7 @@ def show_scoring_option(logger, fail_dict):
     for i in fail_dict:
         logger.info(' -> {0!s} == {1!s}'.format(i, fail_dict[i]))
 
-def enter_score(logger, dal, dataset, fail_dict):
+def enter_score(logger, dal, dataset, fail_dict, category):
     sample = dataset[0]
     proposal = dataset[1]
     session = dataset[2]
@@ -1097,9 +1097,7 @@ def enter_score(logger, dal, dataset, fail_dict):
             'mounted_crystal_code': sample,
             'proposal': proposal,
             'session': session,
-            'run': 'dummy',
-            'is_dataset': True,
-            'data_collection_comment': 'dummy entry - no dataset collected after x-ray alignment'
+            'is_dataset': True
         }
         processdb.update_xray_dataset_table_with_dataset_outcome(logger, dal, d, w)
 
@@ -1108,5 +1106,5 @@ def annotate_failed_datasets(logger, missing_dict, dal):
     logger.info('here are samples where no datasets were collectied')
     for category in missing_dict:
         for dataset in missing_dict[category]:
-            enter_score(logger, dal, dataset, fail_dict)
+            enter_score(logger, dal, dataset, fail_dict, category)
 
