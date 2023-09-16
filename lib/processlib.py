@@ -1090,16 +1090,18 @@ def enter_score(logger, dal, dataset, fail_dict):
     else:
         mounted_crystal_id = processdb.get_mounted_crystal_id(dal, sample)
         d = {
+            'data_collection_outcome': fail_dict[q]
+        }
+        w = {
             'mounted_crystal_id': mounted_crystal_id,
             'mounted_crystal_code': sample,
             'proposal': proposal,
             'session': session,
             'run': 'dummy',
             'is_dataset': True,
-            'data_collection_comment': 'dummy entry - no dataset collected after x-ray alignment',
-            'data_collection_outcome': fail_dict[q]
+            'data_collection_comment': 'dummy entry - no dataset collected after x-ray alignment'
         }
-        processdb.update_xray_dataset_table_with_dataset_outcome(logger, dal, d)
+        processdb.update_xray_dataset_table_with_dataset_outcome(logger, dal, d, w)
 
 def annotate_failed_datasets(logger, missing_dict, dal):
     fail_dict = get_fail_dict(logger)

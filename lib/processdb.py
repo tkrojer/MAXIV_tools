@@ -84,17 +84,15 @@ def insert_into_xray_dataset_table(logger, dal, d):
         else:
             logger.error(str(e))
 
-def update_xray_dataset_table_with_dataset_outcome(logger, dal, d):
+def update_xray_dataset_table_with_dataset_outcome(logger, dal, d, w):
     logger.info('updating xray_dataset table')
     u = dal.xray_dataset_table.update().values(d).where(and_(
-        dal.xray_dataset_table.c.mounted_crystal_code == sample,
-        dal.xray_dataset_table.c.mounted_crystal_id == best['mounted_crystal_id'],
-        dal.xray_dataset_table.c.proposal == d['proposal'],
-        dal.xray_dataset_table.c.session == d['session'],
-        dal.xray_dataset_table.c.run == d['run'],
-        dal.xray_dataset_table.c.is_dataset == d['is_dataset'],
-        dal.xray_dataset_table.c.data_collection_comment == d['data_collection_comment'],
-        dal.xray_dataset_table.c.data_collection_outcome == d['data_collection_outcome']))
+        dal.xray_dataset_table.c.mounted_crystal_code == w['mounted_crystal_code'],
+        dal.xray_dataset_table.c.mounted_crystal_id == w['mounted_crystal_id'],
+        dal.xray_dataset_table.c.proposal == w['proposal'],
+        dal.xray_dataset_table.c.session == w['session'],
+        dal.xray_dataset_table.c.run == w['run'],
+        dal.xray_dataset_table.c.is_dataset == w['is_dataset']))
     dal.connection.execute(u)
 
 
