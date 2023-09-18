@@ -710,18 +710,21 @@ def link_process_results(logger, projectDir, sample, best):
 #    json_info = bestcif.replace(pipeline +'/process.cif', 'info.json')
 #    json_info = bestcif.replace('process.cif', 'info.json')
     json_info = os.path.relpath(best['processing_cif_file']).replace('process.cif', 'info.json')
+    logger.info('>>> MTZ {0!s}'.format(best['processing_mtz_file']))
+    logger.info('>>> LOG {0!s}'.format(best['processing_log_file']))
+    logger.info('>>> CIF {0!s}'.format(best['processing_cif_file']))
     if not os.path.isdir('process.mtz'):
 #        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.mtz')))
     # note: need to wrap path into realpath/ relpath, because,
     # /data/visitors/... really is /gpfs/offline/visitors and the relpath statement alone will turn
     # into ../../../../../../../../data/... but once a realpath come first it will be ./...
-        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(best['processing_mtz_file']))))
+        os.system('ln -s {0!s} process.mtz'.format(os.path.relpath(os.path.realpath(best['processing_mtz_file']))))
     if not os.path.isdir('process.log'):
 #        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
-        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(best['processing_log_file']))))
+        os.system('ln -s {0!s} process.log'.format(os.path.relpath(os.path.realpath(best['processing_log_file']))))
     if not os.path.isdir('process.cif'):
 #        os.system('ln -s {0!s} .'.format(bestcif))
-        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(best['processing_cif_file']))))
+        os.system('ln -s {0!s} process.cif'.format(os.path.relpath(os.path.realpath(best['processing_cif_file']))))
     if not os.path.isdir('info.json'):
         os.system('ln -s {0!s} .'.format(json_info))
 
@@ -1047,7 +1050,7 @@ def save_proc_scripts(logger, projectDir, script_dict):
         f.write(script_dict[script])
         f.close()
 
-def check_if_to_annotate(logger, missing_dict, dal):
+def check_if_to_annotate_and_reprocess(logger, missing_dict, dal):
     if sys.version[0] == '2':
         q = raw_input("\n>>> Do you want to annotate the affected samples? (y/n) ")
     else:
@@ -1062,11 +1065,14 @@ def check_if_to_annotate(logger, missing_dict, dal):
 def get_fail_dict(logger):
     fail_dict = {
         '1': 'fail - no diffraction',
-        '2': 'fail - misaligned',
-        '3': 'fail - loop broke',
-        '4': 'fail - loop empty',
-        '5': 'fail - no X-rays',
-        '6': 'fail - no matching model'
+        '2': 'fail - weak diffraction',
+        '3': 'fail - misaligned',
+        '4': 'fail - loop broke',
+        '5': 'fail - loop empty',
+        '6': 'fail - no X-rays',
+        '7': 'fail - salt crystal',
+        '8': 'fail - data processing',
+        '9': 'fail - no matching model'
     }
     show_scoring_option(logger, fail_dict)
     return fail_dict
@@ -1076,7 +1082,7 @@ def show_scoring_option(logger, fail_dict):
     for i in fail_dict:
         logger.info(' -> {0!s} == {1!s}'.format(i, fail_dict[i]))
 
-def enter_score(logger, dal, dataset, fail_dict, category):
+def enter_score(logger, dal, dataset, fail_dict):
     sample = dataset[0]
     proposal = dataset[1]
     session = dataset[2]
@@ -1085,7 +1091,7 @@ def enter_score(logger, dal, dataset, fail_dict, category):
         q = raw_input(">>> {0!s}: ".format(sample))
     else:
         q = input(">>> {0!s}: ".format(sample))
-    if not accepted_scores:
+    if not q in accepted_scores:
         logger.eror('entry not in allowed scores; skipping...')
     else:
         mounted_crystal_id = processdb.get_mounted_crystal_id(dal, sample)
@@ -1106,5 +1112,21 @@ def annotate_failed_datasets(logger, missing_dict, dal):
     logger.info('here are samples where no datasets were collectied')
     for category in missing_dict:
         for dataset in missing_dict[category]:
-            enter_score(logger, dal, dataset, fail_dict, category)
+            enter_score(logger, dal, dataset, fail_dict)
+
+def select_to_reprocess_missing_datasets(logger, dal, dataset, fail_dict):
+    sample = dataset[0]
+    proposal = dataset[1]
+    session = dataset[2]
+    if sys.version[0] == '2':
+        q = raw_input(">>> {0!s} (y/n): ".format(sample))
+    else:
+        q = input(">>> {0!s} (y/n): ".format(sample))
+    if q.lower() == 'y':
+        logger.info('you chose not to manually annotate the affected samples!')
+
+def reprocess_missing_datasets(logger, missing_dict, dal):
+    logger.info('would you like to re-process some of the missing datasets?')
+    for category in missing_dict:
+        for dataset in missing_dict[category]:
 
