@@ -277,7 +277,7 @@ def insert_into_xray_processing_table(logger, dal, d):
         dal.connection.execute(ins)
     except sqlalchemy.exc.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            logger.warning('entry exists (time soaked {0!s}); skipping'.format(d['soak_datetime']))
+            logger.warning('entry exists; skipping'.format(d['mounted_crystal_code']))
         else:
             logger.error(str(e))
 
@@ -346,3 +346,15 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
         dal.xray_processing_table.c.automatic_processed == best['automatic_processed'],
         dal.xray_processing_table.c.staraniso == best['staraniso']))
     dal.connection.execute(u)
+
+def get_master_file_run_list(logger, dal, sample, proposal, session):
+    logger.info('reading xray_dataset information for {0!}'.format(sample))
+    q = select([dal.xray_dataset_table.c.h5_master_file,
+                dal.xray_dataset_table.c.run]).where(and_(
+                dal.xray_dataset_table.c.mounted_crystal_code == sample,
+                dal.xray_dataset_table.c.proposal == proposal,
+                dal.xray_dataset_table.c.session == session,
+                dal.xray_dataset_table.c.is_dataset == True))
+    rp = dal.connection.execute(q)
+    result = rp.fetchall()
+    return result
