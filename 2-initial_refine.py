@@ -66,7 +66,7 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
         sample = l.split(',')[0]
         logger.info('current sample ' + sample)
         proc_mtz = os.path.join(projectDir, '2-initial_refine', sample, 'process.mtz')
-        info_jso = proc[:proc.rfind('/')] + '/info.json'
+        info_jso = proc_mtz[:proc_mtz.rfind('/')] + '/info.json'
         if os.path.isfile(info_jso) and db_file:
             f = open(info_jso)
             data = json.load(f)
