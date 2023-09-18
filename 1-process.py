@@ -114,8 +114,10 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                                                               proposal, session, run)
                 if os.path.isfile(db_file) and ciffile:
                     processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict)
+                    logger.info('finding highest resolution')
+                    processdb.assign_dataset_outcome(logger, dal, sample, d_xray_processing_table_dict)
 
-#            # looking for manually processed datasets
+    #            # looking for manually processed datasets
 #            manual = pipeline
 #            if pipeline == 'staraniso':
 #                manual = 'autoproc'
@@ -135,9 +137,9 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 #                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
 #                                                protein, status, master, manual_pipeline)
 
-    if foundDataset and foundMTZ:
-        logger.info('finding highest resolution')
-        processdb.assign_dataset_outcome(logger, dal, sample)
+#    if foundDataset and foundMTZ:
+#        logger.info('finding highest resolution')
+#        processdb.assign_dataset_outcome(logger, dal, sample)
 
 
     if not foundDataset :
@@ -185,7 +187,7 @@ def review_missing_datasets(logger, missing_dict, dal):
     logger.info('missing MTZ file:')
     for i in missing_dict['mtz_file']:
         logger.info(' --> {0!s}'.format(i[0]))
-    processlib.check_if_to_annotate(logger, missing_dict, dal)
+    processlib.check_if_to_annotate_and_reprocess(logger, missing_dict, dal)
 
 
 
@@ -197,6 +199,15 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     pipeline = proc_dict['pipeline'] + '_' + now
     script_dict = processlib.get_script_dict(pipeline, n_jobs)
     counter = 0
+    for sample in sampleList:
+        logger.info('current sample - {0!s}'.format(sample))
+        master_files_runs = processdb.get_master_file_run_list(logger, dal, sample, proposal, session)
+        for item in master_files_runs:
+            master_file = item[0]
+            run = item[1]
+
+
+
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
         if sample in sampleList:

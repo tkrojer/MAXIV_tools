@@ -632,7 +632,11 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
         if select_criterion.startswith('reso'):
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             match_list.append([d, float(reso_high)])
-        elif d['autoproc_pipeline'].lower() == select_criterion.lower():
+        elif select_criterion.lower() == 'autoproc' and d['autoproc_pipeline'].lower() == 'autoproc' and d['staraniso'] == False:
+            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
+            found_selected_pipeline = True
+            match_list.append([d, float(reso_high)])
+        elif select_criterion.lower() == 'staraniso' and d['autoproc_pipeline'].lower() == 'autoproc' and d['staraniso'] == True:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
             match_list.append([d, float(reso_high)])
