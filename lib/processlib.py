@@ -1125,8 +1125,8 @@ def select_to_reprocess_missing_datasets(logger, dal, dataset, fail_dict):
     if q.lower() == 'y':
         logger.info('you chose not to manually annotate the affected samples!')
 
-def reprocess_missing_datasets(logger, missing_dict, dal):
-    logger.info('would you like to re-process some of the missing datasets?')
-    for category in missing_dict:
-        for dataset in missing_dict[category]:
+#def reprocess_missing_datasets(logger, missing_dict, dal):
+#    logger.info('would you like to re-process some of the missing datasets?')
+#    for category in missing_dict:
+#        for dataset in missing_dict[category]:
 
