@@ -649,6 +649,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
         logger.info('best match --> {0!s}'.format(best['autoproc_pipeline']))
     else:
         best = None
+    logger.warning('1 -> {0!s}'.format(best))
     return best, found_selected_pipeline
 
 
@@ -705,6 +706,7 @@ def suggest_reprocessing_input(logger, processDir, projectDir, fragmaxcsv, repro
 
 def link_process_results(logger, projectDir, sample, best):
     logger.info('creating symlinks in {0!s}'.format(os.path.join(projectDir, "1-process", sample)))
+    logger.warning('2 -> {0!s}'.format(best))
     os.chdir(os.path.join(projectDir, "1-process", sample))
 #    pipeline = bestcif.split('/')[1]
 #    json_info = bestcif.replace(pipeline +'/process.cif', 'info.json')
