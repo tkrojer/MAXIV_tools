@@ -628,6 +628,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
     backup_list = []
     found_selected_pipeline = False
     for d in proc_list:
+        print(d)
         dataset_id = d['dataset_id']
         processing_outcome = "unknown"
         reso_high = d['reflns_d_resolution_high']
