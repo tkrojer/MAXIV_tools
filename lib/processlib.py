@@ -622,7 +622,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
 #        bestcif = None
 #    return bestcif, found_selected_pipeline
 
-def retain_results_which_fit_selection_criterion(logger, proc_list, select_criterion):
+def retain_results_which_fit_selection_criterion(logger, dal, proc_list, select_criterion):
     logger.info('selecting auto-processing results based on: {0!s}'.format(select_criterion))
     match_list = []
     backup_list = []
@@ -651,7 +651,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
                 d['autoproc_pipeline'], reso_high))
             processing_outcome = "fail - not selected pipeline"
             backup_list.append([d, float(reso_high)])
-        processdb.update_processing_outcome(logger, processing_id, processing_outcome)
+        processdb.update_processing_outcome(logger, dal, processing_id, processing_outcome)
     if not match_list:
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list

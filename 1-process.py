@@ -55,7 +55,7 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
 #            proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
             proc_list = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_list)
 #            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)
-            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_list, select_criterion)
+            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, dal, proc_list, select_criterion)
             if best:
                 processlib.link_process_results(logger, projectDir, sample, best)
                 not_fitting_pipeline_list = processlib.check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion)
