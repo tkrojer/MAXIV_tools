@@ -629,7 +629,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
     found_selected_pipeline = False
     for d in proc_list:
         print(d)
-        dataset_id = d['dataset_id']
+        processing_id = d['processing_id']
         processing_outcome = "unknown"
         reso_high = d['reflns_d_resolution_high']
         if select_criterion.startswith('reso'):
@@ -651,7 +651,7 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
                 d['autoproc_pipeline'], reso_high))
             processing_outcome = "fail - not selected pipeline"
             backup_list.append([d, float(reso_high)])
-        processdb.update_processing_outcome(logger, dataset_id, processing_outcome)
+        processdb.update_processing_outcome(logger, processing_id, processing_outcome)
     if not match_list:
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list

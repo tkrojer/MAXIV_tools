@@ -237,12 +237,12 @@ def assign_dataset_outcome(logger, dal, d_proc):
         dal.xray_dataset_table.c.dataset_id == d_proc['dataset_id'])
     dal.connection.execute(u)
 
-def update_processing_outcome(logger, dal, dataset_id, processing_outcome):
+def update_processing_outcome(logger, dal, processing_id, processing_outcome):
     logger.info('updating processing_outcome')
     d = {}
     d['processing_outcome'] = processing_outcome
-    u = dal.xray_dataset_table.update().values(d).where(
-        dal.xray_dataset_table.c.dataset_id == dataset_id)
+    u = dal.xray_processing_table.update().values(d).where(
+        dal.xray_processing_table.c.processing_id == processing_id)
     dal.connection.execute(u)
 
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
