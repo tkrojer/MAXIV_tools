@@ -344,7 +344,7 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
     dal.connection.execute(u)
 
 def get_master_file_run_list(logger, dal, sample, proposal, session):
-    logger.info('reading xray_dataset information for {0!}'.format(sample))
+    logger.info('reading xray_dataset information for {0!s}'.format(sample))
     q = select([dal.xray_dataset_table.c.h5_master_file,
                 dal.xray_dataset_table.c.run]).where(and_(
                 dal.xray_dataset_table.c.mounted_crystal_code == sample,

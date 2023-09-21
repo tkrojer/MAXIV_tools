@@ -1098,7 +1098,7 @@ def enter_score(logger, dal, dataset, fail_dict):
     else:
         q = input(">>> {0!s}: ".format(sample))
     if not q in accepted_scores:
-        logger.eror('entry not in allowed scores; skipping...')
+        logger.error('entry not in allowed scores; skipping...')
     else:
         mounted_crystal_id = processdb.get_mounted_crystal_id(dal, sample)
         d = {
