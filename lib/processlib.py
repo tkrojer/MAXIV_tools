@@ -631,18 +631,22 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
         reso_high = d['reflns_d_resolution_high']
         if select_criterion.startswith('reso'):
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
+            d['processing_outcome'] = "success - is selected highres"
             match_list.append([d, float(reso_high)])
         elif select_criterion.lower() == 'autoproc' and d['autoproc_pipeline'].lower() == 'autoproc' and d['staraniso'] == False:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
+            d['processing_outcome'] = "success - fits selected pipeline"
             match_list.append([d, float(reso_high)])
         elif select_criterion.lower() == 'staraniso' and d['autoproc_pipeline'].lower() == 'autoproc' and d['staraniso'] == True:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
+            d['processing_outcome'] = "success - fits selected pipeline"
             match_list.append([d, float(reso_high)])
         else:
             logger.warning('MTZ does not match criteria, but added {0!s} with high resolution limit of {1!s} A'.format(
                 d['autoproc_pipeline'], reso_high))
+            d['processing_outcome'] = "fail - not selected pipeline"
             backup_list.append([d, float(reso_high)])
     if not match_list:
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
@@ -658,7 +662,8 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
 
 
 def check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion):
-    pipeline_list = ['xia2dials', 'autoproc', 'xia2xds', 'staraniso']
+#    pipeline_list = ['xia2dials', 'autoproc', 'xia2xds', 'staraniso']
+    pipeline_list = ['xia2', 'autoproc', 'staraniso']
     if select_criterion in pipeline_list:
         if not found_selected_pipeline:
             logger.warning('found a reasonable data processing result, but not for the selected auto-processing pipeline')
@@ -899,7 +904,8 @@ def check_pdbfiles_in_pdbdir(logger, projectDir, passed):
 
 def check_select_criterion(logger, select_criterion, passed):
     logger.info('checking selection option: {0!s}'.format(select_criterion))
-    supported_options = ['xia2dials', 'xia2xds', 'autoproc', 'staraniso', 'resolution']
+#    supported_options = ['xia2dials', 'xia2xds', 'autoproc', 'staraniso', 'resolution']
+    supported_options = ['xia2', 'autoproc', 'staraniso', 'resolution']
     if select_criterion in supported_options:
         logger.info('option exists')
     else:
