@@ -348,6 +348,7 @@ class DataAccessLayer:
         Column('processing_log_file', String(255)),
         Column('processing_cif_file', String(255)),
         Column('processing_date', DateTime(), default=datetime.now),
+        Column('processing_outcome', String(255)),
         Column('processing_comment', String(255)),
         Column('created_on', DateTime(), default=datetime.now),
         Column('updated_on', DateTime(), default=datetime.now, onupdate=datetime.now),
