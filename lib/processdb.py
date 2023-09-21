@@ -341,6 +341,8 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
         dal.xray_processing_table.c.autoproc_pipeline == best['autoproc_pipeline'],
         dal.xray_processing_table.c.automatic_processed == best['automatic_processed'],
         dal.xray_processing_table.c.staraniso == best['staraniso']))
+    logger.info(u.compile(dialect=sqlite.dialect()))
+
     dal.connection.execute(u)
 
 def get_master_file_run_list(logger, dal, sample, proposal, session):
