@@ -217,16 +217,16 @@ def get_highres_stats(block, d):
             d['reflns_outer_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[high]
     return d
 
-def assign_dataset_outcome(logger, dal, mounted_crystal_code):
-    d = {}
-    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high),
-                dal.xray_processing_table.c.dataset_id]).where(
-        dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
-    rp = dal.connection.execute(q)
-    r = rp.fetchall()
-    resolution = r[0][0]
-    dataset_id = r[0][1]
-    logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
+def assign_dataset_outcome(logger, dal, d):
+#    d = {}
+#    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high),
+#                dal.xray_processing_table.c.dataset_id]).where(
+#        dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
+#    rp = dal.connection.execute(q)
+#    r = rp.fetchall()
+#    resolution = r[0][0]
+#    dataset_id = r[0][1]
+    logger.info('highest resolution for processed datasets is {0!s} A'.format(d['reflns_d_resolution_high']))
     try:
         if resolution < 2.0:
             d['data_collection_outcome'] = "success - high resolution"
@@ -236,9 +236,9 @@ def assign_dataset_outcome(logger, dal, mounted_crystal_code):
             d['data_collection_outcome'] = "success - low resolution"
     except TypeError:
         d['data_collection_outcome'] = "unknown"
-    logger.info('updating data_collection_outcome accordingly')
+    logger.info('updating data_collection_outcome accordingly: {0!s}'.format(d['data_collection_outcome']))
     u = dal.xray_dataset_table.update().values(d).where(
-        dal.xray_dataset_table.c.dataset_id == dataset_id)
+        dal.xray_dataset_table.c.dataset_id == d['dataset_id'])
     dal.connection.execute(u)
 
 
