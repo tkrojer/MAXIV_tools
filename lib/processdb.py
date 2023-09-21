@@ -217,9 +217,10 @@ def get_highres_stats(block, d):
             d['reflns_outer_pdbx_CC_half'] = list(block.find_loop('_reflns_shell.pdbx_CC_half'))[high]
     return d
 
-def assign_dataset_outcome(logger, dal, d):
-    resolution = d['reflns_d_resolution_high']
+def assign_dataset_outcome(logger, dal, d_proc):
+    resolution = d_proc['reflns_d_resolution_high']
     logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
+    d = {}
     try:
         if resolution < 2.0:
             d['data_collection_outcome'] = "success - high resolution"
@@ -231,7 +232,7 @@ def assign_dataset_outcome(logger, dal, d):
         d['data_collection_outcome'] = "unknown"
     logger.info('updating data_collection_outcome accordingly: {0!s}'.format(d['data_collection_outcome']))
     u = dal.xray_dataset_table.update().values(d).where(
-        dal.xray_dataset_table.c.dataset_id == d['dataset_id'])
+        dal.xray_dataset_table.c.dataset_id == d_proc['dataset_id'])
     dal.connection.execute(u)
 
 
