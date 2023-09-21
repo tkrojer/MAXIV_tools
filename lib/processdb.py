@@ -218,15 +218,8 @@ def get_highres_stats(block, d):
     return d
 
 def assign_dataset_outcome(logger, dal, d):
-#    d = {}
-#    q = select([func.min(dal.xray_processing_table.c.reflns_d_resolution_high),
-#                dal.xray_processing_table.c.dataset_id]).where(
-#        dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code)
-#    rp = dal.connection.execute(q)
-#    r = rp.fetchall()
-#    resolution = r[0][0]
-#    dataset_id = r[0][1]
-    logger.info('highest resolution for processed datasets is {0!s} A'.format(d['reflns_d_resolution_high']))
+    resolution = d['reflns_d_resolution_high']
+    logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
     try:
         if resolution < 2.0:
             d['data_collection_outcome'] = "success - high resolution"
