@@ -628,26 +628,29 @@ def retain_results_which_fit_selection_criterion(logger, proc_list, select_crite
     backup_list = []
     found_selected_pipeline = False
     for d in proc_list:
+        dataset_id = d['dataset_id']
+        processing_outcome = "unknown"
         reso_high = d['reflns_d_resolution_high']
         if select_criterion.startswith('reso'):
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
-            d['processing_outcome'] = "success - is selected highres"
+            processing_outcome = "success - is selected highres"
             match_list.append([d, float(reso_high)])
         elif select_criterion.lower() == 'autoproc' and d['autoproc_pipeline'].lower() == 'autoproc' and d['staraniso'] == False:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
-            d['processing_outcome'] = "success - fits selected pipeline"
+            processing_outcome = "success - fits selected pipeline"
             match_list.append([d, float(reso_high)])
         elif select_criterion.lower() == 'staraniso' and d['autoproc_pipeline'].lower() == 'autoproc' and d['staraniso'] == True:
             logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
             found_selected_pipeline = True
-            d['processing_outcome'] = "success - fits selected pipeline"
+            processing_outcome = "success - fits selected pipeline"
             match_list.append([d, float(reso_high)])
         else:
             logger.warning('MTZ does not match criteria, but added {0!s} with high resolution limit of {1!s} A'.format(
                 d['autoproc_pipeline'], reso_high))
-            d['processing_outcome'] = "fail - not selected pipeline"
+            processing_outcome = "fail - not selected pipeline"
             backup_list.append([d, float(reso_high)])
+        processdb.update_processing_outcome(logger, dataset_id, processing_outcome)
     if not match_list:
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
         match_list = backup_list
