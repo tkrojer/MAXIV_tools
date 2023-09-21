@@ -75,6 +75,9 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
     foundDataset = False
     foundMTZ = False
     for runs in sorted(glob.glob(os.path.join(sample_folder, '*'))):
+        if not os.listdir(runs):
+            logger.error('process folder is empty: {0!s}'.format(runs))
+            continue
 #        run = runs.split('/')[9]
         run = runs.split('/')[len(runs.split('/'))-1]
         logger.info('checking run {0!s}'.format(run))
