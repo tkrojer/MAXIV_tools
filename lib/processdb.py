@@ -64,8 +64,10 @@ def read_master_file(logger, master_file, d_xray_dataset_table_dict, foundDatase
         if d_xray_dataset_table_dict['omega_range_total'] > 30.0:
             d_xray_dataset_table_dict['is_dataset'] = True
             foundDataset = True
-            d_xray_dataset_table_dict['data_collection_outcome'] = "unknown"
+            d_xray_dataset_table_dict['data_collection_type'] = "rotation dataset"
+            d_xray_dataset_table_dict['data_collection_outcome'] = "collected - processing pending"
         else:
+            d_xray_dataset_table_dict['data_collection_type'] = "X-ray centring"
             d_xray_dataset_table_dict['data_collection_outcome'] = "X-ray centring"
     else:
         logger.error('master file does not exist!')

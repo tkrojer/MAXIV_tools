@@ -266,6 +266,7 @@ class DataAccessLayer:
         Column('crystal_snapshot_2', String(255)),
         Column('crystal_snapshot_3', String(255)),
         Column('crystal_snapshot_4', String(255)),
+        Column('data_collection_type', String(255)),
         Column('data_collection_outcome', String(255)),
         Column('data_collection_date', DateTime(), default=datetime.now),
         Column('data_collection_comment', String(255)),

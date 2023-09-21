@@ -62,6 +62,31 @@ def get_blank_cif():
     }
     return cif
 
+def add_cif_columns_to_df(df):
+    df['collection_date'] = ' '
+    df['proposal'] = ' '
+    df['session'] = ' '
+    df['reso_low'] = ' '
+    df['reso_high'] = ' '
+    df['status'] = ' '
+    df['pipeline'] = ' '
+    df['percent_possible_obs'] = ' '
+    df['Rmerge_I_obs_low'] = ' '
+    df['meanI_over_sigI_obs_high'] = ' '
+#    df['unitcell'] = ' '
+    df['space_group'] = ' '
+    df['initref_software'] = ' '
+    df['initref_spacegroup'] = ' '
+    df['ls_d_res_high'] = ' '
+    df['ls_R_factor_R_work'] = ' '
+    df['ls_R_factor_R_free'] = ' '
+    df['r_bond_refined_d'] = ' '
+    df['r_angle_refined_deg'] = ' '
+    df['blobs'] = ' '
+    df['smiles'] = ' '
+    df['sample_appearance'] = ' '
+    df['cpd_appearance'] = ' '
+    return df
 
 def get_semi_blank_cif():
     cif = {
@@ -143,7 +168,7 @@ def get_point_group_dict():
 
 
 def update_point_group_dict(cif, pgDict):
-    pg = cif['lattice'] + cif['point_group']
+    pg = str(cif['lattice']) + str(cif['point_group'])
     if pg not in pgDict:
         pgDict[pg] = 0
     pgDict[pg] += 1
@@ -160,7 +185,7 @@ def get_point_group_info_dict():
 
 
 def update_point_group_info_dict(cif, pginfoDict):
-    pg = cif['lattice'] + cif['point_group']
+    pg = str(cif['lattice']) + str(cif['point_group'])
     ucv = int(cif['unitcell_volume'])
     rmergelow = float(cif['Rmerge_I_obs_low'])
     pginfoDict['pointgroup'].append(pg)
@@ -239,35 +264,37 @@ def add_row_to_worksheet(workbook, worksheet, sample, cif, row, dozor, cpdID, cp
     if cif['pipeline'].startswith('xia2'):
         cif['percent_possible_obs'] = str(round(float(cif['percent_possible_obs'])*100, 1))
     worksheet.write('A' + str(row), sample, cell_format)
-    worksheet.write('B' + str(row), cif['collection_date'], cell_format)
-    worksheet.write('C' + str(row), cif['proposal'], cell_format)
-    worksheet.write('D' + str(row), cif['session'], cell_format)
+    worksheet.write('B' + str(row), cif['sample_appearance'], cell_format)
+    worksheet.write('C' + str(row), cif['collection_date'], cell_format)
+    worksheet.write('D' + str(row), cif['proposal'], cell_format)
+    worksheet.write('E' + str(row), cif['session'], cell_format)
     if dozor:
-        worksheet.insert_image('E' + str(row), dozor, {'x_scale': 0.195, 'y_scale': 0.22})
-    worksheet.write('F' + str(row), cif['pipeline'], cell_format)
-    worksheet.write('G' + str(row), cif['reso_low'], cell_format)
-    worksheet.write('H' + str(row), cif['reso_high'], cell_format)
-    worksheet.write('I' + str(row), cif['percent_possible_obs'], cell_format)
-    worksheet.write('J' + str(row), cif['Rmerge_I_obs_low'], cell_format)
-    worksheet.write('K' + str(row), cif['meanI_over_sigI_obs_high'], cell_format)
-    worksheet.write('L' + str(row), cif['space_group'], cell_format)
-    worksheet.write('M' + str(row), unitcell, cell_format)
-    worksheet.write('N' + str(row), cif['status'], cell_format)
-    worksheet.write('O' + str(row), cpdID, cell_format)
+        worksheet.insert_image('F' + str(row), dozor, {'x_scale': 0.195, 'y_scale': 0.22})
+    worksheet.write('G' + str(row), cif['pipeline'], cell_format)
+    worksheet.write('H' + str(row), str(cif['reso_low']), cell_format)
+    worksheet.write('I' + str(row), str(cif['reso_high']), cell_format)
+    worksheet.write('J' + str(row), str(cif['percent_possible_obs']), cell_format)
+    worksheet.write('K' + str(row), str(cif['Rmerge_I_obs_low']), cell_format)
+    worksheet.write('L' + str(row), str(cif['meanI_over_sigI_obs_high']), cell_format)
+    worksheet.write('M' + str(row), str(cif['space_group']), cell_format)
+    worksheet.write('N' + str(row), str(unitcell), cell_format)
+    worksheet.write('O' + str(row), str(cif['status']), cell_format)
+    worksheet.write('P' + str(row), cpdID, cell_format)
     if cpdImg:
-        worksheet.insert_image('P' + str(row), cpdImg, {'x_scale': 0.3, 'y_scale': 0.35})
-    worksheet.write('Q' + str(row), cif['soaktime'], cell_format)
+        worksheet.insert_image('Q' + str(row), cpdImg, {'x_scale': 0.3, 'y_scale': 0.35})
+    worksheet.write('R' + str(row), cif['smiles'], cell_format)
+    worksheet.write('S' + str(row), cif['soaktime'], cell_format)
+    worksheet.write('T' + str(row), cif['cpd_appearance'], cell_format)
 
-
-    worksheet.write('R' + str(row), cif['initref_software'], cell_format)
-    worksheet.write('S' + str(row), cif['initref_spacegroup'], cell_format)
-#    worksheet.write('T' + str(row), cif[''], cell_format)
-    worksheet.write('U' + str(row), cif['ls_d_res_high'], cell_format)
-    worksheet.write('V' + str(row), cif['ls_R_factor_R_work'], cell_format)
-    worksheet.write('W' + str(row), cif['ls_R_factor_R_free'], cell_format)
-    worksheet.write('X' + str(row), cif['r_bond_refined_d'], cell_format)
-    worksheet.write('Y' + str(row), cif['r_angle_refined_deg'], cell_format)
-    worksheet.write('Z' + str(row), cif['blobs'], cell_format)
+    worksheet.write('U' + str(row), str(cif['initref_software']), cell_format)
+    worksheet.write('V' + str(row), str(cif['initref_spacegroup']), cell_format)
+    worksheet.write('W' + str(row), '', cell_format)
+    worksheet.write('X' + str(row), str(cif['ls_d_res_high']), cell_format)
+    worksheet.write('Y' + str(row), str(cif['ls_R_factor_R_work']), cell_format)
+    worksheet.write('Z' + str(row), str(cif['ls_R_factor_R_free']), cell_format)
+    worksheet.write('AA' + str(row), str(cif['r_bond_refined_d']), cell_format)
+    worksheet.write('AB' + str(row), str(cif['r_angle_refined_deg']), cell_format)
+    worksheet.write('AC' + str(row), str(cif['blobs']), cell_format)
 
 
 def get_summary_worksheet(workbook, n_samples):
@@ -279,37 +306,43 @@ def get_summary_worksheet(workbook, n_samples):
         'valign': 'vcenter',
         'fg_color': 'yellow'})
     merge_format.set_font_size(20)
-    worksheet.merge_range('A1:E1', 'Data Collection', merge_format)
-    worksheet.merge_range('F1:N1', 'Data Processing', merge_format)
-    worksheet.merge_range('O1:Q1', 'Compound', merge_format)
-    worksheet.merge_range('R1:Z1', 'Initial Refinement', merge_format)
-    worksheet.add_table('A2:Z{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},                 # A
-                                                                      {'header': 'Date'},                   # B
-                                                                      {'header': 'Proposal'},               # C
-                                                                      {'header': 'Session'},                # D
-                                                                      {'header': 'Dozor'},
-                                                                      {'header': 'Pipeline'},
-                                                                      {'header': 'Reso (Low)'},
-                                                                      {'header': 'Reso (High)'},
-                                                                      {'header': 'Completeness\n(Overall)'},
-                                                                      {'header': 'Rmerge (Low)'},
-                                                                      {'header': 'I/sig(I) (High)'},
-                                                                      {'header': 'Spacegroup'},
-                                                                      {'header': 'Unit Cell'},
-                                                                      {'header': 'Status'},
-                                                                      {'header': 'Compound ID'},
-                                                                      {'header': 'Compound'},
-                                                                      {'header': 'Soak time (h)'},      # Q
-                                                                      {'header': 'Pipeline'},           # R
-                                                                      {'header': 'Spacegroup'},         # S
-                                                                      {'header': 'reference PDB'},      # T
-                                                                      {'header': 'Resolution'},         # U
-                                                                      {'header': 'Rwork'},             # V
-                                                                      {'header': 'Rfree'},              # W
-                                                                      {'header': 'rmsd bonds'},         # X
-                                                                      {'header': 'rmsd angles'},        # Y
-                                                                      {'header': 'blobs'}              # z
-                                                                      ]})
+    worksheet.merge_range('A1:B1', 'Crystal', merge_format)
+    worksheet.merge_range('C1:F1', 'Data Collection', merge_format)
+    worksheet.merge_range('G1:O1', 'Data Processing', merge_format)
+    worksheet.merge_range('P1:T1', 'Compound', merge_format)
+    worksheet.merge_range('U1:AC1', 'Initial Refinement', merge_format)
+    worksheet.add_table('A2:AC{0!s}'.format(n_samples+2), {'columns': [{'header': 'Sample'},                        # A
+                                                                      {'header': 'Appearance'},                     # B
+                                                                      {'header': 'Date'},                           # C
+                                                                      {'header': 'Proposal'},                       # D
+                                                                      {'header': 'Session'},                        # E
+                                                                      {'header': 'Dozor'},                          # F
+                                                                      {'header': 'ProcPipeline'},                   # G
+                                                                      {'header': 'Reso (Low)'},                     # H
+                                                                      {'header': 'Reso (High)'},                    # I
+                                                                      {'header': 'Completeness\n(Overall)'},        # J
+                                                                      {'header': 'Rmerge (Low)'},                   # K
+                                                                      {'header': 'I/sig(I) (High)'},                # L
+                                                                      {'header': 'ProcSPG'},                        # M
+                                                                      {'header': 'Unit Cell'},                      # N
+                                                                      {'header': 'Status'},                         # O
+                                                                      {'header': 'Compound ID'},                    # P
+                                                                      {'header': 'Compound'},                       # Q
+                                                                      {'header': 'Smiles'},                         # R
+                                                                      {'header': 'Soak time (h)'},                  # S
+                                                                      {'header': 'Behaviour'},                      # T
+                                                                      {'header': 'RefPipeline'},                    # U
+                                                                      {'header': 'RefSPG'},                         # V
+                                                                      {'header': 'reference PDB'},                  # W
+                                                                      {'header': 'Resolution'},                     # X
+                                                                      {'header': 'Rwork'},                          # Y
+                                                                      {'header': 'Rfree'},                          # Z
+                                                                      {'header': 'rmsd bonds'},                     # AA
+                                                                      {'header': 'rmsd angles'},                    # AB
+                                                                      {'header': 'blobs'}                           # AC
+                                                                      ],
+                                                          'header_row': True,
+                                                          'autofilter': True})
     worksheet.freeze_panes(2, 1)
     worksheet.set_column('E:E', 17)
     worksheet.set_column('P:P', 12)
@@ -351,14 +384,115 @@ def update_status_dict(statusDict, cif):
     statusDict[status] += 1
     return statusDict
 
+def prepare_summary_worksheet_new(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
+                              dataDict, pgDict, pginfoDict, statusDict, auxcsv):
+    logger.info('preparing summary worksheet...')
+    space_group_dict = {}
+    df = pd.read_csv(fragmaxcsv)
+    d = df.to_dict(orient='index')
+    for m, row in enumerate(d):
+        n = m+1
+        cif = d[row]
+
+#    for n, line in enumerate(open(fragmaxcsv)):
+#        if n == 0:
+#            continue
+        sample = cif['mounted_crystal_code']
+        sample_appearance = cif['crystal_appearance']
+        cpdID = cif['compound_code']
+        smiles = cif['smiles']
+        cpd_appearance = cif['compound_appearance']
+        soaktime = "n/a"
+        logger.info('current sample: ' + sample)
+        dataDict = update_crystal_summary(dataDict, 'mounted')
+        ciffile = os.path.join(projectDir, '1-process', sample, 'process.cif')
+        mtzfile = os.path.join(projectDir, '1-process', sample, 'process.mtz')
+        jsofile = os.path.join(projectDir, '1-process', sample, 'info.json')
+        initrefcif = os.path.join(projectDir, '2-initial_refine', sample, 'init.mmcif')
+        initrefmtz = os.path.join(projectDir, '2-initial_refine', sample, 'init.mtz')
+        initrefpdb = os.path.join(projectDir, '2-initial_refine', sample, 'init.pdb')
+        dozor = None
+        cpdImg = get_compound_image(projectDir, sample, cpdID)
+        if os.path.isfile(jsofile):
+            dataDict = update_crystal_summary(dataDict, 'collected')
+            jso = get_json_as_dict(jsofile)
+            dozor = get_dozor_plot(projectDir, sample, jso, dozor)
+        if os.path.isfile(ciffile) and os.path.isfile(mtzfile) and os.path.isfile(jsofile):
+#            cif = processlib.cif_info(ciffile)
+#            mtz = processlib.mtz_info(mtzfile)
+#            cif.update(mtz)
+#            cif.update(jso)
+#            cif['soaktime'] = soaktime
+            dataDict = analyse_resolution(dataDict, cif)
+            pgDict = update_point_group_dict(cif, pgDict)
+            pginfoDict = update_point_group_info_dict(cif, pginfoDict)
+            if os.path.isfile(initrefcif) and os.path.isfile(initrefmtz) and os.path.isfile(initrefpdb):
+                cif.update(refinelib.structure_cif_info(initrefcif))
+                if cif['initref_spacegroup'] not in space_group_dict:
+                    space_group_dict['initref_spacegroup'] = 0
+                space_group_dict['initref_spacegroup'] += 1
+                blobList = refinelib.find_blobs(initrefmtz, initrefpdb)
+                if blobList:
+                    cif['blobs'] = str(len(blobList))
+                else:
+                    cif['blobs'] = '0'
+            else:
+                cif.update(get_blank_init_refine_cif())
+        elif os.path.isfile(jsofile) and not os.path.isfile(ciffile):
+#            jso = get_json_as_dict(jsofile)
+#            cif = get_semi_blank_cif()
+            cif['soaktime'] = soaktime
+            cif.update(jso)
+        else:
+#            cif = get_blank_cif()
+            cif['soaktime'] = soaktime
+            cif = check_aux_csv_file(auxcsv, sample, cif)
+        if sample == 'None':
+            cif['status'] = 'FAIL - mounting failed'
+        row = n + 2
+#        cif['smiles'] = smiles
+#        cif['sample_appearance'] = sample_appearance
+#        cif['cpd_appearance'] = cpd_appearance
+        add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg)
+        statusDict = update_status_dict(statusDict, cif)
+        #        updated = df['SampleID'] == sample
+        updated = df['mounted_crystal_code'] == sample
+        uc = str(cif['unitcell']).replace(",", " ")
+        cif['unitcell'] = uc
+        df_dict = cif
+        #        try:
+        #            del df_dict['unitcell']
+        #        except KeyError:
+        #            pass
+        #        try:
+        #            del df_dict['master']
+        #        except KeyError:
+        #            pass
+        #        print(sample, updated)
+        #        print(cif)
+        df.loc[updated, df_dict.keys()] = df_dict.values()
+    if pginfoDict:
+        print_pg_ucv_distribution(pginfoDict)
+        print_pg_rmergelow_distribution(pginfoDict)
+    if space_group_dict:
+        print('space_groups', space_group_dict)
+    return statusDict, df
+
 
 def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
                               dataDict, pgDict, pginfoDict, statusDict, auxcsv):
     logger.info('preparing summary worksheet...')
     space_group_dict = {}
+    df = pd.read_csv(fragmaxcsv)
+    df = add_cif_columns_to_df(df)
     for n, line in enumerate(open(fragmaxcsv)):
+        if n == 0:
+            continue
         sample = line.split(',')[0]
+        sample_appearance = line.split(',')[9]
         cpdID = line.split(',')[1]
+        smiles = line.split(',')[2]
+        cpd_appearance = line.split(',')[10].replace('\n', '').replace('\r', '')
         soaktime = line.split(',')[5]
         logger.info('current sample: ' + sample)
         dataDict = update_crystal_summary(dataDict, 'mounted')
@@ -404,15 +538,36 @@ def prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, f
             cif = get_blank_cif()
             cif['soaktime'] = soaktime
             cif = check_aux_csv_file(auxcsv, sample, cif)
-        row = n + 3
+        if sample == 'nan':
+            cif['status'] = 'FAIL - mounting failed'
+        row = n + 2
+        cif['smiles'] = smiles
+        cif['sample_appearance'] = sample_appearance
+        cif['cpd_appearance'] = cpd_appearance
         add_row_to_worksheet(workbook, summary_worksheet, sample, cif, row, dozor, cpdID, cpdImg)
         statusDict = update_status_dict(statusDict, cif)
+#        updated = df['SampleID'] == sample
+        updated = df['mounted_crystal_code'] == sample
+        uc = cif['unitcell'].replace(",", " ")
+        cif['unitcell'] = uc
+        df_dict = cif
+#        try:
+#            del df_dict['unitcell']
+#        except KeyError:
+#            pass
+#        try:
+#            del df_dict['master']
+#        except KeyError:
+#            pass
+#        print(sample, updated)
+#        print(cif)
+        df.loc[updated, df_dict.keys()] = df_dict.values()
     if pginfoDict:
         print_pg_ucv_distribution(pginfoDict)
         print_pg_rmergelow_distribution(pginfoDict)
     if space_group_dict:
         print('space_groups', space_group_dict)
-    return statusDict
+    return statusDict, df
 
 
 def get_details_worksheet(workbook, n_autoproc_results):
@@ -435,6 +590,57 @@ def get_details_worksheet(workbook, n_autoproc_results):
     worksheet.freeze_panes(1, 1)
     return worksheet
 
+def get_library_worksheet(workbook, df):
+    worksheet = workbook.add_worksheet('libraries')
+    lib_df = pd.read_excel("/Users/tobkro/MAXIV/FragMAX/LP3/FragMAX_crystal_preparation/database/lookup_tables.xlsx", 6)
+    ld = {}
+    x = 1
+    y = 1
+    for index, row in lib_df.iterrows():
+        cpd_id = row['compound_code']
+        lib_name = row['library_name']
+        if lib_name not in ld:
+            ld[lib_name] = []
+            y += 1
+            x = 1
+        if cpd_id not in ld[lib_name]:
+            ld[lib_name].append(cpd_id)
+            if x == 27:
+                x = 1
+                y += 1
+            col = number_to_column(str(x))
+            dt = df.loc[df['compound_code'] == cpd_id]
+#            dt = df.loc[df['CompoundID'] == cpd_id]
+            for i, r in dt.iterrows():
+                try:
+                    if float(r['ls_d_res_high']) < 2.5:
+                        cell_format = workbook.add_format({'bg_color': '00FF00'})
+                    else:
+                        cell_format = workbook.add_format({'bg_color': '006666'})
+                except ValueError:
+#                    cell_format = workbook.add_format({'bg_color': 'red'})
+#                    print('>>>', r['mounted_crystal_code'], r['ls_d_res_high'], r['sample_appearance'])
+                    if 'bad' in r['sample_appearance'].lower():
+                        cell_format = workbook.add_format({'bg_color': 'yellow'})
+                    elif r['mounted_crystal_code'] == 'None':
+                        cell_format = workbook.add_format({'bg_color': 'magenta'})  # something went wrong during mount
+                    elif r['mounted_crystal_code'] != 'None' and r['status'] == "FAIL - no processing result":
+                        cell_format = workbook.add_format({'bg_color': 'red'})
+                    elif r['mounted_crystal_code'] != 'None' and r['status'].replace(' ', '') == '':    # prepared but not collected
+                        cell_format = workbook.add_format({'bg_color': 'cyan'})
+#                    elif r['status'].replace(' ', '') == '':
+#                        cell_format = workbook.add_format({'bg_color': 'cyan'})
+                    else:
+                        cell_format = workbook.add_format({'bg_color': 'brown'})    # all other failure
+            if dt.empty:
+                cell_format = workbook.add_format({'bg_color': 'white'})
+
+            worksheet.write('{0!s}{1!s}'.format(col, str(y)), cpd_id, cell_format)
+            x += 1
+        else:
+            continue
+    return worksheet
+
 
 def prepare_details_worksheet(logger, workbook, details_worksheet, projectDir, fragmaxcsv):
     logger.info('preparing details worksheet...')
@@ -444,7 +650,7 @@ def prepare_details_worksheet(logger, workbook, details_worksheet, projectDir, f
     color = color_one
     for n, line in enumerate(open(fragmaxcsv)):
         sample = line.split(',')[0]
-        logger.info('curren sample: ' + sample)
+        logger.info('current sample: ' + sample)
         for cif in glob.glob(os.path.join(projectDir, '1-process', sample, '*', '*', 'process.cif')):
             ciffile = cif
             mtzfile = cif.replace('process.cif', 'process.mtz')

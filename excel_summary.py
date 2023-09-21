@@ -46,16 +46,20 @@ def parse_project_directory(logger, projectDir, fragmaxcsv, auxcsv):
     pg_rmergelow_worksheet = summarylib.get_pg_rmergelow_worksheet(workbook)
 
     chart_data = summarylib.get_chart_data_sheet(workbook)
-    summarylib.prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
+    statusDict, df = summarylib.prepare_summary_worksheet(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
                                          dataDict, pgDict, pginfoDict, statusDict, auxcsv)
-    summarylib.prepare_details_worksheet(logger, workbook, details_worksheet, projectDir, fragmaxcsv)
+#    statusDict, df = summarylib.prepare_summary_worksheet_new(logger, workbook, summary_worksheet, projectDir, fragmaxcsv,
+#                                         dataDict, pgDict, pginfoDict, statusDict, auxcsv)
+    # this speeds up the process by a lot
+#    summarylib.prepare_details_worksheet(logger, workbook, details_worksheet, projectDir, fragmaxcsv)
     summarylib.prepare_get_pg_ucv_worksheet(pg_ucv_worksheet)
     summarylib.prepare_get_pg_rmergelow_worksheet(pg_rmergelow_worksheet)
     summarylib.prepare_crystal_chart(workbook, chart_data, dataDict)
     summarylib.prepare_laue_group_chart(workbook, chart_data, pgDict)
     summarylib.prepare_status_chart(workbook, chart_data, statusDict)
+    library_worksheet = summarylib.get_library_worksheet(workbook, df)
     workbook.close()
-
+    df.to_csv('tsummary.csv', index=False)
 
 def main(argv):
     projectDir = ''
