@@ -106,6 +106,8 @@ def create_dummy_dataset_entry(logger, dal, sample, proposal, session):
         'session': session,
         'run': 'dummy',
         'is_dataset': True,
+        'data_collection_type': "dummy",
+        'data_collection_outcome': "fail - no dataset collected",
         'data_collection_comment': 'dummy entry - no dataset collected after x-ray alignment'
     }
     insert_into_xray_dataset_table(logger, dal, d)
