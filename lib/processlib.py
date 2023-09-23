@@ -338,6 +338,7 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
     if unm_mtz:
         logger.info('unmerged mtz exists')
         if not os.path.isfile(unm_mtz):
+            logger.error('/bin/cp {0!s} .'.format(unm_mtz))
             os.system('/bin/cp {0!s} .'.format(unm_mtz))
     if not os.path.isfile(cif_name):
         write_mmcif_header(cif, cif_name, collection_date, wavelength)
