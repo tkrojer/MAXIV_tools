@@ -207,27 +207,33 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     for sample in sampleList:
         logger.info('current sample - {0!s}'.format(sample))
         master_files_runs = processdb.get_master_file_run_list(logger, dal, sample, proposal, session)
+        processlib.create_sample_folder(logger, projectDir, sample)
         for item in master_files_runs:
             master_file = item[0]
             run = item[1]
+            processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
+            proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
+            script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
+                                                    proc_folder, master_file)
+            counter += 1
+            if counter == n_jobs:
+                counter = 0
 
-
-
-    for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
-        sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
-        if sample in sampleList:
-            logger.info('current sample - {0!s}'.format(sample))
-            processlib.create_sample_folder(logger, projectDir, sample)
-            for master_file in glob.glob(os.path.join(sample_folder, '*_master.h5')):
-                run = 'xds_' + master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
-                processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
-                processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
-                proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
-                script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
-                                                                proc_folder, master_file)
-                counter += 1
-                if counter == n_jobs:
-                    counter = 0
+#    for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(processDir.replace('/process/', '/raw/'), '*')))):
+#        sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
+#        if sample in sampleList:
+#            logger.info('current sample - {0!s}'.format(sample))
+#            processlib.create_sample_folder(logger, projectDir, sample)
+#            for master_file in glob.glob(os.path.join(sample_folder, '*_master.h5')):
+#                run = 'xds_' + master_file[master_file.rfind('/')+1:].replace('_master.h5', '') + '_1'
+#                processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
+#                processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
+#                proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
+#                script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
+#                                                                proc_folder, master_file)
+#                counter += 1
+#                if counter == n_jobs:
+#                    counter = 0
     processlib.save_proc_scripts(logger, projectDir, script_dict)
     processlib.end_reprocessing(logger)
 
