@@ -221,6 +221,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     pipeline = proc_dict['pipeline'] + '_manual'
     script_dict = processlib.get_script_dict(pipeline, n_jobs, now)
+    logger.info(script_dict)
     counter = 0
     for sample in sampleList:
         logger.info('current sample - {0!s}'.format(sample))
