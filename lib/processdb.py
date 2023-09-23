@@ -276,9 +276,35 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
                     # but script edits the automatically processed files so that only the header of the first
                     # block remains; note: xia2 has two blocks, the first being a summary, the second
                     # containing details for all resolution shells
-#        break   # only interested in first block; xia2 has a second, somewhat redundant block
-    logger.info('process_dict: {0!s}'.format(d))
 
+#        break   # only interested in first block; xia2 has a second, somewhat redundant block
+    if os.path.isfile(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+                       'unmerged_total.cif')):
+        d = read_mrfana_cif(logger, d)
+    logger.info('process_dict: {0!s}'.format(d))
+    return d
+
+def read_mrfana_cif(logger, d):
+    if os.path.isfile():
+        logger.info('reading MRFANA CIF file')
+        doc = gemmi.cif.read_file('unmerged_total.cif')
+        for block in doc:
+            found_20 = False
+            found_15 = False
+            found_10 = False
+            if block.find_loop('_reflns_shell.pdbx_ordinal'):
+                print(len(list(block.find_loop('_reflns_shell.d_res_high'))))
+                print(len(list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))))
+                for n, isig in enumerate(list(block.find_loop('_reflns_shell.meanI_over_sigI_obs'))):
+                    if float(isig) < 2.0 and not found_20:
+                        d['resolution_high_2_0_sigma'] = list(block.find_loop('_reflns_shell.d_res_high'))[n - 1]
+                        found_20 = True
+                    if float(isig) < 1.5 and not found_15:
+                        d['resolution_high_1_5_sigma'] = list(block.find_loop('_reflns_shell.d_res_high'))[n - 1]
+                        found_15 = True
+                    if float(isig) < 1.0 and not found_10:
+                        d['resolution_high_1_0_sigma'] = list(block.find_loop('_reflns_shell.d_res_high'))[n - 1]
+                        found_10 = True
     return d
 
 

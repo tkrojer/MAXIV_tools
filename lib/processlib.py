@@ -341,6 +341,7 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
         if not os.path.isfile(unm_name):
             logger.error('/bin/cp {0!s} .'.format(unm_mtz))
             os.system('/bin/cp {0!s} .'.format(unm_mtz))
+            run_mrfana(logger, unm_name)
     if not os.path.isfile(cif_name):
         write_mmcif_header(cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
@@ -352,6 +353,32 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
                        'process.cif')
     return mtz, log, cif
 
+
+def run_mrfana(logger, unm_name):
+    if os.path.isfile('unmerged_total.cif'):
+        logger.info('file exists: unmerged_total.cif; skipping...')
+    else:
+        logger.info('running MRFANA on UNMERGED MTZ')
+        cmd = (
+            'module load gopresto BUSTER\n'
+            'mrfana {0!s} -cif unmerged.cif'.format(unm_name)
+        )
+        os.system(cmd)
+        if os.path.isfile('unmerged_total.cif'):
+            logger.info('ran mrfana successfully')
+            check_first_line_of_mrfana_cif(logger)
+
+
+def check_first_line_of_mrfana_cif(logger):
+    logger.info('checking start line of mrfana...')
+    with open('unmerged_total.cif', 'r+') as f:
+        content = f.read()
+        if not content.startswith('data_mrfana'):
+            logger.info('inserting data_mrfana as first line...')
+            f.seek(0, 0)
+            f.write('data_mrfana\n' + content)
+
+
 def create_process_symlink(mtz_name, log_name, cif_name):
     if not os.path.isfile('process.mtz'):
         os.system('ln -s {0!s} process.mtz'.format(mtz_name))
@@ -359,7 +386,6 @@ def create_process_symlink(mtz_name, log_name, cif_name):
         os.system('ln -s {0!s} process.log'.format(log_name))
     if not os.path.isfile('process.cif'):
         os.system('ln -s {0!s} process.cif'.format(cif_name.replace('.bz2', '')))
-
 
 
 def mtz_info(mtzfile):
@@ -754,7 +780,6 @@ def link_process_results(logger, projectDir, sample, best):
         os.system('ln -s {0!s} process.cif'.format(os.path.relpath(os.path.realpath(best['processing_cif_file']))))
     if not os.path.isdir('info.json'):
         os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(json_info))))
-
 
 def link_info_json_file(logger, projectDir, sample):
     foundDozor = False
@@ -1181,3 +1206,4 @@ def reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fra
     if csv_out:
         logger.info('saving reprocess.csv file...')
         save_reprocess_csv_file(logger, csv_out, processDir, projectDir, fragmaxcsv)
+
