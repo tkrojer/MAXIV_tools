@@ -926,7 +926,7 @@ def check_if_database_file_exists(logger, db_file, passed):
     return passed
 
 
-def run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion):
+def run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, db_file):
     logger.info('checking input file and command line options...')
     passed = check_if_process_directory_exists(logger, processDir, select)
     passed = check_if_project_directory_exists(logger, projectDir, passed)
