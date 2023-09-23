@@ -99,7 +99,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
             logger.info('checking {0!s} pipeline'.format(pipeline))
             mtzpath, mtz_extension, log_extension, cif_extension, mtz_unmerged = processlib.get_pipeline_path(pipeline)
 
-            if pipeline.endswith('_manual'):
+            if '_manual' in pipeline:
                 glob_string = os.path.join(projectDir, '1-process', sample, run, mtzpath)
                 logger.info('glob_string', glob_string)
             else:
