@@ -213,6 +213,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
             run = item[1]
             print('->', master_file, run)
             processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
+            processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
             proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
             script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
                                                     proc_folder, master_file)
