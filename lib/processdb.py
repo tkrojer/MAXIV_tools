@@ -249,7 +249,7 @@ def update_processing_outcome(logger, dal, processing_id, processing_outcome):
         dal.xray_processing_table.c.processing_id == processing_id)
     dal.connection.execute(u)
 
-def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline):
+def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline, projectDir):
     dataset_id = get_dataset_id(dal, mounted_crystal_code, proposal, session, run)
 
     d = {   'dataset_id':           dataset_id,
@@ -278,7 +278,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
                     # containing details for all resolution shells
 
 #        break   # only interested in first block; xia2 has a second, somewhat redundant block
-    if os.path.isfile(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+    if os.path.isfile(os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
                        'unmerged_total.cif')):
         d = read_mrfana_cif(logger, d)
     logger.info('process_dict: {0!s}'.format(d))

@@ -363,6 +363,7 @@ def run_mrfana(logger, unm_name):
             'module load gopresto BUSTER\n'
             'mrfana {0!s} -cif unmerged.cif'.format(unm_name)
         )
+        logger.info('command: {0!s}'.format(cmd))
         os.system(cmd)
         if os.path.isfile('unmerged_total.cif'):
             logger.info('ran mrfana successfully')
