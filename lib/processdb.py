@@ -370,4 +370,5 @@ def get_master_file_run_list(logger, dal, sample, proposal, session):
     print(q.compile(dialect=sqlite.dialect()))
     rp = dal.connection.execute(q)
     result = rp.fetchall()
+    print('---->', result)
     return result
