@@ -101,6 +101,10 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
             if '_manual' in pipeline:
                 glob_string = os.path.join(projectDir, '1-process', sample, run, mtzpath)
+                logger.info('projectDir', projectDir)
+                logger.info('sample', sample)
+                logger.info('run', run)
+                logger.info('mtzpath', mtzpath)
                 logger.info('glob_string', glob_string)
             else:
                 glob_string = os.path.join(sample_folder, run, mtzpath)
