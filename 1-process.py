@@ -90,8 +90,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         d_xray_dataset_table_dict, foundDataset = processdb.get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline,
                                                                             run, create_date, master, dozor_plot, crystal_snapshot_list, foundDataset)
 
-        if os.path.isfile(db_file):
-            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
+#        if os.path.isfile(db_file):
+#            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
 
         if not master:  # this may happen if there is a run folder, but without image files
             continue
@@ -213,7 +213,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
             run = item[1]
             print('->', master_file, run)
             processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
-            processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
+            processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline + "_manual")
             proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
             script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
                                                     proc_folder, master_file)
