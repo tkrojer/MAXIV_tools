@@ -1106,10 +1106,19 @@ def get_fail_dict(logger):
         '6': 'fail - no X-rays',
         '7': 'fail - salt crystal',
         '8': 'fail - data processing',
-        '9': 'fail - no matching model'
+        '9': 'fail - no matching model',
+        '10': 'fail - tiny crystal',
+        '11': 'fail - compound crystal'
     }
     show_scoring_option(logger, fail_dict)
     return fail_dict
+
+def get_accepted_scores(logger):
+    fail_dict = get_fail_dict(logger)
+    accepted_scores = []
+    for n in fail_dict:
+        accepted_scores.append(n)
+    return accepted_scores
 
 def show_scoring_option(logger, fail_dict):
     logger.info('scores - overview')
@@ -1120,7 +1129,7 @@ def enter_score(logger, dal, dataset, fail_dict):
     sample = dataset[0]
     proposal = dataset[1]
     session = dataset[2]
-    accepted_scores = ['1', '2', '3', '4', '5', '6']
+    accepted_scores = get_accepted_scores(logger)
     if sys.version[0] == '2':
         q = raw_input(">>> {0!s}: ".format(sample))
     else:
