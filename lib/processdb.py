@@ -259,6 +259,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
             'processing_log_file':  logfile }
 
     mtz = gemmi.read_mtz_file(mtzfile)
+    logger.info('process_dict: {0!s}'.format(d)
     doc = gemmi.cif.read_file(ciffile)
 
     d = get_cell_sym_info(mtz, d)
