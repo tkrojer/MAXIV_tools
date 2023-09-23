@@ -196,7 +196,7 @@ def review_missing_datasets(logger, missing_dict, dal):
 
 
 
-def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict, dal):
+def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):
     proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
     n_jobs = 4  # hardcoded so that we don't hog the cluster
@@ -292,7 +292,7 @@ def main(argv):
         elif reprocesscsv:
             proc_dict = processlib.ask_for_spg_and_unit_cell(logger)
             processlib.start_reprocessing(logger)
-            reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict, dal)
+            reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict)
         else:
             processlib.start_get_autoprocessing_results(logger)
             get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file)
