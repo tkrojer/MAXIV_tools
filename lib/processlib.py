@@ -125,6 +125,7 @@ def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, r
 def get_processing_pipelines():
     pipelines = [
         'autoproc',
+        'autoproc_manual',
         'staraniso',
         'xia2dials',
         'xia2xds'
@@ -154,6 +155,13 @@ def get_pipeline_path(pipeline):
     if pipeline == 'autoproc':
 #        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
         mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'truncate-unique.mtz')
+        mtz_extension = 'HDF5_1/truncate-unique.mtz'
+        log_extension = 'HDF5_1/aimless.log'
+        cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
+        mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
+    elif pipeline == 'autoproc_manual':
+    #        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
+        mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate-unique.mtz')
         mtz_extension = 'HDF5_1/truncate-unique.mtz'
         log_extension = 'HDF5_1/aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'

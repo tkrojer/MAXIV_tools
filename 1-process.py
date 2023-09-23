@@ -90,15 +90,21 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
         d_xray_dataset_table_dict, foundDataset = processdb.get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamline,
                                                                             run, create_date, master, dozor_plot, crystal_snapshot_list, foundDataset)
 
-#        if os.path.isfile(db_file):
-#            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
+        if os.path.isfile(db_file):
+            processdb.insert_into_xray_dataset_table(logger, dal, d_xray_dataset_table_dict)
 
         if not master:  # this may happen if there is a run folder, but without image files
             continue
         for pipeline in pipelines:
             logger.info('checking {0!s} pipeline'.format(pipeline))
             mtzpath, mtz_extension, log_extension, cif_extension, mtz_unmerged = processlib.get_pipeline_path(pipeline)
-            for mtzfile in glob.glob(os.path.join(sample_folder, run, mtzpath)):
+
+            if pipeline.endswith('_manual'):
+                glob_string = os.path.join(projectDir, '1-process', sample, run, mtzpath)
+            else:
+                glob_string = os.path.join(sample_folder, run, mtzpath)
+
+            for mtzfile in glob.glob(glob_string):
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
                     foundMTZ = True
@@ -115,6 +121,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                                                                                               logfile,
                                                                                               sample,
                                                                                               proposal, session, run)
+                    if pipeline.endswith('_manual'):
+                        d_xray_processing_table_dict['automatic_processed'] = False
                 if os.path.isfile(db_file) and ciffile:
                     processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict)
                     logger.info('finding highest resolution')
