@@ -334,7 +334,9 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
         os.system('/bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(log_name):
         os.system('/bin/cp {0!s} .'.format(log))
+    logger.info('unmerged_mtz: {0!s}'.format(unm_mtz))
     if unm_mtz:
+        logger.info('unmerged mtz exists')
         if not os.path.isfile(unm_mtz):
             os.system('/bin/cp {0!s} .'.format(unm_mtz))
     if not os.path.isfile(cif_name):
@@ -749,7 +751,7 @@ def link_process_results(logger, projectDir, sample, best):
 #        os.system('ln -s {0!s} .'.format(bestcif))
         os.system('ln -s {0!s} process.cif'.format(os.path.relpath(os.path.realpath(best['processing_cif_file']))))
     if not os.path.isdir('info.json'):
-        os.system('ln -s {0!s} .'.format(json_info))
+        os.system('ln -s {0!s} .'.format(os.path.relpath(os.path.realpath(json_info))))
 
 
 def link_info_json_file(logger, projectDir, sample):
