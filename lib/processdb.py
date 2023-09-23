@@ -285,7 +285,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
     return d
 
 def read_mrfana_cif(logger, d):
-    if os.path.isfile():
+    if os.path.isfile('unmerged_total.cif'):
         logger.info('reading MRFANA CIF file')
         doc = gemmi.cif.read_file('unmerged_total.cif')
         for block in doc:
