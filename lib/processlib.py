@@ -1020,7 +1020,7 @@ def get_script_dict(pipeline, n_jobs, now):
     cmd += modules_to_load(pipeline)
     script_dict = {}
     for i in range(n_jobs):
-        script_dict[pipeline+'_{0!s}_{1!s}.sh'.format(i, now)] = cmd
+        script_dict[pipeline+'_{0!s}_{1!s}.sh'.format(now, i)] = cmd
 #    script_dict[pipeline+'_1.sh'] = cmd
     return script_dict
 
