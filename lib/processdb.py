@@ -367,6 +367,7 @@ def get_master_file_run_list(logger, dal, sample, proposal, session):
     q = select([dal.xray_dataset_table.c.h5_master_file,
                 dal.xray_dataset_table.c.run]).where(
                 dal.xray_dataset_table.c.mounted_crystal_code == sample)
+    print(dal)
     print(q.compile(dialect=sqlite.dialect()))
     rp = dal.connection.execute(q)
     result = rp.fetchall()
