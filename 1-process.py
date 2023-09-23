@@ -198,7 +198,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
     review_missing_datasets(logger, missing_dict, dal)
-    reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fragmaxcsv)
+    processlib.reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fragmaxcsv)
     processlib.end_get_autoprocessing_results(logger)
 
 

@@ -1092,7 +1092,6 @@ def check_if_to_annotate_and_reprocess(logger, missing_dict, dal):
     if not q.lower() == 'y':
         logger.info('you chose not to manually annotate the affected samples!')
         logger.info('OK, then we are done here for the moment... bye, bye!')
-        sys.exit(2)
     else:
         annotate_failed_datasets(logger, missing_dict, dal)
 
