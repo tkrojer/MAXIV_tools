@@ -1157,19 +1157,22 @@ def annotate_failed_datasets(logger, missing_dict, dal):
         for dataset in missing_dict[category]:
             enter_score(logger, dal, dataset, fail_dict)
 
-def select_to_reprocess_missing_datasets(logger, dal, dataset, fail_dict):
+def select_to_reprocess_missing_datasets(logger, dataset, csv_out):
     sample = dataset[0]
-    proposal = dataset[1]
-    session = dataset[2]
     if sys.version[0] == '2':
         q = raw_input(">>> {0!s} (y/n): ".format(sample))
     else:
         q = input(">>> {0!s} (y/n): ".format(sample))
     if q.lower() == 'y':
         logger.info('you chose not to manually annotate the affected samples!')
+        csv_out += sample + ',\n'
+    return csv_out
 
-#def reprocess_missing_datasets(logger, missing_dict, dal):
-#    logger.info('would you like to re-process some of the missing datasets?')
-#    for category in missing_dict:
-#        for dataset in missing_dict[category]:
-
+def reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fragmaxcsv):
+    logger.info('would you like to re-process some of the missing datasets?')
+    csv_out = ''
+    for dataset in missing_dict['mtz_file']:
+        csv_out = select_to_reprocess_missing_datasets(logger, dataset, csv_out)
+    if csv_out:
+        logger.info('saving reprocess.csv file...')
+        save_reprocess_csv_file(logger, csv_out, processDir, projectDir, fragmaxcsv)

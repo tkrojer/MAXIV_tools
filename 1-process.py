@@ -198,6 +198,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
     review_missing_datasets(logger, missing_dict, dal)
+    reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fragmaxcsv)
     processlib.end_get_autoprocessing_results(logger)
 
 
@@ -228,7 +229,6 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
         for item in master_files_runs:
             master_file = item[0]
             run = item[1]
-            print('->', master_file, run)
             processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
             processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline + "_manual")
             proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
