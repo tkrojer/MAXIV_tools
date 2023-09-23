@@ -196,7 +196,7 @@ def review_missing_datasets(logger, missing_dict, dal):
 
 
 
-def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict):
+def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict, dal):
     proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
     n_jobs = 4  # hardcoded so that we don't hog the cluster
@@ -280,7 +280,7 @@ def main(argv):
             db_file = os.path.abspath(arg)
 
     processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
-    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
+    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, db_file)
 
     if checks_passed:
         processlib.check_if_to_continue(logger)
@@ -292,7 +292,7 @@ def main(argv):
         elif reprocesscsv:
             proc_dict = processlib.ask_for_spg_and_unit_cell(logger)
             processlib.start_reprocessing(logger)
-            reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict)
+            reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict, dal)
         else:
             processlib.start_get_autoprocessing_results(logger)
             get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file)

@@ -364,12 +364,9 @@ def get_master_file_run_list(logger, dal, sample, proposal, session):
                 dal.xray_dataset_table.c.proposal == proposal,
                 dal.xray_dataset_table.c.session == session,
                 dal.xray_dataset_table.c.is_dataset == True))
-    q = select([dal.xray_dataset_table.c.h5_master_file,
-                dal.xray_dataset_table.c.run]).where(
-                dal.xray_dataset_table.c.mounted_crystal_code == sample)
-    print('--', sample)
-    print(q.compile(dialect=sqlite.dialect()))
+#    q = select([dal.xray_dataset_table.c.h5_master_file,
+#                dal.xray_dataset_table.c.run]).where(
+#                dal.xray_dataset_table.c.mounted_crystal_code == sample)
     rp = dal.connection.execute(q)
     result = rp.fetchall()
-    print('---->', result)
     return result

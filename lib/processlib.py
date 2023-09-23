@@ -916,6 +916,15 @@ def check_select_criterion(logger, select_criterion, passed):
         passed = False
     return passed
 
+def check_if_database_file_exists(logger, db_file, passed):
+    logger.info('checking db_file: {0!s}'.format(db_file))
+    if os.path.isfile(db_file):
+        logger.info('db_file exists')
+    else:
+        logger.error('db_file does not exist')
+        passed = False
+    return passed
+
 
 def run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion):
     logger.info('checking input file and command line options...')
@@ -924,6 +933,7 @@ def run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criter
     passed = check_if_fragmaxcsv_exists(logger, fragmaxcsv, passed)
     passed = check_pdbfiles_in_pdbdir(logger, projectDir, passed)
     passed = check_select_criterion(logger, select_criterion, passed)
+    passed = check_if_database_file_exists(logger, db_file, passed)
     logger.info('===================================================================================')
     return passed
 
