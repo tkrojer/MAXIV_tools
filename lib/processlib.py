@@ -740,6 +740,7 @@ def link_process_results(logger, projectDir, sample, best):
     # note: need to wrap path into realpath/ relpath, because,
     # /data/visitors/... really is /gpfs/offline/visitors and the relpath statement alone will turn
     # into ../../../../../../../../data/... but once a realpath come first it will be ./...
+        logger.info('ln -s {0!s} process.mtz'.format(os.path.relpath(os.path.realpath(best['processing_mtz_file']))))
         os.system('ln -s {0!s} process.mtz'.format(os.path.relpath(os.path.realpath(best['processing_mtz_file']))))
     if not os.path.isdir('process.log'):
 #        os.system('ln -s {0!s} .'.format(bestcif.replace('.cif', '.log')))
