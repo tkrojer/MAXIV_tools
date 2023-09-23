@@ -992,7 +992,8 @@ def ask_for_spg_and_unit_cell(logger):
         q = raw_input("\n>>> specify unit cell or press return: ")
     else:
         q = input("\n>>> specify unit cell or press return: ")
-    proc_dict['unit_cell'] = q.replace(' ','')
+#    proc_dict['unit_cell'] = q.replace(' ','')
+    proc_dict['unit_cell'] = ','.join(q.split())
     return proc_dict
 
 
