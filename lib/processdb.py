@@ -249,7 +249,7 @@ def update_processing_outcome(logger, dal, processing_id, processing_outcome):
         dal.xray_processing_table.c.processing_id == processing_id)
     dal.connection.execute(u)
 
-def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run):
+def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline):
     dataset_id = get_dataset_id(dal, mounted_crystal_code, proposal, session, run)
 
     d = {   'dataset_id':           dataset_id,
@@ -271,6 +271,11 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         d = get_overall_stats(block, d)
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
+        if '_manual' in pipeline:
+            break   # there are 4 blocks in Data_2_autoPROC_TRUNCATE_all.cif
+                    # but script edits the automatically processed files so that only the header of the first
+                    # block remains; note: xia2 has two blocks, the first being a summary, the second
+                    # containing details for all resolution shells
 #        break   # only interested in first block; xia2 has a second, somewhat redundant block
     logger.info('process_dict: {0!s}'.format(d))
 

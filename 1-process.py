@@ -129,8 +129,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(logger, dal, ciffile, mtzfile,
                                                                                               logfile,
                                                                                               sample,
-                                                                                              proposal, session, run)
-                    if pipeline.endswith('_manual'):
+                                                                                              proposal, session, run, pipeline)
+                    if '_manual' in pipeline:
                         d_xray_processing_table_dict['automatic_processed'] = False
                 if os.path.isfile(db_file) and ciffile:
                     processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict)
