@@ -1,3 +1,5 @@
+import os.path
+
 import gemmi
 
 import sqlalchemy
@@ -259,7 +261,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
             'processing_log_file':  logfile }
 
     mtz = gemmi.read_mtz_file(mtzfile)
-    logger.info('process_dict: {0!s}'.format(d))
+    logger.info('ciffile: {0!s}'.format(os.path.realpath(ciffile)))
     doc = gemmi.cif.read_file(ciffile)
 
     d = get_cell_sym_info(mtz, d)
@@ -270,6 +272,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
 #        break   # only interested in first block; xia2 has a second, somewhat redundant block
+    logger.info('process_dict: {0!s}'.format(d))
 
     return d
 
