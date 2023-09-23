@@ -60,7 +60,7 @@ def read_master_file(logger, master_file, d_xray_dataset_table_dict, foundDatase
     #    d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'].value
         d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'][()]
         d_xray_dataset_table_dict['n_images'] = dset['sample']['goniometer']['omega'].shape[0]
-        d_xray_dataset_table_dict['omega_range_total'] = dset['sample']['goniometer']['omega_range_total'].value
+        d_xray_dataset_table_dict['omega_range_total'] = dset['sample']['goniometer']['omega_range_total'][()]
         if d_xray_dataset_table_dict['omega_range_total'] > 30.0:
             d_xray_dataset_table_dict['is_dataset'] = True
             foundDataset = True
