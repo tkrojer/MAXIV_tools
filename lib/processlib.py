@@ -330,7 +330,7 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
     mtz_name = mtz.split('/')[len(mtz.split('/'))-1]
     log_name = log.split('/')[len(log.split('/'))-1]
     cif_name = cif.split('/')[len(cif.split('/'))-1]
-    unm_name = unm_mtz.split('/')[len(cif.split('/')) - 1]
+    unm_name = unm_mtz.split('/')[len(unm_mtz.split('/')) - 1]
     if not os.path.isfile(mtz_name):
         os.system('/bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(log_name):
