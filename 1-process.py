@@ -101,10 +101,13 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
             if pipeline.endswith('_manual'):
                 glob_string = os.path.join(projectDir, '1-process', sample, run, mtzpath)
+                logger.info('glob_string', glob_string)
             else:
                 glob_string = os.path.join(sample_folder, run, mtzpath)
 
             for mtzfile in glob.glob(glob_string):
+                if pipeline.endswith('_manual'):
+                    logger.info('mtzfile', mtzfile)
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
                     foundMTZ = True
