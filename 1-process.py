@@ -219,7 +219,7 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
     n_jobs = 4  # hardcoded so that we don't hog the cluster
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    pipeline = proc_dict['pipeline']
+    pipeline = proc_dict['pipeline'] + '_manual'
     script_dict = processlib.get_script_dict(pipeline, n_jobs)
     counter = 0
     for sample in sampleList:
@@ -230,10 +230,10 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
             master_file = item[0]
             run = item[1]
             processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
-            processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline + "_manual")
+            processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
             proc_folder = processlib.get_proc_folder(projectDir, sample, proposal, session, run, pipeline)
             script_dict = processlib.add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict,
-                                                    proc_folder, master_file)
+                                                    proc_folder, master_file, now)
             counter += 1
             if counter == n_jobs:
                 counter = 0

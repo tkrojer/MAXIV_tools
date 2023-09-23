@@ -1071,9 +1071,10 @@ def get_proc_folder(projectDir, sample, proposal, session, run, pipeline):
     return p
 
 
-def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file):
-    script_dict[pipeline + '_{0!s}.sh'.format(counter)] += 'cd ' + proc_folder + '\n'
-    script_dict[pipeline + '_{0!s}.sh'.format(counter)] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
+def add_cmd_to_script_dict(logger, script_dict, counter, pipeline, proc_dict, proc_folder, master_file, now):
+    logger.info('saving shell scripts for manual auto-processing...')
+    script_dict[pipeline + '_{0!s}_{1!s}.sh'.format(now, counter)] += 'cd ' + proc_folder + '\n'
+    script_dict[pipeline + '_{0!s}_{1!s}.sh'.format(now, counter)] += pipeline_cmd(pipeline, proc_dict, master_file) + '\n'
     return script_dict
 
 
