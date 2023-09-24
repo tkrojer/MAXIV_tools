@@ -215,9 +215,9 @@ def review_missing_datasets(logger, missing_dict, dal):
 
 
 def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict, dal):
-    proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
+#    proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
-    n_jobs = 4  # hardcoded so that we don't hog the cluster
+    n_jobs = 7  # hardcoded so that we don't hog the cluster
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     pipeline = proc_dict['pipeline'] + '_manual'
     script_dict = processlib.get_script_dict(pipeline, n_jobs, now)
@@ -225,10 +225,11 @@ def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, 
     counter = 0
     for sample in sampleList:
         logger.info('current sample - {0!s}'.format(sample))
-        master_files_runs = processdb.get_master_file_run_list(logger, dal, sample, proposal, session)
+        master_files_runs = processdb.get_master_file_run_list(logger, dal, sample)
         processlib.create_sample_folder(logger, projectDir, sample)
         for item in master_files_runs:
             master_file = item[0]
+            proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(master_file)
             run = item[1]
             processlib.create_proposal_session_run_folder(logger, projectDir, sample, proposal, session, run)
             processlib.create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)

@@ -391,17 +391,21 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info(u.compile(dialect=sqlite.dialect()))
     dal.connection.execute(u)
 
-def get_master_file_run_list(logger, dal, sample, proposal, session):
+def get_master_file_run_list(logger, dal, sample):
     logger.info('reading xray_dataset information for {0!s}'.format(sample))
-    q = select([dal.xray_dataset_table.c.h5_master_file,
-                dal.xray_dataset_table.c.run]).where(and_(
-                dal.xray_dataset_table.c.mounted_crystal_code == sample,
-                dal.xray_dataset_table.c.proposal == proposal,
-                dal.xray_dataset_table.c.session == session,
-                dal.xray_dataset_table.c.is_dataset == True))
+#    q = select([dal.xray_dataset_table.c.h5_master_file,
+#                dal.xray_dataset_table.c.run]).where(and_(
+#                dal.xray_dataset_table.c.mounted_crystal_code == sample,
+#                dal.xray_dataset_table.c.proposal == proposal,
+#                dal.xray_dataset_table.c.session == session,
+#                dal.xray_dataset_table.c.is_dataset == True))
 #    q = select([dal.xray_dataset_table.c.h5_master_file,
 #                dal.xray_dataset_table.c.run]).where(
 #                dal.xray_dataset_table.c.mounted_crystal_code == sample)
+    q = select([dal.xray_dataset_table.c.h5_master_file,
+                dal.xray_dataset_table.c.run]).where(and_(
+                dal.xray_dataset_table.c.mounted_crystal_code == sample,
+                dal.xray_dataset_table.c.is_dataset == True))
     rp = dal.connection.execute(q)
     result = rp.fetchall()
     return result
