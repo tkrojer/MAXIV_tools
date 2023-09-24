@@ -141,7 +141,7 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref):
     if software == 'dimple':
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
     elif software == 'pipedream':
-        cmd += ''
+        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -d {2!s}'.format(mtzin, pdbref, software)
     elif software == 'phenix':
         cmd += ''
     return cmd
@@ -152,7 +152,7 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
     for script in submitList:
         logger.info('submitting ' + script)
-        os.system('sbatch ' + script)
+£        os.system('sbatch ' + script)
 
 
 def structure_cif_info(cif):
