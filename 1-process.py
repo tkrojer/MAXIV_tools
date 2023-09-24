@@ -52,6 +52,9 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
         if proc_list:
 #            proc_dict = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_dict, ref_dict)
             proc_list = processlib.retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_dict)
+            if not proc_list:
+                not_fitting_pipeline_list.append(sample)
+                continue
 #            proc_dict = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_dict)
             proc_list = processlib.retain_results_with_good_low_reso_rmerge(logger, proc_list)
 #            best, found_selected_pipeline = processlib.retain_results_which_fit_selection_criterion(logger, proc_dict, select_criterion)

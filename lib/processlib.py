@@ -596,6 +596,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
     if match_list:
         proc_list = match_list
     else:
+        proc_list = []
         logger.warning('none of the PDB files appears to be similar to any of the auto-processing MTZ files')
     return proc_list
 
