@@ -46,11 +46,18 @@ def get_sample_list(logger, fragmaxcsv):
 
 
 def get_proposal_and_session_and_protein(processDir):
-    proposal = processDir.split('/')[4]
-    session = processDir.split('/')[5]
-    protein = processDir.split('/')[7]
-    beamline = processDir.split('/')[3]
-    category = processDir.split('/')[2]
+    try:
+        proposal = processDir.split('/')[4]
+        session = processDir.split('/')[5]
+        protein = processDir.split('/')[7]
+        beamline = processDir.split('/')[3]
+        category = processDir.split('/')[2]
+    except AttributeError:
+        proposal = None
+        session = None
+        protein = None
+        beamline = None
+        category = None
     return proposal, session, protein, beamline, category
 
 
