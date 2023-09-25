@@ -133,6 +133,7 @@ def maxiv_header(software):
 
 
 def modules_to_load(software):
+    print(software)
     if software == 'dimple':
         module = 'module load gopresto CCP4\n'
     elif software == 'pipedream':
