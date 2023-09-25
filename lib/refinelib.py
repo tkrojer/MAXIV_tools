@@ -141,7 +141,7 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref):
     if software == 'dimple':
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
     elif software == 'pipedream':
-        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} -l /gpfs/offline1/proprietary/biomax/20230893/20230917/fragmax/0-model/elbow.AGS_pdb.001.cif'.format(pdbref, mtzin, software)
+        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -thorough -remediate -nofreeref -nolmr -d {2!s} -l /gpfs/offline1/proprietary/biomax/20230893/20230917/fragmax/0-model/elbow.AGS_pdb.001.cif'.format(pdbref, mtzin, software)
     elif software == 'phenix':
         cmd += ''
     return cmd

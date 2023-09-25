@@ -92,8 +92,8 @@ def main(argv):
     fragmaxcsv = ''
     overwrite = False
     linkrefine = False
-#    software = 'dimple'
-    software = 'pipedream'
+    software = 'dimple'
+#    software = 'pipedream'
     db_file = ""
     logger = processlib.init_logger('2-initial_refine.log')
     processlib.start_logging(logger, '2-initial_refine.py')
