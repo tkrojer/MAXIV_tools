@@ -44,13 +44,13 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
         if refinelib.autoprocessing_files_exist(logger, projectDir, sample):
             mtzin = os.path.join(projectDir, '1-process', sample, 'process.mtz')
             mtzDict = processlib.mtz_info(mtzin)
-            pdbref, mtzref = refinelib.suitable_reference_file_exists(logger, ref_dict, mtzDict)
+            pdbref, mtzref, cifref = refinelib.suitable_reference_file_exists(logger, ref_dict, mtzDict)
             if pdbref:
                 if refinelib.initial_refinement_exists(logger, projectDir, sample, software, overwrite):
                     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
                     refinelib.create_sample_folder(logger, projectDir, sample)
                     refinelib.prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref,
-                                                             now, submitList, counter, software)
+                                                             now, submitList, counter, software, cifref)
                     counter += 1
     if submitList:
         logger.info('there are {0!s} {1!s} jobs to submit'.format(len(submitList), software))
@@ -92,13 +92,13 @@ def main(argv):
     fragmaxcsv = ''
     overwrite = False
     linkrefine = False
-    software = 'dimple'
+    software = None
 #    software = 'pipedream'
     db_file = ""
     logger = processlib.init_logger('2-initial_refine.log')
     processlib.start_logging(logger, '2-initial_refine.py')
     try:
-        opts, args = getopt.getopt(argv, "p:f:s:d:hol", ["project=", "fragmax=", "software=", "database=",
+        opts, args = getopt.getopt(argv, "p:f:s:d:s:hol", ["project=", "fragmax=", "software=", "database=", "software=",
                                                          "help", "overwrite", "link"])
     except getopt.GetoptError:
         refinelib.usage()
@@ -118,6 +118,8 @@ def main(argv):
             linkrefine = True
         elif opt in ("-d", "--database"):
             db_file = os.path.abspath(arg)
+        elif opt in ("-s", "--software"):
+            db_file = os.path.abspath(arg)
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
@@ -128,8 +130,10 @@ def main(argv):
         link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal, db_file)
 
     else:
-        run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
-
+        if software:
+            run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
+        else:
+            logger.error('please select initial refinement pipeline')
 #    if checks_passed:
 #        processlib.check_if_to_continue(logger)
 #        if select:

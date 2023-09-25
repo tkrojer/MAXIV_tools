@@ -36,7 +36,10 @@ def create_sample_folder(logger, projectDir, sample):
 def get_reference_file_information(logger, projectDir):
     logger.info('looking for reference files in {0!s}/0-model...'.format(projectDir))
     ref_dict = {}
+    ciffile = None
     for pdbfile in glob.glob(os.path.join(projectDir, '0-model', '*pdb')):
+        if os.path.isfile(pdbfile.replace('.pdb', '.cif')):
+            ciffile = pdbfile.replace('.pdb', '.cif')
         pdb = pdbfile[pdbfile.rfind('/')+1:]
         mtz = ''
         structure = gemmi.read_pdb(pdbfile)
@@ -50,7 +53,7 @@ def get_reference_file_information(logger, projectDir):
         logger.info('found {0!s} - pg {1!s} - lattice {2!s} - uc_vol {3!s} - ref_mtz {4!s}'.format(
             pdb, point_group, lattice, unitcell_volume, mtz
         ))
-        ref_dict[pdbfile] = [point_group, lattice, unitcell_volume, mtz]
+        ref_dict[pdbfile] = [point_group, lattice, unitcell_volume, mtz, ciffile]
     if not ref_dict:
         logger.error('could not find any PDB file in folder')
     return ref_dict
@@ -70,6 +73,7 @@ def autoprocessing_files_exist(logger, projectDir, sample):
 def suitable_reference_file_exists(logger, ref_dict, mtzDict):
     logger.info('looking for suitable input PDB file...')
     pdbref = None
+    cifref = None
     mtzref = ''
     pgr_mtz = mtzDict['point_group']
     ucv_mtz = float(mtzDict['unitcell_volume'])
@@ -79,6 +83,8 @@ def suitable_reference_file_exists(logger, ref_dict, mtzDict):
         ucv_pdb = float(ref_dict[pdb][2])
         lat_pdb = ref_dict[pdb][1]
         mtzref = ref_dict[pdb][3]
+        if ref_dict[pdb][4]:
+            cifref = ref_dict[pdb][4]
         ucv_diff = abs((ucv_mtz - ucv_pdb)) / ucv_pdb
         if pgr_mtz == pgr_pdb and lat_mtz == lat_pdb and ucv_diff < 0.1:
             logger.info('lattice, point group and unit cell volume of MTZ file matches {0!s}'.format(pdb))
@@ -86,7 +92,7 @@ def suitable_reference_file_exists(logger, ref_dict, mtzDict):
             break
     if not pdbref:
         logger.error('could not find a suitable reference PDB file for MTZ file')
-    return pdbref, mtzref
+    return pdbref, mtzref, cifref
 
 
 def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
@@ -104,11 +110,11 @@ def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
     return continue_refinement
 
 
-def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter, software):
+def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter, software, cifref):
     logger.info('preparing script for initial refinement')
     cmd = maxiv_header(software)
     cmd += modules_to_load(software)
-    cmd += init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref)
+    cmd += init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref)
     os.chdir(os.path.join(projectDir, 'tmp'))
     submitList.append('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter))
     f = open('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter), 'w')
@@ -136,12 +142,16 @@ def modules_to_load(software):
     return module
 
 
-def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref):
+def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref):
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
     elif software == 'pipedream':
-        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -thorough -remediate -nofreeref -nolmr -d {2!s} -l /gpfs/offline1/proprietary/biomax/20230893/20230917/fragmax/0-model/elbow.AGS_pdb.001.cif'.format(pdbref, mtzin, software)
+        if cifref:
+            lig = "-l {0!s}".format(cifref)
+        else:
+            lig = ""
+        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -thorough -remediate -nofreeref -nolmr -d {2!s} {3!s}'.format(pdbref, mtzin, software, lig)
     elif software == 'phenix':
         cmd += ''
     return cmd
@@ -152,7 +162,7 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
     for script in submitList:
         logger.info('submitting ' + script)
-        os.system('sbatch ' + script)
+#        os.system('sbatch ' + script)
 
 
 def structure_cif_info(cif):
