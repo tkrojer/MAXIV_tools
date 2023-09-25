@@ -133,7 +133,6 @@ def maxiv_header(software):
 
 
 def modules_to_load(software):
-    print('-->', software)
     if software == 'dimple':
         module = 'module load gopresto CCP4\n'
     elif software == 'pipedream':
@@ -152,7 +151,7 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref)
             lig = "-l {0!s}".format(cifref)
         else:
             lig = ""
-        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -thorough -remediate -nofreeref -nolmr -d {2!s} {3!s}'.format(pdbref, mtzin, software, lig)
+        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s}'.format(pdbref, mtzin, software, lig)
     elif software == 'phenix':
         cmd += ''
     return cmd
@@ -163,7 +162,7 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
     for script in submitList:
         logger.info('submitting ' + script)
-#        os.system('sbatch ' + script)
+        os.system('sbatch ' + script)
 
 
 def structure_cif_info(cif):
