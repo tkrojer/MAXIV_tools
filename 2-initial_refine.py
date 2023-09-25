@@ -119,7 +119,7 @@ def main(argv):
         elif opt in ("-d", "--database"):
             db_file = os.path.abspath(arg)
         elif opt in ("-s", "--software"):
-            db_file = os.path.abspath(arg)
+            software = os.path.abspath(arg)
 
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
