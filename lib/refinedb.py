@@ -53,6 +53,7 @@ def insert_update_xray_initial_refinement_table(logger, dal, d, sample, software
             logger.error(str(e))
 
 def set_selected_initial_refinement_pipeline(logger, dal, d, sample, software):
+    print('hallo')
     # set all to 0
     # then select
 
