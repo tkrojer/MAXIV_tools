@@ -52,17 +52,24 @@ def insert_update_xray_initial_refinement_table(logger, dal, d, sample, software
         else:
             logger.error(str(e))
 
-def set_selected_initial_refinement_pipeline(logger, dal, d, sample, software):
-    print('hallo')
-    # set all to 0
-    # then select
+def unselected_initial_refinement_pipeline(logger, dal, sample):
+    logger.info('step 1: unselecting all initial refinement results for {0!s}'.format(sample))
+    d = {}
+    d['selected'] = False
+    u = dal.xray_initial_refinement_table.update().values(d).where(
+        dal.xray_initial_refinement_table.c.mounted_crystal_code == sample)
+    dal.connection.execute(u)
 
 
-#def get_xray_initial_refinement_table_dict(logger, dal, sample, data):
-#    logger.info('getting d_xray_initial_refinement_table_dict for {0!s}'.format(sample))
-#    process_id = get_processing_id(dal, data)
-#    d = {   'processing_id':        process_id,
-#            'mounted_crystal_code': sample }
-#    return d
+def set_selected_initial_refinement_pipeline(logger, dal, sample, software):
+    logger.info('step 2: set initial refinement results for {0!s}'.format(sample))
+    d = {}
+    d['selected'] = True
+    u = dal.xray_initial_refinement_table.update().values(d).where(and_(
+        dal.xray_initial_refinement_table.c.mounted_crystal_code == sample,
+        dal.xray_initial_refinement_table.c.initial_refinement_pipeline == software))
+    dal.connection.execute(u)
+
+
 
 

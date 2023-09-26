@@ -165,33 +165,33 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
 #        os.system('sbatch ' + script)
 
 
-def structure_cif_info(cif):
-    cifDict = {
-        'ls_d_res_high': '',
-        'ls_R_factor_R_work': '',
-        'ls_R_factor_R_free': '',
-        'initref_software': '',
-        'initref_spacegroup': '',
-        'r_bond_refined_d': '',
-        'r_angle_refined_deg': ''
-    }
-    doc = gemmi.cif.read_file(cif)
-    for block in doc:
-        if block.find_pair('_refine.ls_d_res_high'):
-            cifDict['ls_d_res_high'] = str(block.find_pair('_refine.ls_d_res_high')[1])
-        if block.find_pair('_refine.ls_R_factor_R_work'):
-            cifDict['ls_R_factor_R_work'] = str(block.find_pair('_refine.ls_R_factor_R_work')[1])
-        if block.find_pair('_refine.ls_R_factor_R_free'):
-            cifDict['ls_R_factor_R_free'] = str(block.find_pair('_refine.ls_R_factor_R_free')[1])
-        if block.find_pair('_software.name'):
-            cifDict['initref_software'] = str(block.find_pair('_software.name')[1])
-        if block.find_pair('_symmetry.space_group_name_H-M'):
-            cifDict['initref_spacegroup'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
-        if block.find_loop('_refine_ls_restr.type'):
-            table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
-            cifDict['r_bond_refined_d'] = str(list(table.find_row('r_bond_refined_d'))[1])
-            cifDict['r_angle_refined_deg'] = str(list(table.find_row('r_angle_refined_deg'))[1])
-    return cifDict
+#def structure_cif_info(cif):
+#    cifDict = {
+#        'ls_d_res_high': '',
+#        'ls_R_factor_R_work': '',
+#        'ls_R_factor_R_free': '',
+#        'initref_software': '',
+#        'initref_spacegroup': '',
+#        'r_bond_refined_d': '',
+#        'r_angle_refined_deg': ''
+#    }
+#    doc = gemmi.cif.read_file(cif)
+#    for block in doc:
+#        if block.find_pair('_refine.ls_d_res_high'):
+#            cifDict['ls_d_res_high'] = str(block.find_pair('_refine.ls_d_res_high')[1])
+#        if block.find_pair('_refine.ls_R_factor_R_work'):
+#            cifDict['ls_R_factor_R_work'] = str(block.find_pair('_refine.ls_R_factor_R_work')[1])
+#        if block.find_pair('_refine.ls_R_factor_R_free'):
+#            cifDict['ls_R_factor_R_free'] = str(block.find_pair('_refine.ls_R_factor_R_free')[1])
+#        if block.find_pair('_software.name'):
+#            cifDict['initref_software'] = str(block.find_pair('_software.name')[1])
+#        if block.find_pair('_symmetry.space_group_name_H-M'):
+#            cifDict['initref_spacegroup'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
+#        if block.find_loop('_refine_ls_restr.type'):
+#            table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
+#            cifDict['r_bond_refined_d'] = str(list(table.find_row('r_bond_refined_d'))[1])
+#            cifDict['r_angle_refined_deg'] = str(list(table.find_row('r_angle_refined_deg'))[1])
+#    return cifDict
 
 
 def find_blobs(mtzfile, pdbfile):
@@ -206,3 +206,102 @@ def find_blobs(mtzfile, pdbfile):
     for blob in blobs:
         blobList.append(blob.volume)
     return blobList
+
+"""
+            initpdb, initmtz, initcif, freecif = processlib.get_refinement_files(logger, projectDir, sample, software)
+            os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
+            if os.path.isfile(os.path.join(software, 'final.pdb')):
+                os.system('ln -s {0!s} init.pdb'.format(os.path.join(software, 'final.pdb')))
+            if os.path.isfile(os.path.join(software, 'final.mtz')):
+                os.system('ln -s {0!s} init.mtz'.format(os.path.join(software, 'final.mtz')))
+            if os.path.isfile(os.path.join(software, 'final.mmcif')):
+                os.system('ln -s {0!s} init.mmcif'.format(os.path.join(software, 'final.mmcif')))
+            if os.path.isfile(os.path.join(software, 'reindexed.mtz')):
+                os.system('ln -s {0!s} free.mtz'.format(os.path.join(software, 'reindexed.mtz')))
+
+"""
+
+def link_init_refinement_files(logger, projectDir, sample, initpdb, initmtz, initcif, freemtz):
+    os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
+    if os.path.isfile(initpdb):
+        os.system('ln -s {0!s} init.pdb'.format(initpdb))
+    if os.path.isfile(initmtz):
+        os.system('ln -s {0!s} init.mtz'.format(initmtz))
+    if os.path.isfile(initcif):
+        os.system('ln -s {0!s} init.mmcif'.format(initcif))
+    if os.path.isfile(freemtz):
+        os.system('ln -s {0!s} free.mtz'.format(freemtz))
+
+
+def get_refinement_files(logger, projectDir, sample, software, d):
+    d = {}
+    initpdb = None
+    initmtz = None
+    initcif = None
+    freemtz = None
+    os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
+    if software == 'dimple':
+        if os.path.isfile(os.path.join(software, 'final.pdb')):
+            initpdb = os.path.relpath(os.path.realpath(os.path.join(software, 'final.pdb')))
+        if os.path.isfile(os.path.join(software, 'final.mtz')):
+            initmtz = os.path.relpath(os.path.realpath(os.path.join(software, 'final.mtz')))
+        if os.path.isfile(os.path.join(software, 'final.mmcif')):
+            initcif = os.path.relpath(os.path.realpath(os.path.join(software, 'final.mmcif')))
+        if os.path.isfile(os.path.join(software, 'reindexed.mtz')):
+            freemtz = os.path.relpath(os.path.realpath(os.path.join(software, 'reindexed.mtz')))
+    elif software == 'pipedream':
+        if os.path.isfile(os.path.join(software, 'refine', 'refine.pdb')):
+            initpdb = os.path.relpath(os.path.realpath(os.path.join(software, 'refine', 'refine.pdb')))
+        if os.path.isfile(os.path.join(software, 'refine', 'refine.mtz')):
+            initmtz = os.path.relpath(os.path.realpath(os.path.join(software, 'refine', 'refine.mtz')))
+        if os.path.isfile(os.path.join(software, 'refine', 'BUSTER_model.cif')):
+            initcif = os.path.relpath(os.path.realpath(os.path.join(software, 'refine', 'BUSTER_model.cif')))
+        if initpdb:
+            for line in open(initpdb):
+                if line.startswith("REMARK   MTZ "):
+                    freemtz = os.path.relpath(os.path.realpath(line.split()[3]))
+    else:
+        logger.error('auto-refinement pipeline does not exist')
+    d['mounted_crystal_code'] = sample
+    d['initial_refinement_pipeline'] = software
+    d['initial_refinement_pdb_file'] = initpdb
+    d['initial_refinement_mtz_file'] = initmtz
+    d['initial_refinement_cif_file'] = initcif
+    d['rfree_mtz_file'] = freemtz
+    d['initial_refinement_directory'] = os.path.join(projectDir, '2-initial_refine', sample, software)
+    return initpdb, initmtz, initcif, freemtz, d
+
+
+def get_db_dict_from_model_cif(logger, model_cif, d):
+    logger.info('reading information from {0!s}'.format(model_cif))
+    doc = gemmi.cif.read_file(model_cif)
+    for block in doc:
+        if block.find_pair('_refine.ls_R_factor_R_work'):
+            d['refine_ls_R_factor_R_work'] = block.find_pair('_refine.ls_R_factor_R_work')[1]
+        if block.find_pair('_refine.ls_R_factor_R_free'):
+            d['refine_ls_R_factor_R_free'] = block.find_pair('_refine.ls_R_factor_R_free')[1]
+        if block.find_pair('_refine.ls_d_res_high'):
+            d['refine_ls_d_res_high'] = block.find_pair('_refine.ls_d_res_high')[1]
+        if block.find_pair('_refine.ls_d_res_low'):
+            d['refine_ls_d_res_low'] = block.find_pair('_refine.ls_d_res_low')[1]
+        if block.find_pair('_cell.length_a'):
+            d['cell_length_a'] = block.find_pair('_cell.length_a')[1]
+        if block.find_pair('_cell.length_b'):
+            d['cell_length_b'] = block.find_pair('_cell.length_b')[1]
+        if block.find_pair('_cell.length_c'):
+            d['cell_length_c'] = block.find_pair('_cell.length_c')[1]
+        if block.find_pair('_cell.angle_alpha'):
+            d['cell_angle_alpha'] = block.find_pair('_cell.angle_alpha')[1]
+        if block.find_pair('_cell.angle_beta'):
+            d['cell_angle_beta'] = block.find_pair('_cell.angle_beta')[1]
+        if block.find_pair('_cell.angle_gamma'):
+            d['cell_angle_gamma'] = block.find_pair('_cell.angle_gamma')[1]
+        if block.find_pair('_symmetry.space_group_name_H-M'):
+            d['sym_space_group'] = block.find_pair('_symmetry.space_group_name_H-M')[1]
+        if block.find_pair('_symmetry.Int_Tables_number'):
+            d['sym_Int_Tables_number'] = block.find_pair('_symmetry.Int_Tables_number')[1]
+        if block.find_loop('_refine_ls_restr.type'):
+            table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
+            d['refine_r_bond_refined_d'] = str(list(table.find_row('r_bond_refined_d'))[1])
+            d['refine_r_angle_refined_deg'] = str(list(table.find_row('r_angle_refined_deg'))[1])
+    return d

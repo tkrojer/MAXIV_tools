@@ -67,26 +67,23 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
     for l in open(fragmaxcsv):
         sample = l.split(',')[0]
         logger.info('current sample ' + sample)
-        proc_mtz = os.path.join(projectDir, '2-initial_refine', sample, 'process.mtz')
-        info_jso = proc_mtz[:proc_mtz.rfind('/')] + '/info.json'
-        if os.path.isfile(info_jso) and db_file:
-            f = open(info_jso)
-            data = json.load(f)
-            d = processdb.get_xray_initial_refinement_table_dict(logger, dal, sample, data)
-            processdb.insert_into_xray_initial_refinement_table(logger, dal, d)
 
         if os.path.isdir(os.path.join(projectDir, '2-initial_refine', sample)):
             os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
             if os.path.isfile('init.pdb') and overwrite:
                 os.system('/bin/rm -f init.*')
-            if os.path.isfile(os.path.join(software, 'final.pdb')):
-                os.system('ln -s {0!s} init.pdb'.format(os.path.join(software, 'final.pdb')))
-            if os.path.isfile(os.path.join(software, 'final.mtz')):
-                os.system('ln -s {0!s} init.mtz'.format(os.path.join(software, 'final.mtz')))
-            if os.path.isfile(os.path.join(software, 'final.mmcif')):
-                os.system('ln -s {0!s} init.mmcif'.format(os.path.join(software, 'final.mmcif')))
-            if os.path.isfile(os.path.join(software, 'reindexed.mtz')):
-                os.system('ln -s {0!s} free.mtz'.format(os.path.join(software, 'reindexed.mtz')))
+            elif os.path.isfile('init.pdb') and not overwrite:
+                logger.warning('init.pdb already exists, choose overwrite if you want to replace; skipping...')
+                continue
+            else:
+                logger.into('nothing selected yet')
+
+            initpdb, initmtz, initcif, freemtz, d = processlib.get_refinement_files(logger, projectDir, sample, software)
+            d = get_db_dict_from_model_cif(logger, initcif, d)
+            processlib.link_init_refinement_files(logger, projectDir, sample, initpdb, initmtz, initcif, freemtz)
+            refinedb.insert_update_xray_initial_refinement_table(logger, dal, d, sample, software)
+            refinedb.unselected_initial_refinement_pipeline(logger, dal, sample)
+            refinedb.set_selected_initial_refinement_pipeline(logger, dal, sample, software)
 
 
 def main(argv):
