@@ -233,7 +233,7 @@ def link_init_refinement_files(logger, projectDir, sample, initpdb, initmtz, ini
         os.system('ln -s {0!s} free.mtz'.format(freemtz))
 
 
-def get_refinement_files(logger, projectDir, sample, software, d):
+def get_refinement_files(logger, projectDir, sample, software):
     d = {}
     initpdb = None
     initmtz = None
