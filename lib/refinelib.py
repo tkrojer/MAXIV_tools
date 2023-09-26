@@ -272,7 +272,7 @@ def get_refinement_files(logger, projectDir, sample, software):
     return initpdb, initmtz, initcif, freemtz, d
 
 
-def get_db_dict_from_model_cif(logger, model_cif, d):
+def get_db_dict_from_model_cif(logger, model_cif, d, software):
     logger.info('reading information from {0!s}'.format(model_cif))
     doc = gemmi.cif.read_file(model_cif)
     for block in doc:
@@ -301,7 +301,12 @@ def get_db_dict_from_model_cif(logger, model_cif, d):
         if block.find_pair('_symmetry.Int_Tables_number'):
             d['sym_Int_Tables_number'] = block.find_pair('_symmetry.Int_Tables_number')[1]
         if block.find_loop('_refine_ls_restr.type'):
-            table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
-            d['refine_r_bond_refined_d'] = str(list(table.find_row('r_bond_refined_d'))[1])
-            d['refine_r_angle_refined_deg'] = str(list(table.find_row('r_angle_refined_deg'))[1])
-    return d
+            if software == 'dimple':
+                table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
+                d['refine_r_bond_refined_d'] = str(list(table.find_row('r_bond_refined_d'))[1])
+                d['refine_r_angle_refined_deg'] = str(list(table.find_row('r_angle_refined_deg'))[1])
+            if software == 'pipedream':
+                table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
+                d['refine_r_bond_refined_d'] = str(list(table.find_row('t_bond_d'))[1])
+                d['refine_r_angle_refined_deg'] = str(list(table.find_row('t_angle_deg'))[1])
+        return d
