@@ -34,7 +34,7 @@ import processdb
 sys.path.append('/data/staff/biomax/tobias/software/MAXIV_tools/lib')
 from db import dal
 
-def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
+def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite, dal):
     ref_dict = refinelib.get_reference_file_information(logger, projectDir)
     submitList = []
     counter = 0
@@ -63,7 +63,7 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite):
 
 
 
-def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal, db_file):
+def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal):
     for l in open(fragmaxcsv):
         sample = l.split(',')[0]
         logger.info('current sample ' + sample)
@@ -126,14 +126,20 @@ def main(argv):
 #    processlib.report_parameters(logger, processDir, projectDir, fragmaxcsv, select, select_criterion, overwrite)
 #    checks_passed = processlib.run_checks(logger, processDir, projectDir, fragmaxcsv, select, select_criterion)
 
+    if db_file:
+        logger.info('initializing database: {0!s}'.format(db_file))
+        dal.db_init(db_file)
+    else:
+        logger.error('database not specified; try again...')
+
     if linkrefine:
         if os.path.isfile(db_file):
             dal.db_init(db_file)
-        link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal, db_file)
+        link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwrite, dal)
 
     else:
         if software:
-            run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite)
+            run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite, dal)
         else:
             logger.error('please select initial refinement pipeline')
 #    if checks_passed:
