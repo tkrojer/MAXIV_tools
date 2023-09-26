@@ -79,7 +79,7 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
                 logger.info('nothing selected yet')
 
             initpdb, initmtz, initcif, freemtz, d = refinelib.get_refinement_files(logger, projectDir, sample, software)
-            d = get_db_dict_from_model_cif(logger, initcif, d)
+            d = refinelib.get_db_dict_from_model_cif(logger, initcif, d)
             refinelib.link_init_refinement_files(logger, projectDir, sample, initpdb, initmtz, initcif, freemtz)
             refinedb.insert_update_xray_initial_refinement_table(logger, dal, d, sample, software)
             refinedb.unselected_initial_refinement_pipeline(logger, dal, sample)
