@@ -103,7 +103,7 @@ def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
         if overwrite:
             logger.warning('"overwrite" option selected; will remove folder...')
             os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
-            os.system('/bin/rm -fr ' + software)
+#            os.system('/bin/rm -fr ' + software)
         else:
             logger.error('you need to select "overwrite" option if you want to run init refinement; skipping sample...')
             continue_refinement = False
@@ -162,7 +162,7 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
     for script in submitList:
         logger.info('submitting ' + script)
-        os.system('sbatch ' + script)
+#        os.system('sbatch ' + script)
 
 
 def structure_cif_info(cif):
