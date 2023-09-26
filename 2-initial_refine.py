@@ -76,7 +76,7 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
                 logger.warning('init.pdb already exists, choose overwrite if you want to replace; skipping...')
                 continue
             else:
-                logger.into('nothing selected yet')
+                logger.info('nothing selected yet')
 
             initpdb, initmtz, initcif, freemtz, d = refinelib.get_refinement_files(logger, projectDir, sample, software)
             d = get_db_dict_from_model_cif(logger, initcif, d)
