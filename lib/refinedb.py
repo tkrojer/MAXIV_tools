@@ -70,6 +70,14 @@ def set_selected_initial_refinement_pipeline(logger, dal, sample, software):
         dal.xray_initial_refinement_table.c.initial_refinement_pipeline == software))
     dal.connection.execute(u)
 
+def update_initial_refinement_outcome(logger, dal, sample, software, initial_refinement_outcome):
+    logger.warning('setting outcome for {0!s} - {1!s} to {2!s}'.format(sample, software, initial_refinement_outcome))
+    d = {}
+    d['initial_refinement_outcome'] = initial_refinement_outcome
+    u = dal.xray_initial_refinement_table.update().values(d).where(and_(
+        dal.xray_initial_refinement_table.c.mounted_crystal_code == sample,
+        dal.xray_initial_refinement_table.c.initial_refinement_pipeline == software))
+    dal.connection.execute(u)
 
 
 

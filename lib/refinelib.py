@@ -309,4 +309,11 @@ def get_db_dict_from_model_cif(logger, model_cif, d, software):
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = str(list(table.find_row('t_bond_d'))[1])
                 d['refine_r_angle_refined_deg'] = str(list(table.find_row('t_angle_deg'))[1])
+        if 'refine_ls_R_factor_R_free' in d:
+            if float(d['refine_ls_R_factor_R_free']) < 0.3:
+                d['initial_refinement_outcome'] = "success"
+            elif float(d['refine_ls_R_factor_R_free']) >= 0.3 and float(d['refine_ls_R_factor_R_free']) < 0.35:
+                d['initial_refinement_outcome'] = "success - elevated Rfree"
+            else:
+                d['initial_refinement_outcome'] = "fail - Rfree too high"
         return d

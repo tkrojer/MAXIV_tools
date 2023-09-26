@@ -72,18 +72,24 @@ def link_initial_refine_results(logger, projectDir, fragmaxcsv, software, overwr
             os.chdir(os.path.join(projectDir, '2-initial_refine', sample))
             if os.path.isfile('init.pdb') and overwrite:
                 os.system('/bin/rm -f init.*')
+                os.system('/bin/rm -f free.mtz')
             elif os.path.isfile('init.pdb') and not overwrite:
                 logger.warning('init.pdb already exists, choose overwrite if you want to replace; skipping...')
                 continue
             else:
                 logger.info('nothing selected yet')
 
-            initpdb, initmtz, initcif, freemtz, d = refinelib.get_refinement_files(logger, projectDir, sample, software)
-            d = refinelib.get_db_dict_from_model_cif(logger, initcif, d, software)
-            refinelib.link_init_refinement_files(logger, projectDir, sample, initpdb, initmtz, initcif, freemtz)
-            refinedb.insert_update_xray_initial_refinement_table(logger, dal, d, sample, software)
             refinedb.unselected_initial_refinement_pipeline(logger, dal, sample)
-            refinedb.set_selected_initial_refinement_pipeline(logger, dal, sample, software)
+
+            initpdb, initmtz, initcif, freemtz, d = refinelib.get_refinement_files(logger, projectDir, sample, software)
+            if initcif:
+                d = refinelib.get_db_dict_from_model_cif(logger, initcif, d, software)
+                refinelib.link_init_refinement_files(logger, projectDir, sample, initpdb, initmtz, initcif, freemtz)
+                refinedb.insert_update_xray_initial_refinement_table(logger, dal, d, sample, software)
+                refinedb.set_selected_initial_refinement_pipeline(logger, dal, sample, software)
+            else:
+                initial_refinement_outcome = "fail - initial refinment failed"
+                refinedb.update_initial_refinement_outcome(logger, dal, sample, software, initial_refinement_outcome)
 
 
 def main(argv):
