@@ -379,6 +379,7 @@ class DataAccessLayer:
         Column('initial_refinement_pdb_file', String(255)),
         Column('initial_refinement_cif_file', String(255)),
         Column('rfree_mtz_file', String(255)),
+        Column('initial_refinement_outcome', String(255)),
         Column('cell_length_a', Numeric(12, 2)),
         Column('cell_length_b', Numeric(12, 2)),
         Column('cell_length_c', Numeric(12, 2)),
