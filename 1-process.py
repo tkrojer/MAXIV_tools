@@ -120,7 +120,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
                     foundMTZ = True
-                    continue
+#                    continue
                 logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
                 status, logfile, ciffile, mtzfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
