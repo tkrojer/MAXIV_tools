@@ -1,4 +1,5 @@
 from datetime import datetime
+import sqlalchemy
 from sqlalchemy import (MetaData, Table, Column, Integer, Numeric, String,
         DateTime, ForeignKey, Boolean, create_engine, UniqueConstraint)
 
