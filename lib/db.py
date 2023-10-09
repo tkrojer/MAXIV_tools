@@ -12,6 +12,15 @@ class DataAccessLayer:
     class generates all tables in database
     """
 
+    version_table = Table('version_table',
+        metadata,
+        Column('version_id', Integer(), primary_key=True),
+        Column('version_number', String()),
+        Column('created_on', DateTime(), default=datetime.now),
+        Column('updated_on', DateTime(), default=datetime.now, onupdate=datetime.now),
+        UniqueConstraint('version_number', name='version_number')
+    )
+
     project_table = Table('project_table',
         metadata,
         Column('project_id', Integer(), primary_key=True),
@@ -606,5 +615,11 @@ class DataAccessLayer:
         self.engine = create_engine('sqlite:///' + conn_string or self.conn_string)
         self.metadata.create_all(self.engine)
         self.connection = self.engine.connect()
+        d = {'version_number': '00001'}
+        try:
+            ins = dal.version_table.insert().values(d)
+            dal.connection.execute(ins)
+        except sqlalchemy.exc.IntegrityError as e:
+            pass
 
 dal = DataAccessLayer()
