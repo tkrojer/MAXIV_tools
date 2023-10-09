@@ -521,6 +521,7 @@ def read_reference_pdb_files(logger, projectDir):
     os.chdir(os.path.join(projectDir, '0-model'))
     ref_dict = {}
     for pdbfile in glob.glob('*.pdb'):
+        logger.info('current pdbfile: {0!s}'.format(pdbfile))
         structure = gemmi.read_pdb(pdbfile)
         unitcell = structure.cell
         unitcell_volume = unitcell.volume
