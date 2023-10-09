@@ -162,7 +162,7 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
     for script in submitList:
         logger.info('submitting ' + script)
-#        os.system('sbatch ' + script)
+        os.system('sbatch ' + script)
 
 
 #def structure_cif_info(cif):
