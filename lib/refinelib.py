@@ -142,7 +142,7 @@ def modules_to_load(software):
     return module
 
 
-def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref):
+def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id):
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
@@ -151,7 +151,11 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref)
             lig = "-l {0!s}".format(cifref)
         else:
             lig = ""
-        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s}'.format(pdbref, mtzin, software, lig)
+        if os.path.isdir(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')):
+            rhofit = "-rhofit {0!s}".format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif'))
+        else:
+            rhofit = ""
+        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s} {4!s}'.format(pdbref, mtzin, software, lig, rhofit)
     elif software == 'phenix':
         cmd += ''
     return cmd

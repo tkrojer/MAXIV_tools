@@ -40,6 +40,7 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite, 
     counter = 0
     for l in open(fragmaxcsv):
         sample = l.split(',')[0]
+        cpd_id = l.split(',')[3]
         logger.info('current sample ' + sample)
         if refinelib.autoprocessing_files_exist(logger, projectDir, sample):
             mtzin = os.path.join(projectDir, '1-process', sample, 'process.mtz')
@@ -51,7 +52,7 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite, 
                     d = refinedb.get_d_xray_initial_refinement_table_dict(logger, dal, sample, software, pdbref, mtzin, cifref, mtzref)
                     refinelib.create_sample_folder(logger, projectDir, sample)
                     refinelib.prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref,
-                                                             now, submitList, counter, software, cifref)
+                                                             now, submitList, counter, software, cifref, cpd_id)
                     refinedb.insert_update_xray_initial_refinement_table(logger, dal, d, sample, software)
                     counter += 1
     if submitList:

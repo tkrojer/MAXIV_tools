@@ -38,7 +38,7 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
             continue
         logger.info('current sample ' + sample)
         cpdID = l.split(',')[3].replace(' ', '')
-        smiles = l.split(',')[5].replace(' ', '')
+        smiles = l.split(',')[6].replace(' ', '')
         logger.info('CompoundID >{0!s}<, Smiles >{1!s}<'.format(cpdID, smiles))
         if smiles == '' or cpdID == '':
             logger.warning('CompoundID or Smiles field is empty; skipping...')
@@ -107,6 +107,9 @@ def make_links_to_any_folder(logger, projectDir, anyDir):
             os.system('/bin/cp {0!s}/*.cif .'.format(os.path.join(projectDir, '3-compound', sample)))
         else:
             logger.warning('could not find ligand cif file')
+
+def run_rhofit(logger, projectDir):
+    logger.info('running rhofit on dimple results')
 
 
 
