@@ -1158,11 +1158,12 @@ def get_fail_dict(logger):
         '4': 'fail - loop broke',
         '5': 'fail - loop empty',
         '6': 'fail - no X-rays',
-        '7': 'fail - salt crystal',
+        '7': 'fail - salt/ compound crystal',
         '8': 'fail - data processing',
         '9': 'fail - no matching model',
         '10': 'fail - tiny crystal',
-        '11': 'fail - compound crystal'
+        '11': 'fail - queue stopped',
+        '12': 'fail - unknown'
     }
     show_scoring_option(logger, fail_dict)
     return fail_dict
