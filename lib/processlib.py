@@ -479,9 +479,12 @@ def get_status(logger, mtzfile, mtz, ciffile, status):
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
             cif = cif_info(logger, ciffile)
-            if float(cif['Rmerge_I_obs_low']) > 0.15:
-                logger.error('Rmerge of {0!s} is higher than 15%'.format(cif['Rmerge_I_obs_low']))
-                status = 'FAIL - high Rmerge (low)'
+            if 'Rmerge_I_obs_low' in cif:
+                if float(cif['Rmerge_I_obs_low']) > 0.15:
+                    logger.error('Rmerge of {0!s} is higher than 15%'.format(cif['Rmerge_I_obs_low']))
+                    status = 'FAIL - high Rmerge (low)'
+            else:
+                status = 'FAIL - unknown'
         elif float(mtzDict['resolution_high']) >= 2.8 and float(mtzDict['resolution_high']) < 3.2:
             status = 'FAIL - medium resolution'
         else:
