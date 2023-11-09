@@ -432,7 +432,11 @@ def mtz_info(mtzfile):
 
 def cif_info(ciffile):
     cifDict = {}
-    doc = gemmi.cif.read_file(ciffile)
+    try:
+        doc = gemmi.cif.read_file(ciffile)
+    except ValueError:
+        logger.error('gemmi throws a ValueError for {0!s}'.format(ciffile))
+        return cifDict
     for block in doc:
 #        if block.find_pair('_symmetry.space_group_name_H-M'):
 #            cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
@@ -474,7 +478,7 @@ def get_status(logger, mtzfile, mtz, ciffile, status):
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
-            cif = cif_info(ciffile)
+            cif = cif_info(logger, ciffile)
             if float(cif['Rmerge_I_obs_low']) > 0.15:
                 logger.error('Rmerge of {0!s} is higher than 15%'.format(cif['Rmerge_I_obs_low']))
                 status = 'FAIL - high Rmerge (low)'
@@ -853,7 +857,7 @@ def read_data_collection_stats(logger, ciffile, proc_dict):
         mtz = mtz_info(mtzfile)
         mtz['pipeline'] = pipeline
         mtz['subfolder'] = subfolder
-        cif = cif_info(ciffile)
+        cif = cif_info(logger, ciffile)
         mtz.update(cif)
         proc_dict[os.path.join(ciffile)] = mtz
     else:
