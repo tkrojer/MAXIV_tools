@@ -262,7 +262,12 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
 
     mtz = gemmi.read_mtz_file(mtzfile)
     logger.info('ciffile: {0!s}'.format(os.path.realpath(ciffile)))
-    doc = gemmi.cif.read_file(ciffile)
+
+    try:
+        doc = gemmi.cif.read_file(ciffile)
+    except ValueError:
+        logger.error('gemmi ValueError in processdb/get_process_stats_from_mmcif_as_dict reading {0!s}'.format(ciffile))
+        return d
 
     d = get_cell_sym_info(mtz, d)
 
