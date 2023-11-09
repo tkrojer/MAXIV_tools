@@ -430,7 +430,7 @@ def mtz_info(mtzfile):
     return mtzDict
 
 
-def cif_info(ciffile):
+def cif_info(logger, ciffile):
     cifDict = {}
     try:
         doc = gemmi.cif.read_file(ciffile)
