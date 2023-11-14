@@ -36,7 +36,7 @@ def get_d_xray_initial_refinement_table_dict(logger, dal, sample, software, pdbr
     return d
 
 def insert_update_xray_initial_refinement_table(logger, dal, d, sample, software):
-    logger.info('saving xxray_initial_refinement_table to database')
+    logger.info('saving xray_initial_refinement_table to database')
     try:
         ins = dal.xray_initial_refinement_table.insert().values(d)
         dal.connection.execute(ins)

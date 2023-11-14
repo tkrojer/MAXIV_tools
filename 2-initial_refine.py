@@ -39,8 +39,13 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite, 
     submitList = []
     counter = 0
     for l in open(fragmaxcsv):
-        sample = l.split(',')[0]
-        cpd_id = l.split(',')[3]
+        sample = l.split(',')[0].replace(' ', '')
+        if sample == 'SampleID' or sample == 'mounted_crystal_code':
+            continue
+        if not sample:
+            print('no sample information in line; skipping...')
+            continue
+        cpd_id = l.split(',')[3].replace(' ', '')
         logger.info('current sample ' + sample)
         if refinelib.autoprocessing_files_exist(logger, projectDir, sample):
             mtzin = os.path.join(projectDir, '1-process', sample, 'process.mtz')

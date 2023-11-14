@@ -36,8 +36,11 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
         sample = l.split(',')[0]
         if sample == 'SampleID' or sample == 'mounted_crystal_code':
             continue
+        if not sample:
+            print('no sample information in line; skipping...')
+            continue
         logger.info('current sample ' + sample)
-        cpdID = l.split(',')[3].replace(' ', '')
+        cpdID = l.split(',')[4].replace(' ', '')
         smiles = l.split(',')[6].replace(' ', '')
         logger.info('CompoundID >{0!s}<, Smiles >{1!s}<'.format(cpdID, smiles))
         if smiles == '' or cpdID == '':
