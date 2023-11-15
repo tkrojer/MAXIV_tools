@@ -169,7 +169,7 @@ def get_pipeline_path(pipeline):
 # MAXIVFastProcessingTask_0/AutoPROCTask_0/AutoPROCExecTask_0/AutoPROCExec_0
         mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'truncate-unique.mtz')
         mtz_extension = 'truncate-unique.mtz'
-        log_extension = 'Haimless.log'
+        log_extension = 'aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
         mtz_unmerged = 'aimless_unmerged.mtz'
 
@@ -189,7 +189,7 @@ def get_pipeline_path(pipeline):
 #        mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
         mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'truncate-unique.mtz')
         mtz_extension = 'truncate-unique.mtz'
-        log_extension = 'Haimless.log'
+        log_extension = 'aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
         mtz_unmerged = 'aimless_unmerged.mtz'
     elif pipeline == 'xia2dials':
