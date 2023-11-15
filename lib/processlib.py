@@ -455,7 +455,10 @@ def cif_info(logger, ciffile):
             cifDict['pdbx_netI_over_sigmaI'] = str(block.find_pair('_reflns.pdbx_netI_over_sigmaI')[1])
             cifDict['pdbx_redundancy'] = str(block.find_pair('_reflns.pdbx_redundancy')[1])
             if 'staraniso' in ciffile:
-                cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.pdbx_percent_possible_spherical')[1])
+                try:
+                    cifDict['percent_possible_obs'] = str(block.find_pair('_reflns.pdbx_percent_possible_spherical')[1])
+                except TypeError:
+                    pass
             elif 'xia2' in ciffile:
                 cifDict['percent_possible_obs'] = str(round((float(block.find_pair('_reflns.percent_possible_obs')[1])*100), 1))
             else:
