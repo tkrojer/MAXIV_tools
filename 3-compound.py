@@ -40,8 +40,8 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
             print('no sample information in line; skipping...')
             continue
         logger.info('current sample ' + sample)
-        cpdID = l.split(',')[4].replace(' ', '')
-        smiles = l.split(',')[6].replace(' ', '')
+        cpdID = l.split(',')[5].replace(' ', '')
+        smiles = l.split(',')[7].replace(' ', '')
         logger.info('CompoundID >{0!s}<, Smiles >{1!s}<'.format(cpdID, smiles))
         if smiles == '' or cpdID == '':
             logger.warning('CompoundID or Smiles field is empty; skipping...')
