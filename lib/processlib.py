@@ -188,9 +188,9 @@ def get_pipeline_path(pipeline):
 #        cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
 #        mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
         mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'truncate-unique.mtz')
-        mtz_extension = 'truncate-unique.mtz'
-        log_extension = 'aimless.log'
-        cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
+        mtz_extension = 'staraniso_alldata-unique.mtz'
+        log_extension = 'staraniso_alldata.log'
+        cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
         mtz_unmerged = 'aimless_unmerged.mtz'
     elif pipeline == 'xia2dials':
 ##        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
