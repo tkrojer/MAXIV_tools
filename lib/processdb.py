@@ -382,7 +382,7 @@ def unselected_autoprocessing_result(logger, dal, sample):
 def unselect_datasets(logger, dal, sample):
     logger.info('step 1a: unselecting all datasets for {0!s}'.format(sample))
     d = {}
-    d['selected'] = False
+    d['is_dataset'] = False
     u = dal.xray_dataset_table.update().values(d).where(
         dal.xray_dataset_table.c.mounted_crystal_code == sample)
 #    print("hallo")
