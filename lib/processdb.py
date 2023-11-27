@@ -387,9 +387,9 @@ def unselect_datasets(logger, dal, sample):
         dal.xray_dataset_table.c.mounted_crystal_code == sample)
 #    print("hallo")
 #    print(u)
-#    print(u.compile(dialect=sqlite.dialect()))
+    print(u.compile(dialect=sqlite.dialect()))
 #    print('============================')
-    dal.connection.execute(u)
+#    dal.connection.execute(u)
 
 def get_dataset_id_for_selected_autoprocessing_result(dal, mounted_crystal_code):
     q = select([dal.xray_processing_table.c.dataset_id]).where(and_(
