@@ -68,6 +68,7 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
                 logger.error('None of MTZ files fulfilled the minimal requirements; check messages aboove')
         else:
             logger.error('could not find any MTZ or CIF in sample folder')
+            processdb.select_last_dataset(logger, dal, sample)
             processlib.link_info_json_file(logger, projectDir, sample)
     processlib.report_not_fitting_pipelines(logger, not_fitting_pipeline_list, processDir, projectDir, fragmaxcsv)
     processlib.end_select_results(logger)

@@ -377,7 +377,24 @@ def unselected_autoprocessing_result(logger, dal, sample):
     u = dal.xray_processing_table.update().values(d).where(
         dal.xray_processing_table.c.mounted_crystal_code == sample)
     dal.connection.execute(u)
+    unselect_datasets(logger, dal, sample)
 
+def unselect_datasets(logger, dal, sample):
+    logger.info('step 1a: unselecting all datsets for {0!s}'.format(sample))
+    d = {}
+    d['selected'] = False
+    u = dal.xray_dataset_table.update().values(d).where(
+        dal.xray_dataset_table.c.mounted_crystal_code == sample)
+    dal.connection.execute(u)
+
+def get_dataset_id_for_selected_autoprocessing_result(dal, mounted_crystal_code):
+    q = select([dal.xray_processing_table.c.dataset_id]).where(and_(
+                dal.xray_processing_table.c.mounted_crystal_code == mounted_crystal_code,
+                dal.xray_processing_table.c.selected == True))
+    rp = dal.connection.execute(q)
+    r = rp.fetchall()
+    idx = r[0][0]
+    return idx
 
 def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info('step 2: set auto-processing results for {0!s}'.format(sample))
@@ -394,6 +411,36 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info(d)
     logger.info(best)
     logger.info(u.compile(dialect=sqlite.dialect()))
+    dal.connection.execute(u)
+    select_dataset(logger, dal, sample)
+
+def select_dataset(logger, dal, sample):
+    logger.info('step 2b: select dataset for auto-processing results of {0!s}'.format(sample))
+    dataset_id = get_dataset_id_for_selected_autoprocessing_result(dal, sample)
+    d = {}
+    d['selected'] = True
+    u = dal.xray_dataset_table.update().values(d).where(
+        dal.xray_dataset_table.c.dataset_id == dataset_id)
+    dal.connection.execute(u)
+
+def get_dataset_id_of_last_dataset(dal, mounted_crystal_code):
+    q = select([dal.xray_dataset_table.c.dataset_id,
+                sqlalchemy.func.max(dal.xray_dataset_table.c.data_collection_date)]).where(and_(
+                dal.xray_dataset_table.c.mounted_crystal_code == mounted_crystal_code,
+                dal.xray_dataset_table.c.is_dataset == True))
+    rp = dal.connection.execute(q)
+    r = rp.fetchall()
+    idx = r[0][0]
+    return idx
+
+def select_last_dataset(logger, dal, sample):
+    logger.warning('no processing files, but select last collected dataset for summary query...')
+    unselect_datasets(logger, dal, sample)
+    dataset_id = get_dataset_id_of_last_dataset(dal, sample)
+    d = {}
+    d['selected'] = True
+    u = dal.xray_dataset_table.update().values(d).where(
+        dal.xray_dataset_table.c.dataset_id == dataset_id)
     dal.connection.execute(u)
 
 def get_master_file_run_list(logger, dal, sample):
