@@ -385,6 +385,7 @@ def unselect_datasets(logger, dal, sample):
     d['selected'] = False
     u = dal.xray_dataset_table.update().values(d).where(
         dal.xray_dataset_table.c.mounted_crystal_code == sample)
+    print("hallo")
     print(u.compile(dialect=sqlite.dialect()))
     dal.connection.execute(u)
 
