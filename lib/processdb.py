@@ -380,11 +380,12 @@ def unselected_autoprocessing_result(logger, dal, sample):
     unselect_datasets(logger, dal, sample)
 
 def unselect_datasets(logger, dal, sample):
-    logger.info('step 1a: unselecting all datsets for {0!s}'.format(sample))
+    logger.info('step 1a: unselecting all datasets for {0!s}'.format(sample))
     d = {}
     d['selected'] = False
     u = dal.xray_dataset_table.update().values(d).where(
         dal.xray_dataset_table.c.mounted_crystal_code == sample)
+    print(u.compile(dialect=sqlite.dialect()))
     dal.connection.execute(u)
 
 def get_dataset_id_for_selected_autoprocessing_result(dal, mounted_crystal_code):
