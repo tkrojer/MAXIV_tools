@@ -377,7 +377,7 @@ def unselected_autoprocessing_result(logger, dal, sample):
     u = dal.xray_processing_table.update().values(d).where(
         dal.xray_processing_table.c.mounted_crystal_code == sample)
     dal.connection.execute(u)
-    unselect_datasets(logger, dal, sample)
+#    unselect_datasets(logger, dal, sample)
 
 def unselect_datasets(logger, dal, sample):
     logger.info('step 1a: unselecting all datasets for {0!s}'.format(sample))
@@ -418,7 +418,7 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info(best)
     logger.info(u.compile(dialect=sqlite.dialect()))
     dal.connection.execute(u)
-    select_dataset(logger, dal, sample)
+#    select_dataset(logger, dal, sample)
 
 def select_dataset(logger, dal, sample):
     logger.info('step 2b: select dataset for auto-processing results of {0!s}'.format(sample))
