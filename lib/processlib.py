@@ -232,6 +232,8 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
 
     logger.info('log_extension: {0!s}'.format(log_extension))
+    logger.info('mtz_extension: {0!s}'.format(mtz_extension))
+    logger.info('mtzfile: {0!s}'.format(mtzfile))
 
     logger.info('looking for logfile: {0!s}'.format(mtzfile.replace(mtz_extension, log_extension)))
     if os.path.isfile(mtzfile.replace(mtz_extension, log_extension)):
