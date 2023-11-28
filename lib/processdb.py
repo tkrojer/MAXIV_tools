@@ -441,7 +441,7 @@ def get_dataset_id_of_last_dataset(dal, mounted_crystal_code):
 
 def select_last_dataset(logger, dal, sample):
     logger.warning('no processing files, but select last collected dataset for summary query...')
-    unselect_datasets(logger, dal, sample)
+#    unselect_datasets(logger, dal, sample)
     dataset_id = get_dataset_id_of_last_dataset(dal, sample)
     d = {}
     d['selected'] = True
