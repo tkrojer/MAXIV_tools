@@ -187,7 +187,7 @@ def get_pipeline_path(pipeline):
 #        log_extension = 'HDF5_1/staraniso_alldata.log'
 #        cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
 #        mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
-        mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'truncate-unique.mtz')
+        mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'staraniso_alldata-unique.mtz')
         mtz_extension = 'staraniso_alldata-unique.mtz'
         log_extension = 'staraniso_alldata.log'
         cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
@@ -231,9 +231,9 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     wavelength = mtz['wavelength']
     create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
 
-    logger.info('log_extension: {0!s}'.format(log_extension))
-    logger.info('mtz_extension: {0!s}'.format(mtz_extension))
-    logger.info('mtzfile: {0!s}'.format(mtzfile))
+#    logger.info('log_extension: {0!s}'.format(log_extension))
+#    logger.info('mtz_extension: {0!s}'.format(mtz_extension))
+#    logger.info('mtzfile: {0!s}'.format(mtzfile))
 
     logger.info('looking for logfile: {0!s}'.format(mtzfile.replace(mtz_extension, log_extension)))
     if os.path.isfile(mtzfile.replace(mtz_extension, log_extension)):
