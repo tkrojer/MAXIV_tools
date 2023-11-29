@@ -418,7 +418,7 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
     logger.info(best)
     logger.info(u.compile(dialect=sqlite.dialect()))
     dal.connection.execute(u)
-#    select_dataset(logger, dal, sample)
+    select_dataset(logger, dal, sample)
 
 def select_dataset(logger, dal, sample):
     logger.info('step 2b: select dataset for auto-processing results of {0!s}'.format(sample))
@@ -441,13 +441,13 @@ def get_dataset_id_of_last_dataset(dal, mounted_crystal_code):
 
 def select_last_dataset(logger, dal, sample):
     logger.warning('no processing files, but select last collected dataset for summary query...')
-#    unselect_datasets(logger, dal, sample)
+    unselect_datasets(logger, dal, sample)
     dataset_id = get_dataset_id_of_last_dataset(dal, sample)
     d = {}
     d['selected'] = True
-#    u = dal.xray_dataset_table.update().values(d).where(
-#        dal.xray_dataset_table.c.dataset_id == dataset_id)
-#    dal.connection.execute(u)
+    u = dal.xray_dataset_table.update().values(d).where(
+        dal.xray_dataset_table.c.dataset_id == dataset_id)
+    dal.connection.execute(u)
 
 def get_master_file_run_list(logger, dal, sample):
     logger.info('reading xray_dataset information for {0!s}'.format(sample))

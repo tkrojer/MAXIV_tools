@@ -270,6 +270,7 @@ class DataAccessLayer:
         Column('omega_range_total', Numeric(12, 2)),
         Column('n_images', Integer()),
         Column('is_dataset', Boolean(), default=False),
+        Column('selected', Boolean(), default=False),
         Column('scicat_doi', String(255)),
         Column('dozor_plot', String(255)),
         Column('crystal_snapshot_1', String(255)),
