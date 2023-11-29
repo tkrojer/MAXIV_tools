@@ -433,7 +433,8 @@ def get_dataset_id_of_last_dataset(dal, mounted_crystal_code):
     q = select([dal.xray_dataset_table.c.dataset_id,
                 sqlalchemy.func.max(dal.xray_dataset_table.c.data_collection_date)]).where(and_(
                 dal.xray_dataset_table.c.mounted_crystal_code == mounted_crystal_code,
-                dal.xray_dataset_table.c.is_dataset == True))
+                dal.xray_dataset_table.c.is_dataset == True,
+                dal.xray_dataset_table.c.data_collection_type != "dummy"))
     rp = dal.connection.execute(q)
     r = rp.fetchall()
     idx = r[0][0]
