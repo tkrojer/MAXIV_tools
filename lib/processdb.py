@@ -443,6 +443,7 @@ def select_last_dataset(logger, dal, sample):
     logger.warning('no processing files, but select last collected dataset for summary query...')
     unselect_datasets(logger, dal, sample)
     dataset_id = get_dataset_id_of_last_dataset(dal, sample)
+    logger.info('dataset id = {0!s}'.format(dataset_id))
     d = {}
     d['selected'] = True
     u = dal.xray_dataset_table.update().values(d).where(
