@@ -377,7 +377,7 @@ def unselected_autoprocessing_result(logger, dal, sample):
     u = dal.xray_processing_table.update().values(d).where(
         dal.xray_processing_table.c.mounted_crystal_code == sample)
     dal.connection.execute(u)
-#    unselect_datasets(logger, dal, sample)
+    unselect_datasets(logger, dal, sample)
 
 def unselect_datasets(logger, dal, sample):
     logger.info('step 1a: unselecting all datasets for {0!s}'.format(sample))
