@@ -373,7 +373,7 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
         if not os.path.isfile(unm_name):
             logger.error('/bin/cp {0!s} .'.format(unm_mtz))
             os.system('/bin/cp {0!s} .'.format(unm_mtz))
-            run_mrfana(logger, unm_name)
+#            run_mrfana(logger, unm_name)
     if not os.path.isfile(cif_name):
         write_mmcif_header(cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
