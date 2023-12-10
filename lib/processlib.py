@@ -370,9 +370,9 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
     logger.info('unmerged_mtz: {0!s}'.format(unm_mtz))
     if unm_mtz:
         logger.info('unmerged mtz exists')
-        if not os.path.isfile(unm_name):
-            logger.error('/bin/cp {0!s} .'.format(unm_mtz))
-            os.system('/bin/cp {0!s} .'.format(unm_mtz))
+#        if not os.path.isfile(unm_name):
+#            logger.error('/bin/cp {0!s} .'.format(unm_mtz))
+#            os.system('/bin/cp {0!s} .'.format(unm_mtz))
 #            run_mrfana(logger, unm_name)
     if not os.path.isfile(cif_name):
         write_mmcif_header(cif, cif_name, collection_date, wavelength)
