@@ -111,13 +111,13 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
             if '_manual' in pipeline:
                 glob_string = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), mtzpath)
-#                logger.info('glob_string: {0!s}'.format(glob_string))
+                logger.info('glob_string: {0!s}'.format(glob_string))
             else:
                 glob_string = os.path.join(sample_folder, run, mtzpath)
 
             for mtzfile in glob.glob(glob_string):
                 if '_manual' in pipeline:
-                    logger.info('mtzfile: {0!s}'.format(mtzfile))
+                    logger.info('mtzfile manual: {0!s}'.format(mtzfile))
                 if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
                                                                    pipeline):
                     foundMTZ = True

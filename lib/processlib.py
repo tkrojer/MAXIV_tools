@@ -330,6 +330,7 @@ def add_biomax_mmcif_header_items(wavelength, collection_date):
 
 
 def write_mmcif_header(cif, cif_name, collection_date, wavelength):
+    logger.info('writing mmcif header file...')
     cifLines = add_biomax_mmcif_header_items(wavelength, collection_date)
     previous_line = ''
     if cif_name.endswith('.bz2'):
@@ -354,6 +355,7 @@ def write_mmcif_header(cif, cif_name, collection_date, wavelength):
     f = open(cif_name.replace(' ', '').replace('.bz2', ''), 'w')
     f.write(cifLines)
     f.close()
+    logger.warning('done writing mmcif header file')
 
 
 def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
