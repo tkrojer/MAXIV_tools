@@ -329,7 +329,7 @@ def add_biomax_mmcif_header_items(wavelength, collection_date):
     return header
 
 
-def write_mmcif_header(cif, cif_name, collection_date, wavelength):
+def write_mmcif_header(logger, cif, cif_name, collection_date, wavelength):
     logger.info('writing mmcif header file...')
     cifLines = add_biomax_mmcif_header_items(wavelength, collection_date)
     previous_line = ''
@@ -377,7 +377,7 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
 #            os.system('/bin/cp {0!s} .'.format(unm_mtz))
 #            run_mrfana(logger, unm_name)
     if not os.path.isfile(cif_name):
-        write_mmcif_header(cif, cif_name, collection_date, wavelength)
+        write_mmcif_header(logger, cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
     mtz = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
                        'process.mtz')
