@@ -613,6 +613,7 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
                 ucv_mtz = float(d['cell_volume'])
             except ValueError:
                 logger.error('cannot convert unit cell volume to float: {0!s}'.format(d['cell_volume']))
+                continue
 #            lat_mtz = proc_dict[f]['lattice']
             lat_mtz = d['sym_lattice']
             logger.info('CIF -> lat: {0!s} - pg: {1!s} - ucv: {2!s}'.format(lat_mtz, pgr_mtz, ucv_mtz))
