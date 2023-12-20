@@ -224,18 +224,22 @@ def get_highres_stats(block, d):
     return d
 
 def assign_dataset_outcome(logger, dal, d_proc):
-    resolution = d_proc['reflns_d_resolution_high']
-    logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
-    d = {}
     try:
-        if resolution < 2.0:
-            d['data_collection_outcome'] = "success - high resolution"
-        elif resolution >= 2.0 and resolution <= 2.8:
-            d['data_collection_outcome'] = "success - medium resolution"
-        else:
-            d['data_collection_outcome'] = "success - low resolution"
-    except TypeError:
-        d['data_collection_outcome'] = "unknown"
+        resolution = d_proc['reflns_d_resolution_high']
+        logger.info('highest resolution for processed datasets is {0!s} A'.format(resolution))
+        try:
+            if resolution < 2.0:
+                d['data_collection_outcome'] = "success - high resolution"
+            elif resolution >= 2.0 and resolution <= 2.8:
+                d['data_collection_outcome'] = "success - medium resolution"
+            else:
+                d['data_collection_outcome'] = "success - low resolution"
+        except TypeError:
+            d['data_collection_outcome'] = "unknown"
+    except KeyError:
+        logger.error("KeyError in d_proc['reflns_d_resolution_high']")
+        d['data_collection_outcome'] = "unkown"
+    d = {}
     logger.info('updating data_collection_outcome accordingly: {0!s}'.format(d['data_collection_outcome']))
     u = dal.xray_dataset_table.update().values(d).where(
         dal.xray_dataset_table.c.dataset_id == d_proc['dataset_id'])
