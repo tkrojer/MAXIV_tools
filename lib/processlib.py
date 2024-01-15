@@ -169,7 +169,8 @@ def get_pipeline_path(pipeline):
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
         mtz_unmerged = 'aimless_unmerged.mtz'
     elif pipeline == 'autoproc_old':
-        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
+        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'truncate-unique.mtz')
+#        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
         mtz_extension = 'HDF5_1/truncate-unique.mtz'
         log_extension = 'HDF5_1/aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
@@ -188,7 +189,8 @@ def get_pipeline_path(pipeline):
         cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
         mtz_unmerged = 'aimless_unmerged.mtz'
     elif pipeline == 'staraniso_old':
-        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
+        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*anom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
+#        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'staraniso_alldata-unique.mtz')
         mtz_extension = 'HDF5_1/staraniso_alldata-unique.mtz'
         log_extension = 'HDF5_1/staraniso_alldata.log'
         cif_extension = 'Data_1_autoPROC_STARANISO_all.cif'
