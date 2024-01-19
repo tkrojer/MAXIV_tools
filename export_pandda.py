@@ -168,7 +168,7 @@ def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble):
 def export_models(logger, panddaDir, fragmaxDir, overwrite):
     sample_dict = get_sample_dict_for_export(logger, panddaDir)
     for sample in sample_dict:
-        ensemble_structure = sample_dict[sample]
+        ensemble = sample_dict[sample]
         pandda_model = os.path.join(panddaDir, 'processed_datasets', sample, 'modelled_structures', sample + '-pandda-model.pdb')
         if os.path.isfile(pandda_model):
             prepare_sample_refine_folder(logger, fragmaxDir, sample)
