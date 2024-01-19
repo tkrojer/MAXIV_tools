@@ -214,6 +214,8 @@ def main(argv):
 
     if os.path.isdir(panddaDir):
         export_models(logger, panddaDir, fragmaxDir, overwrite)
+    else:
+        logger.error('pandda directory does not exist: {0!s}'.format(panddaDir))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
