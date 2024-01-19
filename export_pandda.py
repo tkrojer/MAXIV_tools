@@ -111,8 +111,12 @@ def prepare_ensemble_model(logger, panddaDir, sample):
     os.chdir(os.path.join(panddaDir, 'processed_datasets', sample))
     logger.info('changing directory to {0!s}'.format(os.path.join(panddaDir, 'processed_datasets', sample)))
     if os.path.isfile('merge_conformations.pdb'):
-        logger.warning("removing 'merge_conformations.pdb'")
+        logger.warning("removing 'merge_conformations.pdb' and other files from giant.merge_conformations...")
         os.system('/bin/rm merge_conformations.pdb')
+        os.system('/bin/rm merge_conformations-restraints.phenix.params')
+        os.system('/bin/rm merge_conformations-restraints.refmac.params')
+        os.system('/bin/rm merge_conformations.log')
+        os.system('/bin/rm restraints.log')
     input_model = os.path.join(panddaDir, 'processed_datasets', sample, sample + '-pandda-input.pdb')
     if os.path.isfile(input_model):
         cmd = (
