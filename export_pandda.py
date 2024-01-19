@@ -101,7 +101,7 @@ def backup_existing_files_folders_in_sample_dir(logger, fragmaxDir, sample):
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     logger.warning("'{0!s}' folder in {1!s}/5-refine in not empty; backing up files/ folders in 'backup_{2!s}'".format(sample, fragmaxDir, now))
     os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
-    mkdir('backup_' + now)
+    os.mkdir('backup_' + now)
     for f in glob.glob('*'):
         if not f.startswith('backup_'):
             os.system('/bin/mv {0!s} backup_{1!s}'.format(f, now))
