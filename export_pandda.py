@@ -123,6 +123,11 @@ def prepare_ensemble_model(logger, panddaDir, sample):
     else:
         logger.error('input model for pandda does not exist: {0!s}'.format(input_model))
 
+def set_ensemble_refinement_mark(logger, fragmaxDir, sample, ensemble):
+    logger.info("creating empty file 'REFINE_AS_ENSEMBLE' to indicate ensemble refinement with giant.quick_refine")
+    os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
+    os.system('touch REFINE_AS_ENSEMBLE')
+
 def copy_process_files(logger, fragmaxDir, sample):
     logger.info('copying process files from {0!s}'.format(os.path.join(fragmaxDir, '1-process', sample)))
     os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
@@ -138,36 +143,92 @@ def copy_free_mtz(logger, fragmaxDir, sample):
     logger.info('copying free.mtz from {0!s}'.format(os.path.join(fragmaxDir, '2-initial_refine', sample)))
     os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
     os.system('/bin/cp {0!s}/free.mtz .'.format(os.path.join(fragmaxDir, '2-initial_refine', sample)))
+    os.system('ln -s init.mtz refine.mtz')
 
-def copy_init_refine_files():
+def copy_init_refine_files(logger, fragmaxDir, sample):
     logger.info('copying initial refinement files from {0!s}'.format(os.path.join(fragmaxDir, '2-initial_refine', sample)))
     os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
     os.system('/bin/cp {0!s}/init.* .'.format(os.path.join(fragmaxDir, '2-initial_refine', sample)))
-
-def copy_event_maps():
-    print('hallo')
-
-def set_ensemble_refinement_mark(logger, fragmaxDir, sample, ensemble):
-    if ensemble:
-        logger.info("creating empty file 'REFINE_AS_ENSEMBLE' to indicate ensemble refinement with giant.quick_refine")
-        os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
-        os.system('touch REFINE_AS_ENSEMBLE')
 
 def copy_pdb_file(logger, fragmaxDir, sample, panddaDir, ensemble):
     os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
     if ensemble:
         pdb = os.path.join(panddaDir, 'processed_datasets', sample, 'merge_conformations.pdb')
+        par = os.path.join(panddaDir, 'processed_datasets', sample, 'merge_conformations-restraints.refmac.params')
         logger.info('copying ensemble PDB file {0!s}'.format(pdb))
+        os.system('/bin/cp {0!s} .'.format(pdb))
+        logger.info('copying refmac restraints PDB file {0!s}'.format(par))
+        os.system('/bin/cp {0!s} .'.format(par))
+        os.system('ln -s merge_conformations.pdb refine.pdb')
+    else:
+        pdb = os.path.join(panddaDir, 'processed_datasets', sample, 'modelled_structures', sample + '-pandda-model.pdb')
+        logger.info('copying single conformer PDB file {0!s}'.format(pdb))
+        os.system('/bin/cp {0!s} .'.format(pdb))
+        os.system('ln -s {0!s}-pandda-model.pdb refine.pdb'.format(sample))
 
+def assign_modelled_ligand_to_event_coordinate(logger, sample, panddaDir, eventdf):
+    model = os.path.join(panddaDir, 'processed_datasets', sample, 'modelled_structures', sample + '-pandda-model.pdb')
+    logger.info('trying to assign event (maps) to modelled ligands of type LIG in {0!s}'.format(model))
+    structure = gemmi.read_structure(model, merge_chain_parts=True)
+    matching_event_maps = []
+    for mod in structure:
+        for chain in mod:
+            for residue in chain:
+                if residue.name == 'LIG':
+                    c = gemmi.Chain(chain.name)
+                    c.add_residue(residue, 0)
+                    for index, row in eventdf.iterrows():
+                        dtag = row['dtag']
+                        if dtag == sample:
+                            eventidx = row['event_num']
+                            x = row['x']
+                            y = row['y']
+                            z = row['z']
+                            event = gemmi.Position(float(x), float(y), float(z))
+                            distance = round(event.dist(c.calculate_center_of_mass()), 2)
+                            lig = residue.name + '-' + chain.name + '-' + str(residue.seqid.num)
+                            logger.info('event: {0!s} - x={1!s}, y={2!s}, z={3!s} - ligand: {4!s} - distance: {5!s}'.format(eventidx, x, y, z, lig, distance))
+                            if distance < 8:
+                                os.chdir(os.path.join(panddaDir, 'processed_datasets', sample))
+                                for emap in glob.glob('*-pandda-output-event-*.mtz'):
+                                    n_map = emap.replace('.mtz', '').split('-')[len(emap.replace('.mtz', '').split('-'))-1]
+                                    if int(eventidx) == int(n_map):
+                                        logger.info('matching event map is {0!s}'.format(emap))
+                                        matching_event_maps.append(emap)
+                                logger.info('ligand is within 8A of event, assuming they match...')
+                            else:
+                                logger.warning('ligand is more than 8A away from event; ignoring it...')
+    if matching_event_maps:
+        logger.info('found at least one matching event map for modelled ligand(s)')
+    else:
+        logger.error('could not find any matching event maps...')
+    return matching_event_maps
+
+def copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf):
+    matching_event_maps = assign_modelled_ligand_to_event_coordinate(logger, sample, panddaDir, eventdf)
+    os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
+    for emap in matching_event_maps:
+        emtz = os.path.join(panddaDir, 'processed_datasets', sample, emap)
+        logger.info('copying event mtz file {0!s}'.format(emtz))
+        os.system('/bin/cp {0!s} .'.format(emtz))
 
 def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble):
+    eventdf = read_pandda_analyse_events_as_df(logger, panddaDir)
     if ensemble:
         prepare_ensemble_model(logger, panddaDir, sample)
-
-
+        set_ensemble_refinement_mark(logger, fragmaxDir, sample, ensemble)
+    copy_process_files(logger, fragmaxDir, sample)
+    copy_ligand_restraints(logger, fragmaxDir, sample, panddaDir)
+    copy_free_mtz(logger, fragmaxDir, sample)
+    copy_init_refine_files(logger, fragmaxDir, sample)
+    copy_pdb_file(logger, fragmaxDir, sample, panddaDir, ensemble)
+    copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf)
+    
 def export_models(logger, panddaDir, fragmaxDir, overwrite):
     sample_dict = get_sample_dict_for_export(logger, panddaDir)
+    logger.info('starting sample export')
     for sample in sample_dict:
+        logger.info('>>> {0!s} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(sample))
         ensemble = sample_dict[sample]
         pandda_model = os.path.join(panddaDir, 'processed_datasets', sample, 'modelled_structures', sample + '-pandda-model.pdb')
         if os.path.isfile(pandda_model):
@@ -179,13 +240,8 @@ def export_models(logger, panddaDir, fragmaxDir, overwrite):
                 copy_files(logger, panddaDir, sample, fragmaxDir, ensemble)
             else:
                 logger.warning("{0!s}: skipping sample; use -o option if you want to export...".format(sample))
-
-
-            # NSP1014-x0092-pandda-output-event-001.mtz
-
-    print(sample_dict)
-#        print(sample, event, confidence)
-#        print(row)
+        logger.info('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    logger.info('finished exporting samples')
 
 
 def main(argv):
