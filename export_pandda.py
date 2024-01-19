@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 import pandas as pd
+import gemmi
 
 import getopt
 import glob
@@ -223,7 +224,7 @@ def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble):
     copy_init_refine_files(logger, fragmaxDir, sample)
     copy_pdb_file(logger, fragmaxDir, sample, panddaDir, ensemble)
     copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf)
-    
+
 def export_models(logger, panddaDir, fragmaxDir, overwrite):
     sample_dict = get_sample_dict_for_export(logger, panddaDir)
     logger.info('starting sample export')
