@@ -92,6 +92,7 @@ def sample_refine_folder_is_empty(logger, fragmaxDir, sample):
     for f in glob.glob('*'):
         logger.warning("'{0!s}' folder in {1!s}/5-refine in not empty".format(sample, fragmaxDir))
         sample_folder_empty = False
+        break
     if sample_folder_empty:
         logger.info("'{0!s}' folder in {1!s}/5-refine in empty".format(sample, fragmaxDir))
     return sample_folder_empty
