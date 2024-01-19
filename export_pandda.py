@@ -100,7 +100,7 @@ def sample_refine_folder_is_empty(logger, fragmaxDir, sample):
 def backup_existing_files_folders_in_sample_dir(logger, fragmaxDir, sample):
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     logger.warning("'{0!s}' folder in {1!s}/5-refine in not empty; backing up files/ folders in 'backup_{2!s}'".format(sample, fragmaxDir, now))
-    os.chdir(fragmaxDir, '5-refine', sample)
+    os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
     mkdir('backup_' + now)
     for f in glob.glob('*'):
         if not f.startswith('backup_'):
