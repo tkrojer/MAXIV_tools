@@ -212,10 +212,10 @@ def main(argv):
         elif opt in ("-o", "--overwrite"):
             overwrite = True
 
-    if os.path.isdir(panddaDir):
+    if os.path.isdir(panddaDir) and os.path.isdir(fragmaxDir):
         export_models(logger, panddaDir, fragmaxDir, overwrite)
     else:
-        logger.error('pandda directory does not exist: {0!s}'.format(panddaDir))
+        logger.error('pandda directory and/or fragmax project folder do not exist: {0!s}'.format(panddaDir))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
