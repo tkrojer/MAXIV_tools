@@ -845,7 +845,7 @@ class main_window(object):
                     for emtz in glob.glob(os.path.join(self.projectDir, self.xtal, data[lig])):
                         print('======>', emtz)
 #                    emtz = os.path.join(self.projectDir, self.xtal, data[lig])
-                       print('=============> looking for {0!s}'.format(emtz))
+                        print('=============> looking for {0!s}'.format(emtz))
 #                        if os.path.isfile(emtz):
                         if emtz not in loaded_emtz:
                             print('make_and_draw_map("{0!s}", "FEVENT", "PHEVENT", "1", 0, 0)'.format(emtz))
