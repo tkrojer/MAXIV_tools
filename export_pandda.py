@@ -249,7 +249,7 @@ def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble, dal):
     copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf)
 
 
-def export_models(logger, panddaDir, fragmaxDir, overwrite, dal):
+def export_models(logger, panddaDir, fragmaxDir, overwrite):
     sample_dict = get_sample_dict_for_export(logger, panddaDir)
     logger.info('starting sample export')
     for sample in sample_dict:
@@ -296,9 +296,10 @@ def main(argv):
         elif opt in ("-d", "--database"):
             db_file = os.path.abspath(arg)
 
-    if os.path.isdir(panddaDir) and os.path.isdir(fragmaxDir) and db_file:
-        dal.db_init(db_file)
-        export_models(logger, panddaDir, fragmaxDir, overwrite, dal)
+    if os.path.isdir(panddaDir) and os.path.isdir(fragmaxDir):
+#        dal.db_init(db_file)
+#        export_models(logger, panddaDir, fragmaxDir, overwrite, dal)
+        export_models(logger, panddaDir, fragmaxDir, overwrite)
     else:
         logger.error('pandda directory and/or fragmax project folder do not exist: {0!s}'.format(panddaDir))
 
