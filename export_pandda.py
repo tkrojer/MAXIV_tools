@@ -223,7 +223,7 @@ def copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf):
     for lig in matching_event_maps:
         emap = matching_event_maps[lig]
         emtz = os.path.join(panddaDir, 'processed_datasets', sample, emap)
-        if os.path.isfile(emtz):
+        if os.path.isfile(os.path.join(fragmaxDir, '5-refine', sample, emap)):
             logger.warning('event mtz already exists in sample folder - {0!s}; skipping...'.format(emap))
         else:
             logger.info('copying event mtz file {0!s}'.format(emtz))
