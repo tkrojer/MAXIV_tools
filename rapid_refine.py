@@ -48,8 +48,8 @@ def project_data():
         'settings': {
             'project_directory':    '',
             'glob_string':          '*',
-            'pdb':                  'init.pdb',
-            'mtz':                  'init.mtz',
+            'pdb':                  'refine.pdb',
+            'mtz':                  'refine.mtz',
             'mtz_free':             'free.mtz',
             'ligand_cif':           'ligand_files/*.cif'
             },
@@ -842,11 +842,12 @@ class main_window(object):
                 data = json.load(json_file)
                 loaded_emtz = []
                 for lig in data:
-                    emtz = data[lig]
-                    if emtz not in loaded_emtz:
-                        imol = coot.make_and_draw_map(emtz, "FEVENT", "PHEVENT", "1", 0, 0)
-                        self.mol_dict['emtz'].append(imol)
-                        loaded_emtz.append(emtz)
+                    emtz = os.path.join(self.projectDir, self.xtal, data[lig])
+                    if os.path.isfile(emtz):
+                        if emtz not in loaded_emtz:
+                            imol = coot.make_and_draw_map(emtz, "FEVENT", "PHEVENT", "1", 0, 0)
+                            self.mol_dict['emtz'].append(imol)
+                            loaded_emtz.append(emtz)
 
     def RefreshData(self):
 
