@@ -843,6 +843,7 @@ class main_window(object):
                 loaded_emtz = []
                 for lig in data:
                     emtz = os.path.join(self.projectDir, self.xtal, data[lig])
+                    print('=============> looking for {0!s}'.format(emtz))
                     if os.path.isfile(emtz):
                         if emtz not in loaded_emtz:
                             imol = coot.make_and_draw_map(emtz, "FEVENT", "PHEVENT", "1", 0, 0)
