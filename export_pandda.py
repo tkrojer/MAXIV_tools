@@ -20,6 +20,7 @@
 
 import pandas as pd
 import gemmi
+import json
 
 import getopt
 import glob
@@ -30,13 +31,18 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'lib')))
 import processlib
 
+sys.path.append('/data/staff/biomax/tobias/software/MAXIV_tools/lib')
+from db import dal
+
+
 def read_pandda_analyse_events_as_df(logger, panddaDir):
     eventdf = None
-    if os.path.isfile(os.path.join(panddaDir, 'results', 'pandda_inspect_events.csv')):
+    eventcsv = 'pandda_inspect_events.csv'
+    if os.path.isfile(os.path.join(panddaDir, 'results', eventcsv)):
         eventcsv = os.path.join(panddaDir, 'results', 'pandda_inspect_events.csv')
         logger.info('reading {0!s} as dataframe...'.format(eventcsv))
         eventdf = pd.read_csv(eventcsv)
-    elif os.path.isfile(os.path.join(panddaDir, 'analyses', 'pandda_inspect_events.csv')):
+    elif os.path.isfile(os.path.join(panddaDir, 'analyses', eventcsv)):
         eventcsv = os.path.join(panddaDir, 'analyses', 'pandda_inspect_events.csv')
         logger.info('reading {0!s} as dataframe...'.format(eventcsv))
         eventdf = pd.read_csv(eventcsv)
@@ -176,7 +182,7 @@ def assign_modelled_ligand_to_event_coordinate(logger, sample, panddaDir, eventd
     model = os.path.join(panddaDir, 'processed_datasets', sample, 'modelled_structures', sample + '-pandda-model.pdb')
     logger.info('trying to assign event (maps) to modelled ligands of type LIG in {0!s}'.format(model))
     structure = gemmi.read_structure(model, merge_chain_parts=True)
-    matching_event_maps = []
+    matching_event_maps = {}
     for mod in structure:
         for chain in mod:
             for residue in chain:
@@ -200,7 +206,8 @@ def assign_modelled_ligand_to_event_coordinate(logger, sample, panddaDir, eventd
                                     n_map = emap.replace('.mtz', '').split('-')[len(emap.replace('.mtz', '').split('-'))-1]
                                     if int(eventidx) == int(n_map):
                                         logger.info('matching event map is {0!s}'.format(emap))
-                                        matching_event_maps.append(emap)
+                                        matching_event_maps[lig] = emap
+#                                        matching_event_maps.append(emap)
                                 logger.info('ligand is within 8A of event, assuming they match...')
                             else:
                                 logger.warning('ligand is more than 8A away from event; ignoring it...')
@@ -213,12 +220,23 @@ def assign_modelled_ligand_to_event_coordinate(logger, sample, panddaDir, eventd
 def copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf):
     matching_event_maps = assign_modelled_ligand_to_event_coordinate(logger, sample, panddaDir, eventdf)
     os.chdir(os.path.join(fragmaxDir, '5-refine', sample))
-    for emap in matching_event_maps:
+    for lig in matching_event_maps:
+        emap = matching_event_maps[lig]
         emtz = os.path.join(panddaDir, 'processed_datasets', sample, emap)
-        logger.info('copying event mtz file {0!s}'.format(emtz))
-        os.system('/bin/cp {0!s} .'.format(emtz))
+        if os.path.isfile(emtz):
+            logger.warning('event mtz already exists in sample folder - {0!s}; skipping...'.format(emap))
+        else:
+            logger.info('copying event mtz file {0!s}'.format(emtz))
+            os.system('/bin/cp {0!s} .'.format(emtz))
+    save_event_map_info_as_json(logger, matching_event_maps)
 
-def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble):
+def save_event_map_info_as_json(logger, matching_event_maps):
+    logger.info('saving event maps information as json file...')
+    if matching_event_maps:
+        with open('event_map_assignment.json', 'w') as fp:
+            json.dump(matching_event_maps, fp)
+
+def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble, dal):
     eventdf = read_pandda_analyse_events_as_df(logger, panddaDir)
     if ensemble:
         prepare_ensemble_model(logger, panddaDir, sample)
@@ -230,7 +248,8 @@ def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble):
     copy_pdb_file(logger, fragmaxDir, sample, panddaDir, ensemble)
     copy_event_maps(logger, fragmaxDir, sample, panddaDir, eventdf)
 
-def export_models(logger, panddaDir, fragmaxDir, overwrite):
+
+def export_models(logger, panddaDir, fragmaxDir, overwrite, dal):
     sample_dict = get_sample_dict_for_export(logger, panddaDir)
     logger.info('starting sample export')
     for sample in sample_dict:
@@ -240,10 +259,10 @@ def export_models(logger, panddaDir, fragmaxDir, overwrite):
         if os.path.isfile(pandda_model):
             prepare_sample_refine_folder(logger, fragmaxDir, sample)
             if sample_refine_folder_is_empty(logger, fragmaxDir, sample):
-                copy_files(logger, panddaDir, sample, fragmaxDir, ensemble)
+                copy_files(logger, panddaDir, sample, fragmaxDir, ensemble, dal)
             elif overwrite:
                 backup_existing_files_folders_in_sample_dir(logger, fragmaxDir, sample)
-                copy_files(logger, panddaDir, sample, fragmaxDir, ensemble)
+                copy_files(logger, panddaDir, sample, fragmaxDir, ensemble, dal)
             else:
                 logger.warning("{0!s}: skipping sample; use -o option if you want to export...".format(sample))
         logger.info('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
@@ -253,6 +272,7 @@ def export_models(logger, panddaDir, fragmaxDir, overwrite):
 def main(argv):
     panddaDir = ''
     fragmaxDir = ''
+    db_file = ""
     overwrite = False
     logger = processlib.init_logger('pandda_export.log')
     processlib.start_logging(logger, 'pandda_export.py')
@@ -273,9 +293,12 @@ def main(argv):
             fragmaxDir = os.path.abspath(arg)
         elif opt in ("-o", "--overwrite"):
             overwrite = True
+        elif opt in ("-d", "--database"):
+            db_file = os.path.abspath(arg)
 
-    if os.path.isdir(panddaDir) and os.path.isdir(fragmaxDir):
-        export_models(logger, panddaDir, fragmaxDir, overwrite)
+    if os.path.isdir(panddaDir) and os.path.isdir(fragmaxDir) and db_file:
+        dal.db_init(db_file)
+        export_models(logger, panddaDir, fragmaxDir, overwrite, dal)
     else:
         logger.error('pandda directory and/or fragmax project folder do not exist: {0!s}'.format(panddaDir))
 
