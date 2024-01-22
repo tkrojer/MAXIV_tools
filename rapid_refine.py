@@ -839,7 +839,7 @@ class main_window(object):
     def load_event_mtz_if_exists(self):
         if os.path.isfile(os.path.join(self.projectDir, self.xtal, 'event_map_assignment.json')):
             with open(os.path.join(self.projectDir, self.xtal, 'event_map_assignment.json')) as json_file:
-                data = json.load(json_file)
+                data = json.load(json_file, encoding='utf-8')
                 loaded_emtz = []
                 for lig in data:
                     emtz = os.path.join(self.projectDir, self.xtal, data[lig])

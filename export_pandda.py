@@ -234,8 +234,8 @@ def save_event_map_info_as_json(logger, matching_event_maps):
     logger.info('saving event maps information as json file...')
     if matching_event_maps:
         with open('event_map_assignment.json', 'w') as fp:
-#            json.dump(matching_event_maps, fp)
-            json.dumps(fp, encoding='utf-8', ensure_ascii=False)
+            json.dump(matching_event_maps, fp)
+#            json.dumps(fp, encoding='utf-8', ensure_ascii=False)
 
 def copy_files(logger, panddaDir, sample, fragmaxDir, ensemble, dal):
     eventdf = read_pandda_analyse_events_as_df(logger, panddaDir)
