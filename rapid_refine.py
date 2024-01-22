@@ -441,6 +441,39 @@ class command_line_scripts(object):
 #    def prepare_giant_quick_refine_script(self):
 #        cmd = "giant.quick_refine input.pdb=MID2-x0054-ensemble-model.pdb mtz=free.mtz cif=VT00188.cif params=multi-state-restraints.refmac.params"
 
+def prepare_giant_maxiv_script(self, nextCycle, ligand_cif, projectDir, xtal):
+    #        cif_name = ligand_cif.split('/')[len(ligand_cif.split('/'))-1]
+    cif_name = "." + ligand_cif.replace(os.path.join(projectDir, xtal), '')
+    os.chdir(os.path.join(projectDir, xtal, "scripts"))
+    cmd = (
+            '#!/bin/bash\n'
+            '#SBATCH --time=10:00:00\n'
+            '#SBATCH --job-name=buster\n'
+            '#SBATCH --cpus-per-task=1\n'
+            'module load gopresto BUSTER\n'
+            'cd {0!s}\n'.format(os.path.join(projectDir, xtal).replace('/Volumes/offline-staff', '/data/staff')) +
+            'touch refinement_in_progress\n'
+            'giant.quick_refine' 
+            ' input.pdb=saved_models/input_model_for_cycle_{0!s}.pdb'.format(nextCycle) +
+            ' mtz=free.mtz' 
+            ' cif={0!s}'.format(cif_name) +
+            ' params=merge_conformations-restraints.refmac.params\n'
+#            'ln -s ./Refine_{0!s}/refine.pdb .\n'.format(nextCycle) +
+#            'ln -s ./Refine_{0!s}/refine.mtz .\n'.format(nextCycle) +
+#            'ln -s ./Refine_{0!s}/BUSTER_model.cif refine.cif\n'.format(nextCycle) +
+            '/bin/rm refinement_in_progress\n'
+
+    )
+    print('writing giant_{0!s}.sh in {1!s}'.format(nextCycle, os.path.join(projectDir, xtal, "scripts")))
+    f = open('giant_{0!s}.sh'.format(nextCycle), 'w')
+    f.write(cmd)
+    f.close()
+
+    print('submitting job...')
+    print('ssh offline-fe1 "cd {0!s}; sbatch giant_{1!s}.sh"'.format(
+        os.path.join(projectDir, xtal, "scripts").replace('/Volumes/offline-staff', '/data/staff'), nextCycle))
+    os.system('ssh offline-fe1 "cd {0!s}; sbatch giant_{1!s}.sh"'.format(
+        os.path.join(projectDir, xtal, "scripts").replace('/Volumes/offline-staff', '/data/staff'), nextCycle))
 
     def run_refmac_unix_script(self, nextCycle, project_data, xtal):
         os.chdir(os.path.join(project_data, xtal, "scripts"))
@@ -977,7 +1010,10 @@ class main_window(object):
 #            command_line_scripts.prepare_refmac_windows_script(nextCycle, self.mtz_free, self.ligand_cif, self.project_data, self.xtal)
 #        else:
 #            command_line_scripts.prepare_refmac_unix_script(nextCycle, self.mtz_free, self.ligand_cif, self.project_data, self.xtal)
-        command_line_scripts().prepare_buster_maxiv_script(nextCycle, self.ligand_cif, self.projectDir, self.xtal)
+        if self.use_giant_quick_refine:
+            command_line_scripts().prepare_giant_maxiv_script(nextCycle, self.ligand_cif, self.projectDir, self.xtal)
+        else:
+            command_line_scripts().prepare_buster_maxiv_script(nextCycle, self.ligand_cif, self.projectDir, self.xtal)
 
     def remove_files_from_previous_cycle(self):
         os.chdir(os.path.join(self.projectDir, self.xtal))
