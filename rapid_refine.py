@@ -846,7 +846,7 @@ class main_window(object):
                     print('=============> looking for {0!s}'.format(emtz))
                     if os.path.isfile(emtz):
                         if emtz not in loaded_emtz:
-                            print('make_and_draw_map(emtz, "FEVENT", "PHEVENT", "1", 0, 0)')
+                            print('make_and_draw_map({0!s}, "FEVENT", "PHEVENT", "1", 0, 0)'.format(emtz))
                             imol = coot.make_and_draw_map(emtz, "FEVENT", "PHEVENT", "1", 0, 0)
                             self.mol_dict['emtz'].append(imol)
                             loaded_emtz.append(emtz)
