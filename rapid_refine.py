@@ -441,11 +441,11 @@ class command_line_scripts(object):
 #    def prepare_giant_quick_refine_script(self):
 #        cmd = "giant.quick_refine input.pdb=MID2-x0054-ensemble-model.pdb mtz=free.mtz cif=VT00188.cif params=multi-state-restraints.refmac.params"
 
-def prepare_giant_maxiv_script(self, nextCycle, ligand_cif, projectDir, xtal):
-    #        cif_name = ligand_cif.split('/')[len(ligand_cif.split('/'))-1]
-    cif_name = "." + ligand_cif.replace(os.path.join(projectDir, xtal), '')
-    os.chdir(os.path.join(projectDir, xtal, "scripts"))
-    cmd = (
+    def prepare_giant_maxiv_script(self, nextCycle, ligand_cif, projectDir, xtal):
+        #        cif_name = ligand_cif.split('/')[len(ligand_cif.split('/'))-1]
+        cif_name = "." + ligand_cif.replace(os.path.join(projectDir, xtal), '')
+        os.chdir(os.path.join(projectDir, xtal, "scripts"))
+        cmd = (
             '#!/bin/bash\n'
             '#SBATCH --time=10:00:00\n'
             '#SBATCH --job-name=buster\n'
@@ -464,15 +464,15 @@ def prepare_giant_maxiv_script(self, nextCycle, ligand_cif, projectDir, xtal):
             '/bin/rm refinement_in_progress\n'
 
     )
-    print('writing giant_{0!s}.sh in {1!s}'.format(nextCycle, os.path.join(projectDir, xtal, "scripts")))
-    f = open('giant_{0!s}.sh'.format(nextCycle), 'w')
-    f.write(cmd)
-    f.close()
+        print('writing giant_{0!s}.sh in {1!s}'.format(nextCycle, os.path.join(projectDir, xtal, "scripts")))
+        f = open('giant_{0!s}.sh'.format(nextCycle), 'w')
+        f.write(cmd)
+        f.close()
 
-    print('submitting job...')
-    print('ssh offline-fe1 "cd {0!s}; sbatch giant_{1!s}.sh"'.format(
+        print('submitting job...')
+        print('ssh offline-fe1 "cd {0!s}; sbatch giant_{1!s}.sh"'.format(
         os.path.join(projectDir, xtal, "scripts").replace('/Volumes/offline-staff', '/data/staff'), nextCycle))
-    os.system('ssh offline-fe1 "cd {0!s}; sbatch giant_{1!s}.sh"'.format(
+        os.system('ssh offline-fe1 "cd {0!s}; sbatch giant_{1!s}.sh"'.format(
         os.path.join(projectDir, xtal, "scripts").replace('/Volumes/offline-staff', '/data/staff'), nextCycle))
 
     def run_refmac_unix_script(self, nextCycle, project_data, xtal):
