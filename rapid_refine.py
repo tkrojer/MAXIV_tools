@@ -826,7 +826,7 @@ class main_window(object):
 #            print('pdb', datasetDict['pdb'])
 #            print('repr(pdb)', repr(datasetDict['pdb']))
             for mtzFile in sorted(glob.glob(os.path.join(self.projectDir, sample_ID, mtzName))):
-                print('INFO: found mtz file: {0!s}'.format(mtzFile))
+                self.logger.info('INFO: found mtz file: {0!s}'.format(mtzFile))
                 datasetDict['mtz'] = mtzFile.split(os.sep)
 #            if os.path.isfile(pdbFile.replace(pdbName, mtzName)):
 #                print('INFO: found mtz file: {0!s}'.format(pdbFile.replace(pdbName, mtzName)))
@@ -839,18 +839,18 @@ class main_window(object):
             for cifFile in glob.glob(os.path.join(self.projectDir, sample_ID, cifName)):
                 if os.path.isfile(cifFile.replace('.cif', '.pdb')):
                     datasetDict['ligand_cif'] = cifFile.split(os.sep)
-                    print("found ligand cif and corresponding pdb file: {0!s}".format(cifFile))
+                    self.logger.info("found ligand cif and corresponding pdb file: {0!s}".format(cifFile))
                     foundCIF = True
                     break
             if not foundCIF:
-                print('WARNING: did not find ligand cif file for {0!s}'.format(sample_ID))
+                self.logger.warning('did not find ligand cif file for {0!s}'.format(sample_ID))
             self.project_data['datasets'].append((datasetDict))
 #            print('datasetDict', datasetDict)
             n += 1
             self.crystal_progressbar.set_fraction(float(n)/float(n_folders))
-        print('INFO: PDB, MTZ, CIF file in project_data:')
-        print(self.project_data)
-        print('INFO: done...')
+        self.logger.info('PDB, MTZ, CIF file in project_data:')
+        self.logger.info(self.project_data)
+        self.logger.info('done...')
         self.crystal_progressbar.set_fraction(0)
         self.index_label.set_label(str(self.index))
         self.index_total_label.set_label(str(len(self.project_data['datasets'])))
@@ -885,10 +885,10 @@ class main_window(object):
 
     def check_if_refine_with_giant_quick_refine(self):
         if os.path.isfile(os.path.join(self.projectDir, self.xtal, 'REFINE_AS_ENSEMBLE')):
-            print('===> found empty file "REFINE_AS_ENSEMBLE"; will use giant.quick_refine for refinement')
+            self.logger.info('found empty file "REFINE_AS_ENSEMBLE"; will use giant.quick_refine for refinement')
             self.use_giant_quick_refine = True
         else:
-            print('===> did not find empty file "REFINE_AS_ENSEMBLE"; will refine model as single structure')
+            self.logger.info('did not find empty file "REFINE_AS_ENSEMBLE"; will refine model as single structure')
             self.use_giant_quick_refine = False
 
     def load_event_mtz_if_exists(self):
@@ -966,15 +966,15 @@ class main_window(object):
         coot.set_colour_map_rotation_for_map(0)
 
     def place_ligand_here(self, widget):
-        print('===> moving ligand to pointer')
-        print('LIGAND: ', self.mol_dict['ligand_cif'])
+        self.logger.info('moving ligand to pointer')
+        self.logger.info('LIGAND: {0!s}'.format(self.mol_dict['ligand_cif']))
         __main__.move_molecule_here(self.mol_dict['ligand_cif'])
 
     def merge_ligand_into_protein(self, widget):
-        print('===> merge ligand into protein structure')
+        self.logger.info('===> merge ligand into protein structure')
         # merge_molecules(list(imols), imol) e.g. merge_molecules([1],0)
         coot.merge_molecules_py([self.mol_dict['ligand_cif']], self.mol_dict['pdb'])
-        print('===> deleting ligand molecule')
+        self.logger.info('===> deleting ligand molecule')
         coot.close_molecule(self.mol_dict['ligand_cif'])
 
     def get_next_model_number(self):
@@ -1003,16 +1003,16 @@ class main_window(object):
 
     def create_saved_models_folder_if_not_exists(self):
         if not os.path.isdir(os.path.join(self.projectDir, self.xtal, 'saved_models')):
-            print('creating saved_models folder in {0!s}'.format(os.path.join(self.projectDir, self.xtal)))
+            self.logger.info('creating saved_models folder in {0!s}'.format(os.path.join(self.projectDir, self.xtal)))
             os.mkdir(os.path.join(self.projectDir, self.xtal, 'saved_models'))
 
     def save_model_to_saved_models_folder(self, fileName):
-        print("saving model as {0!s}".format(os.path.join(self.projectDir, self.xtal, 'saved_models', fileName)))
+        self.logger.info("saving model as {0!s}".format(os.path.join(self.projectDir, self.xtal, 'saved_models', fileName)))
         coot.write_pdb_file(self.mol_dict['pdb'], os.path.join(self.projectDir, self.xtal, 'saved_models', fileName))
 
     def create_scripts_folder_if_not_exists(self):
         if not os.path.isdir(os.path.join(self.projectDir, self.xtal, 'scripts')):
-            print('creating scripts folder in {0!s}'.format(os.path.join(self.projectDir, self.xtal)))
+            self.logger.info('creating scripts folder in {0!s}'.format(os.path.join(self.projectDir, self.xtal)))
             os.mkdir(os.path.join(self.projectDir, self.xtal, 'scripts'))
 
     def get_next_refinement_cycle(self):
@@ -1027,7 +1027,7 @@ class main_window(object):
         print('hallo')
 
     def prepare_refinement_batch_script(self, nextCycle):
-        print('preparing refinement script...')
+        self.logger.info('preparing refinement script...')
 #        if os.name == 'nt':
 #            command_line_scripts.prepare_refmac_windows_script(nextCycle, self.mtz_free, self.ligand_cif, self.project_data, self.xtal)
 #        else:
