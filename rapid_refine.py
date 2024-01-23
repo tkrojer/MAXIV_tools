@@ -30,6 +30,25 @@ import time
 
 import json
 
+import logging
+
+def init_logger(logfile):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s', '%m-%d-%Y %H:%M:%S')
+
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setLevel(logging.DEBUG)
+    stdout_handler.setFormatter(formatter)
+    logger.addHandler(stdout_handler)
+
+    file_handler = logging.FileHandler(logfile)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    return logger
+
 
 def defaults():
     defaults = {
@@ -448,7 +467,7 @@ class command_line_scripts(object):
         cmd = (
             '#!/bin/bash\n'
             '#SBATCH --time=10:00:00\n'
-            '#SBATCH --job-name=buster\n'
+            '#SBATCH --job-name=giant.quick_refine\n'
             '#SBATCH --cpus-per-task=1\n'
             'module load gopresto BUSTER\n'
             'cd {0!s}\n'.format(os.path.join(projectDir, xtal).replace('/Volumes/offline-staff', '/data/staff')) +
@@ -515,6 +534,8 @@ class main_window(object):
         self.r_work_label = gtk.Label('')
         self.r_free_label = gtk.Label('')
         self.space_group_label = gtk.Label('')
+
+        self.logger = processlib.init_logger('rapid_refine.log')
 
 
     def start_gui(self):
@@ -788,7 +809,8 @@ class main_window(object):
 #                sample_ID = pdbFile.split('/')[len(self.projectDir.split('/'))]
 ##                sample_ID = pdbFile.split('/')[len(pdbFile.split('/'))]
             sample_ID = pdbFile.split(os.sep)[len(self.projectDir.split(os.sep))]
-            print('checking folder: {0!s}'.format(sample_ID))
+#            print('checking folder: {0!s}'.format(sample_ID))
+            self.logger.info('checking folder: {0!s}'.format(sample_ID))
             newSample = True
             for d in self.project_data['datasets']:
                 if sample_ID == d['sample_ID']:
