@@ -535,7 +535,7 @@ class main_window(object):
         self.r_free_label = gtk.Label('')
         self.space_group_label = gtk.Label('')
 
-        self.logger = processlib.init_logger('rapid_refine.log')
+        self.logger = init_logger('rapid_refine.log')
 
 
     def start_gui(self):
