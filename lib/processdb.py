@@ -166,7 +166,7 @@ def get_overall_stats(block, d):
         d['reflns_pdbx_CC_half'] = block.find_pair('_reflns.pdbx_CC_half')[1]
     return d
 
-def get_dataset_id(dal, mounted_crystal_code, proposal, session, run):
+def get_dataset_id(dal, logger, mounted_crystal_code, proposal, session, run):
     logger.info("getting dataset id for {0!s} - {1!s} - {2!s} - {3!s}".format(mounted_crystal_code, proposal, session, run))
     q = select([dal.xray_dataset_table.c.dataset_id]).where(and_(
                 dal.xray_dataset_table.c.mounted_crystal_code == mounted_crystal_code,
@@ -255,7 +255,7 @@ def update_processing_outcome(logger, dal, processing_id, processing_outcome):
     dal.connection.execute(u)
 
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline, projectDir):
-    dataset_id = get_dataset_id(dal, mounted_crystal_code, proposal, session, run)
+    dataset_id = get_dataset_id(dal, logger, mounted_crystal_code, proposal, session, run)
 
     d = {   'dataset_id':           dataset_id,
             'mounted_crystal_code': mounted_crystal_code,
