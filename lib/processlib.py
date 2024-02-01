@@ -579,8 +579,8 @@ def read_info_json_file(logger, json_file):
     run = None
     logger.info("reading {0!s}".format(json_file))
     d = None
-    with open('data.json') as json_file:
-        d = json.load(json_file)
+    with open(json_file) as jfile:
+        d = json.load(jfile)
     if d:
         proposal = d['proposal']
         session = d['session']
