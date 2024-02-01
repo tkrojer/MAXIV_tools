@@ -79,7 +79,7 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
 
 
 def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                        status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict, search_manual):
+                        status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict, search_manual, n_manual):
     foundDataset = False
     foundMTZ = False
     for runs in sorted(glob.glob(os.path.join(sample_folder, '*'))):
@@ -141,6 +141,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 #                    continue
                 logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
+                n_manual += 1
                 status, logfile, ciffile, mtzfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
                                                       mtz_extension, cif_extension, log_extension, status, mtz_unmerged)
@@ -180,7 +181,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
             processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                             protein, status, master, '')
     logger.info('===================================================================================\n')
-    return missing_dict
+    return missing_dict, n_manual
 
 def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file, search_manual):
     sampleList = processlib.get_sample_list(logger, fragmaxcsv)
@@ -188,6 +189,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
         'dataset': [],
         'mtz_file': []
     }
+    n_manual = 0
     if search_manual:
         folder = os.path.join(projectDir, "1-process")
     else:
@@ -207,13 +209,16 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
             logger.info('SUCCESS: found sample in summary csv file')
             processlib.create_sample_folder(logger, projectDir, sample)
             status = 'FAIL - no processing result'
-            missing_dict = parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
-                                status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict, search_manual)
+            missing_dict, n_manual = parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, session, pipelines,
+                                status, protein, processDir, overwrite, beamline, dal, db_file, category, missing_dict, search_manual, n_manual)
         else:
             logger.warning('WARNING: cannot find sample in summary csv file')
             logger.info('===================================================================================\n')
-    review_missing_datasets(logger, missing_dict, dal)
-    processlib.reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fragmaxcsv)
+    if search_manual:
+        logger.info('found {0!s} MTZ files from manual processing'.format(n_manual))
+    else:
+        review_missing_datasets(logger, missing_dict, dal)
+        processlib.reprocess_missing_datasets(logger, missing_dict, processDir, projectDir, fragmaxcsv)
     processlib.end_get_autoprocessing_results(logger)
 
 

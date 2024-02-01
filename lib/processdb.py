@@ -167,6 +167,7 @@ def get_overall_stats(block, d):
     return d
 
 def get_dataset_id(dal, mounted_crystal_code, proposal, session, run):
+    logger.info("getting dataset id for {0!s} - {1!s} - {2!s} - {3!s}".format(mounted_crystal_code, proposal, session, run))
     q = select([dal.xray_dataset_table.c.dataset_id]).where(and_(
                 dal.xray_dataset_table.c.mounted_crystal_code == mounted_crystal_code,
                 dal.xray_dataset_table.c.proposal == proposal,
