@@ -203,7 +203,7 @@ def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overw
     if search_manual:
         folder = os.path.join(projectDir, "1-process")
     else:
-        folder = projectDir
+        folder = processDir
         proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
         pipelines = processlib.get_processing_pipelines()
         missing_dict = {
