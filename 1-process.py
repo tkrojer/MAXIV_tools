@@ -200,16 +200,16 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 
 def get_autoprocessing_results(logger, processDir, projectDir, fragmaxcsv, overwrite, dal, db_file, search_manual):
     sampleList = processlib.get_sample_list(logger, fragmaxcsv)
+    missing_dict = {
+        'dataset': [],
+        'mtz_file': []
+    }
     if search_manual:
         folder = os.path.join(projectDir, "1-process")
     else:
         folder = processDir
         proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
         pipelines = processlib.get_processing_pipelines()
-        missing_dict = {
-        'dataset': [],
-        'mtz_file': []
-        }
 
     for n, sample_folder in enumerate(sorted(glob.glob(os.path.join(folder, '*')))):
         sample = sample_folder.split('/')[len(sample_folder.split('/')) - 1]
