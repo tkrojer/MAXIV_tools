@@ -131,7 +131,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     json_file = os.path.join(mtzfile[:mtzfile.rfind(pipeline)], "info.json")
                     if os.path.isfile(json_file):
                         logger.info("info.json exists in {0!s}".format(json_file))
-                        proposal, session, run = processlib.get_proposal_session_run_from_json(logger, json_file)
+                        proposal, session, run = processlib.read_info_json_file(logger, json_file)
                     else:
                         logger.error("info.json does not exist in {0!s}; skipping...".format(json_file))
                         continue
