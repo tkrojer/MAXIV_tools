@@ -786,6 +786,18 @@ def retain_results_which_fit_selection_criterion(logger, dal, proc_list, select_
     logger.warning('1 -> {0!s}'.format(best))
     return best, found_selected_pipeline
 
+#def get_result_with_highest_resolution(logger, dal, proc_list, select_criterion):
+#    match_list = []
+#    for d in proc_list:
+#        processing_id = d['processing_id']
+#        processing_outcome = "unknown"
+#        reso_high = d['reflns_d_resolution_high']
+#        match_list.append([d, float(reso_high)])
+#
+#        if select_criterion.startswith('reso'):
+#            logger.info('added {0!s} with high resolution limit of {1!s} A'.format(d['autoproc_pipeline'], reso_high))
+#            processing_outcome = "success - is selected highres"
+
 
 def check_if_best_result_is_from_select_pipeline(logger, sample, found_selected_pipeline, not_fitting_pipeline_list, select_criterion):
 #    pipeline_list = ['xia2dials', 'autoproc', 'xia2xds', 'staraniso']

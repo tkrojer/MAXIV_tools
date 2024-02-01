@@ -65,7 +65,11 @@ def select_results(logger, projectDir, select_criterion, overwrite, processDir, 
                 processdb.unselected_autoprocessing_result(logger, dal, sample)
                 processdb.set_selected_autoprocessing_result(logger, dal, sample, best)
             else:
-                logger.error('None of MTZ files fulfilled the minimal requirements; check messages aboove')
+                logger.error('None of MTZ files fulfilled the minimal requirements; check messages above')
+#                processdb.unselected_autoprocessing_result(logger, dal, sample)
+#                logger.warning('will select the one with the highest resolution')
+
+
         else:
             logger.error('could not find any MTZ or CIF in sample folder')
             processdb.select_last_dataset(logger, dal, sample)
