@@ -128,7 +128,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
 #                if '_manual' in pipeline:
                 if search_manual:
                     logger.info('mtzfile manual: {0!s}'.format(mtzfile))
-                    json_file = mtzfile[:mtzfile.rfind(pipeline)]
+                    json_file = os.path.join(mtzfile[:mtzfile.rfind(pipeline)], "info.json")
                     if os.path.isfile(json_file):
                         logger.info("info.json exists in {0!s}".format(json_file))
                         proposal, session, run = processlib.get_proposal_session_run_from_json(logger, json_file)
@@ -166,41 +166,18 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                     protein, status, master, None)
 
-    #            # looking for manually processed datasets
-#            manual = pipeline
-#            if pipeline == 'staraniso':
-#                manual = 'autoproc'
-#            for mtzfile in glob.glob(os.path.join(projectDir, '1-process', sample, '*', manual + '_*', mtz_extension)):
-#                manual_pipeline = processlib.get_manual_pipeline_name(logger, manual, mtzfile)
-#                if pipeline == 'staraniso':
-#                    manual_pipeline = manual_pipeline.replace('autoproc', 'staraniso')
-#
-#                if processlib.process_files_for_run_pipeline_exist(logger, projectDir, sample, proposal, session, run,
-#                                                                   manual_pipeline):
-#                    foundMTZ = True
-#                    continue
-#                logger.info('found manually processed MTZ file: ' + mtzfile)
-#                status, logfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
-#                                                      run, manual_pipeline, collection_date,
-#                                                      mtz_extension, cif_extension, log_extension, status)
-#                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
-#                                                protein, status, master, manual_pipeline)
-
-#    if foundDataset and foundMTZ:
-#        logger.info('finding highest resolution')
-#        processdb.assign_dataset_outcome(logger, dal, sample)
-
-
     if not foundDataset :
-        logger.warning('could not find any DATASET for sample, will create dummy entry in database...')
-        processdb.create_dummy_dataset_entry(logger, dal, sample, proposal, session)
-        missing_dict['dataset'].append([sample, proposal, session])
+        if not search_manual:
+            logger.warning('could not find any DATASET for sample, will create dummy entry in database...')
+            processdb.create_dummy_dataset_entry(logger, dal, sample, proposal, session)
+            missing_dict['dataset'].append([sample, proposal, session])
     if foundDataset and not foundMTZ:
-        missing_dict['mtz_file'].append([sample, proposal, session])
-        logger.warning('could not find any MTZ file for sample!')
-        status = processlib.get_status(logger, None, None, None, status)
-        processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
-                                        protein, status, master, '')
+        if not search_manual:
+            missing_dict['mtz_file'].append([sample, proposal, session])
+            logger.warning('could not find any MTZ file for sample!')
+            status = processlib.get_status(logger, None, None, None, status)
+            processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
+                                            protein, status, master, '')
     logger.info('===================================================================================\n')
     return missing_dict
 
