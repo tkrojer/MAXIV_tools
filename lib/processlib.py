@@ -60,6 +60,13 @@ def get_proposal_and_session_and_protein(processDir):
         category = None
     return proposal, session, protein, beamline, category
 
+def get_none_proposal_and_session_and_protein():
+    proposal = None
+    session = None
+    protein = None
+    beamline = None
+    category = None
+    return proposal, session, protein, beamline, category
 
 def create_sample_folder(logger, projectDir, sample):
     os.chdir(os.path.join(projectDir, '1-process'))
@@ -132,7 +139,6 @@ def find_dozor_plot(logger, processDir, projectDir, sample, proposal, session, r
 def get_processing_pipelines():
     pipelines = [
         'autoproc',
-        'autoproc_manual',
         'autoproc_old',
         'staraniso',
         'staraniso_old',
@@ -142,6 +148,11 @@ def get_processing_pipelines():
     ]
     return pipelines
 
+def get_manual_processing_pipelines():
+    pipelines = [
+        'autoproc_manual'
+    ]
+    return pipelines
 
 def get_manual_pipeline_name(logger, pipeline, mtzfile):
     manual_pipeline = None
@@ -538,8 +549,8 @@ def make_thumbnail(folder, image):
 def write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                          protein, status, master, pipeline):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run)))
-    if pipeline:
-        os.chdir(pipeline)
+#    if pipeline:
+#        os.chdir(pipeline)
     d = {}
     d['sample'] = sample
     d['collection_date'] = collection_date
@@ -547,13 +558,34 @@ def write_json_info_file(logger, projectDir, sample, collection_date, run, propo
     d['proposal'] = proposal
     d['session'] = session
     d['protein'] = protein
-    d['status'] = status
+    d['status'] = ""
     d['master'] = master
-    d['pipeline'] = pipeline
-    logger.info('saving info.json file...')
+    d['pipeline'] = ""
+    logger.info('saving info.json file without pipeline and status information...')
     with open("info.json", "w") as outfile:
         json.dump(d, outfile)
+    if pipeline:
+        logger.info('changing to pipeline folder')
+        os.chdir(pipeline)
+        d['pipeline'] = pipeline
+        d['status'] = status
+        logger.info('saving info.json file (again)...')
+        with open("info.json", "w") as outfile:
+            json.dump(d, outfile)
 
+def read_info_json_file(logger, json_file):
+    proposal = None
+    session = None
+    run = None
+    logger.info("reading {0!s}".format(json_file))
+    d = None
+    with open('data.json') as json_file:
+        d = json.load(json_file)
+    if d:
+        proposal = d['proposal']
+        session = d['session']
+        run = d['run']
+    return proposal, session, run
 
 def read_reference_pdb_files(logger, projectDir):
     logger.info('reading point group, lattice and unit cell volume from reference pdb files...')
