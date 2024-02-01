@@ -585,7 +585,8 @@ def read_info_json_file(logger, json_file):
         proposal = d['proposal']
         session = d['session']
         run = d['run']
-    return proposal, session, run
+        collection_date = d['collection_date']
+    return proposal, session, run, collection_date
 
 def read_reference_pdb_files(logger, projectDir):
     logger.info('reading point group, lattice and unit cell volume from reference pdb files...')

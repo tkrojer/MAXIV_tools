@@ -131,7 +131,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     json_file = os.path.join(mtzfile[:mtzfile.rfind(pipeline)], "info.json")
                     if os.path.isfile(json_file):
                         logger.info("info.json exists in {0!s}".format(json_file))
-                        proposal, session, run = processlib.read_info_json_file(logger, json_file)
+                        proposal, session, run, collection_date = processlib.read_info_json_file(logger, json_file)
                     else:
                         logger.error("info.json does not exist in {0!s}; skipping...".format(json_file))
                         continue
@@ -144,7 +144,8 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                 status, logfile, ciffile, mtzfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
                                                       mtz_extension, cif_extension, log_extension, status, mtz_unmerged)
-                processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
+                if not search_manual
+                    processlib.write_json_info_file(logger, projectDir, sample, collection_date, run, proposal, session,
                                                 protein, status, master, pipeline)
                 if ciffile:
                     d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(logger, dal, ciffile, mtzfile,
