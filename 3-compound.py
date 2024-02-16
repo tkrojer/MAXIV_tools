@@ -43,7 +43,9 @@ def make_restraints(logger, projectDir, fragmaxcsv, software, overwrite):
 #        cpdID = l.split(',')[5].replace(' ', '')
 #        smiles = l.split(',')[11].replace(' ', '')
         cpdID = l.split(',')[1].replace(' ', '')
-        smiles = l.split(',')[2].replace(' ', '')
+        # replace should not be necessary as long as the respective csv file is made with fragmaxdb
+        # but it could be important if the file was custom made
+        smiles = l.split(',')[2].replace(' ', '').replace('\n', '').replace('\r', '')
         logger.info('CompoundID >{0!s}<, Smiles >{1!s}<'.format(cpdID, smiles))
         if smiles == '' or cpdID == '':
             logger.warning('CompoundID or Smiles field is empty; skipping...')
