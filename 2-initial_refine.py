@@ -45,7 +45,7 @@ def run_initial_refinement(logger, projectDir, fragmaxcsv, software, overwrite, 
         if not sample:
             print('no sample information in line; skipping...')
             continue
-        cpd_id = l.split(',')[3].replace(' ', '')
+#        cpd_id = l.split(',')[3].replace(' ', '')
         logger.info('current sample ' + sample)
         if refinelib.autoprocessing_files_exist(logger, projectDir, sample):
             mtzin = os.path.join(projectDir, '1-process', sample, 'process.mtz')

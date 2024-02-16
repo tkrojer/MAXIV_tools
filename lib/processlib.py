@@ -703,11 +703,11 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
         logger.info('current pipeline: {0!s}'.format(d['autoproc_pipeline']))
         if float(d['reflns_inner_pdbx_Rmerge_I_obs']) < max_allowed_Rmerge_I_obs_low():
 #            logger.info('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
-            logger.error('acceptable low resolution Rmerge: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
+            logger.info('acceptable low resolution Rmerge: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
             match_list.append(d)
         else:
 #            logger.error('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
-            logger.error('low resolution Rmerge is too high: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
+            logger.warning('low resolution Rmerge is too high: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
     if match_list:
         proc_list = match_list
     else:
