@@ -72,7 +72,9 @@ def maxiv_header(restraints_program):
 
 def restraints_program_cmd(restraints_program, ligandID, smiles):
     if restraints_program == 'acedrg':
-        cmd = 'acedrg --res LIG -i "{0!s}" -o {1!s}'.format(smiles, ligandID)
+        # replace should not be necessary as long as the respective csv file is made with fragmaxdb
+        # but it could be important if the file was custom made
+        cmd = 'acedrg --res LIG -i "{0!s}" -o {1!s}'.format(smiles.replace('\n', '').replace('\r', ''), ligandID)
     elif restraints_program == 'grade':
         cmd = ''
     elif restraints_program == 'elbow':
