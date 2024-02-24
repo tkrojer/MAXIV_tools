@@ -152,11 +152,14 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref)
         else:
             lig = ""
         rhofit = ""
-#        if os.path.isdir(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')):
-#            rhofit = "-rhofit {0!s}".format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif'))
-#        else:
-#            rhofit = ""
-        cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s} {4!s}'.format(pdbref, mtzin, software, lig, rhofit)
+        if os.path.isdir(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')):
+            rhofit = "-rhofit {0!s}".format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif'))
+            cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s} {4!s}'.format(pdbref, mtzin,
+                                                                                                       software, lig,
+                                                                                                       rhofit)
+        else:
+            rhofit = ""
+            cmd += ""
     elif software == 'phenix':
         cmd += ''
     return cmd
@@ -167,7 +170,7 @@ def submit_jobs_to_cluster(logger, projectDir, submitList):
     os.chdir(os.path.join(projectDir, 'tmp'))
     for script in submitList:
         logger.info('submitting ' + script)
-        os.system('sbatch ' + script)
+#        os.system('sbatch ' + script)
 
 
 #def structure_cif_info(cif):
