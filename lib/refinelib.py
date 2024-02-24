@@ -114,7 +114,7 @@ def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mt
     logger.info('preparing script for initial refinement')
     cmd = maxiv_header(software)
     cmd += modules_to_load(software)
-    cmd += init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id)
+    cmd += init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id)
     os.chdir(os.path.join(projectDir, 'tmp'))
     submitList.append('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter))
     f = open('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter), 'w')
@@ -142,7 +142,7 @@ def modules_to_load(software):
     return module
 
 
-def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id):
+def init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id):
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
@@ -152,6 +152,7 @@ def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref,
         else:
             lig = ""
         rhofit = ""
+        logger.info('looking for {0!s}'.format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')))
         if os.path.isdir(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')):
             rhofit = "-rhofit {0!s}".format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif'))
             cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s} {4!s}'.format(pdbref, mtzin,
