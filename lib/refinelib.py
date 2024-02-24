@@ -153,7 +153,7 @@ def init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref,
             lig = ""
         rhofit = ""
         logger.info('looking for {0!s}'.format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')))
-        if os.path.isdir(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')):
+        if os.path.isfile(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif')):
             logger.info('here')
             rhofit = "-rhofit {0!s}".format(os.path.join(projectDir, '3-compound', sample, cpd_id + '.cif'))
             cmd += 'pipedream -xyzin {0!s} -hklin {1!s} -nofreeref -nolmr -d {2!s} {3!s} {4!s}'.format(pdbref, mtzin,
