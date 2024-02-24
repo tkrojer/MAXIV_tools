@@ -160,6 +160,7 @@ def init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref,
                                                                                                        software, lig,
                                                                                                        rhofit)
         else:
+            logger.info('iefhuyefguyefgyuegf')
             rhofit = ""
             cmd += ""
     elif software == 'phenix':
