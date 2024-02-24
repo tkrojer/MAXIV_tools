@@ -110,11 +110,11 @@ def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
     return continue_refinement
 
 
-def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter, software, cifref):
+def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter, software, cifref, cpd_id):
     logger.info('preparing script for initial refinement')
     cmd = maxiv_header(software)
     cmd += modules_to_load(software)
-    cmd += init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref)
+    cmd += init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id)
     os.chdir(os.path.join(projectDir, 'tmp'))
     submitList.append('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter))
     f = open('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter), 'w')
@@ -142,7 +142,7 @@ def modules_to_load(software):
     return module
 
 
-def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref):
+def init_refine_cmd(software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id):
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
