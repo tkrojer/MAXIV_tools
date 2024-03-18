@@ -1,3 +1,7 @@
+import sqlalchemy
+from sqlalchemy.sql import select
+from sqlalchemy import and_, or_
+
 import sys
 sys.path.append('/data/staff/biomax/tobias/software/MAXIV_tools/lib')
 from db import dal
@@ -6,10 +10,6 @@ import pandas as pd
 from fpdf import FPDF
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
-
-import sqlalchemy
-from sqlalchemy.sql import select
-from sqlalchemy import and_, or_
 
 db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlitex"
 tmp_dir = "/data/visitors/biomax/20240919/20240317/fragmax/tmp"
