@@ -11,8 +11,8 @@ import sqlalchemy
 from sqlalchemy.sql import select
 from sqlalchemy import and_, or_
 
-db_file = ""
-tmp_dir = ""
+db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlite"
+tmp_dir = "/data/visitors/biomax/20240919/20240317/fragmax/tmp"
 dal.db_init(db_file)
 
 k = dal.soaked_crystals_table.join(
@@ -43,10 +43,10 @@ k = dal.soaked_crystals_table.join(
 q = select([dal.mounted_crystals_table.c.mounted_crystal_code,
             dal.soak_plate_table.c.base_buffer,
             dal.marked_crystals_table.c.marked_crystal_image,
-            dal.marked_crystals_table.c.crystal_snapshot_1,
-            dal.marked_crystals_table.c.crystal_snapshot_2,
-            dal.marked_crystals_table.c.crystal_snapshot_3,
-            dal.marked_crystals_table.c.crystal_snapshot_4,
+            dal.xray_dataset_table.c.crystal_snapshot_1,
+            dal.xray_dataset_table.c.crystal_snapshot_2,
+            dal.xray_dataset_table.c.crystal_snapshot_3,
+            dal.xray_dataset_table.c.crystal_snapshot_4,
             dal.xray_processing_table.c.reflns_d_resolution_high,
             dal.xray_processing_table.c.reflns_outer_pdbx_netI_over_sigmaI,
             dal.xray_processing_table.c.reflns_inner_pdbx_Rmerge_I_obs,
