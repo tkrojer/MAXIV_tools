@@ -39,7 +39,7 @@ def get_d_xray_dataset_table_dict(logger, dal, sample, proposal, session, beamli
     if dozor_plot:
         d_xray_dataset_table_dict['dozor_plot'] = dozor_plot
 
-    key = ['crystal_snapshot_1', 'crystal_snapshot_2', 'crystal_snapshot_3', 'crystal_snapshot_3']
+    key = ['crystal_snapshot_1', 'crystal_snapshot_2', 'crystal_snapshot_3', 'crystal_snapshot_4']
     if crystal_snapshot_list:
         for n, img in enumerate(crystal_snapshot_list):
             if n >= 4:
