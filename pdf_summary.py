@@ -11,7 +11,7 @@ import sqlalchemy
 from sqlalchemy.sql import select
 from sqlalchemy import and_, or_
 
-db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlite"
+db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlitex"
 tmp_dir = "/data/visitors/biomax/20240919/20240317/fragmax/tmp"
 dal.db_init(db_file)
 
