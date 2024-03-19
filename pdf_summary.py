@@ -58,7 +58,9 @@ q = select([dal.mounted_crystals_table.c.mounted_crystal_code,
             dal.xray_processing_table.c.reflns_d_resolution_high,
             dal.xray_processing_table.c.reflns_outer_pdbx_netI_over_sigmaI,
             dal.xray_processing_table.c.reflns_inner_pdbx_Rmerge_I_obs,
-            dal.xray_processing_table.c.sym_space_group
+            dal.xray_processing_table.c.sym_space_group,
+            dal.xray_processing_table.c.reflns_outer_percent_possible_obs,
+            dal.xray_processing_table.c.reflns_inner_pdbx_Rmerge_I_obs
            ]).order_by(dal.mounted_crystals_table.c.mounted_crystal_code.asc())
 q = q.select_from(k)
 df = pd.read_sql_query(q, dal.engine)
@@ -79,7 +81,9 @@ df.rename(columns={'mounted_crystal_code': 'sample_id',
                    'crystal_snapshot_4': 'img4',
                    'reflns_d_resolution_high': 'reso_high',
                    'reflns_outer_pdbx_netI_over_sigmaI': 'I_sigI',
-                   'sym_space_group': 'spg',}, inplace=True)
+                   'sym_space_group': 'spg',
+                   'reflns_outer_percent_possible_obs': 'comp',
+                   'reflns_inner_pdbx_Rmerge_I_obs': 'rmerge'}, inplace=True)
 
 
 class PDF(FPDF):
@@ -105,10 +109,10 @@ image_height_mm = 40  # Image height in mm
 column_width = 60  # Column width for text in mm
 
 # Table header
-column_widths = [30, 140, 60, 60, 60, 60, 60, 30, 30, 30]  # Adjust the widths as necessary
+column_widths = [30, 140, 60, 60, 60, 60, 60, 30, 30, 30, 30, 30]  # Adjust the widths as necessary
 pdf.set_font('Arial', 'B', 12)
 headers = ["sample_id", "base_buffer", "marked_crystal_image", "img1", "img2", "img3", "img4",
-           "resosolution\nhigh", "I/sig(I)\nhigh", "spg"]
+           "reso (high)", "I/sig(I) (high)", "Compl (high)", "Rmerge (low)", "spg"]
 for i, header in enumerate(headers):
     pdf.cell(column_widths[i], 10, header, 1, 0, 'C')
 pdf.ln(10)
@@ -204,7 +208,9 @@ for index, row in df.iterrows():
     pdf.set_xy(current_x, image_y)
     pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
     pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
-    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
+    pdf.cell(column_widths[9], image_height_mm, str(row['comp']), border=1)
+    pdf.cell(column_widths[10], image_height_mm, str(row['rmerge']), border=1)
+    pdf.cell(column_widths[11], image_height_mm, str(row['spg']), border=1)
 #    pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
 #    pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
 #    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
