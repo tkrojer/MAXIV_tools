@@ -65,7 +65,7 @@ df = df[df["is_dataset"] != False]
 df = df[df["xray_dataset_table_selected"] != False]
 df = df[df["xray_processing_table_selected"] != False]
 
-df = df[df["selected"] != False]
+df = df.drop('is_dataset', axis=1)
 df = df.drop('xray_dataset_table_selected', axis=1)
 df = df.drop('xray_processing_table_selected', axis=1)
 
