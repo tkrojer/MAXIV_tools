@@ -130,7 +130,7 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
         run_number = int(current_run.split('_')[len(current_run.split('_'))-1])
         run_base = current_run[:current_run.rfind('_')]
         for n in reversed(range(run_number)):
-            for img in sorted(glob.glob(os.path.join(snapshot_dir, f"{run_base}_{run_number}*.snapshot.jpeg"))):
+            for img in sorted(glob.glob(os.path.join(snapshot_dir, f"{run_base}_{n}*.snapshot.jpeg"))):
                 logger.info('copying {0!s}'.format(img))
                 os.system('/bin/cp {0!s} .'.format(img))
                 img_name = img[img.rfind('/') + 1:]
