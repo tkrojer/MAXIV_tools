@@ -123,6 +123,21 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
         if len(crystal_snapshot_list) <= 4:
             crystal_snapshot_list.append(os.path.join(image_dir, img_name))
 
+    if not crystal_snapshot_list:
+        logger.warning(f"could not find crystal snapshots for run {run}. This is most likely because this is either a line scan or an automitcally processed dataset")
+        logger.info(f"trying to go backwards in run number to find runs from optical prealignment")
+        current_run = run.replace('xds_', '')[:-2]
+        run_number = int(current_run.split('_')[len(current_run.split('_'))-1])
+        run_base = current_run[:current_run.rfind('_')]
+        for n in reversed(range(run_number)):
+            for img in sorted(glob.glob(os.path.join(snapshot_dir, f"{run_base}_{run_number}*.snapshot.jpeg"))):
+                logger.info('copying {0!s}'.format(img))
+                os.system('/bin/cp {0!s} .'.format(img))
+                img_name = img[img.rfind('/') + 1:]
+                if len(crystal_snapshot_list) <= 4:
+                    crystal_snapshot_list.append(os.path.join(image_dir, img_name))
+            if crystal_snapshot_list:
+                break
     return crystal_snapshot_list
 
 
