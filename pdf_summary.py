@@ -181,6 +181,8 @@ for index, row in df.iterrows():
         pdf.image(temp_image_path, x=image_d, y=image_y, w=image_width_mm, h=image_height_mm)
 
     # Add text cells
+    current_x = pdf.get_x()
+    pdf.set_xy(current_x, image_y)
     pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
     pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
     pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
