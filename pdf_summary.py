@@ -111,7 +111,7 @@ for index, row in df.iterrows():
     pdf.cell(column_widths[1], image_height_mm, str(row['base_buffer']), border=1)
 
     # Add the image
-    img_path = row['marked_crystal_image']
+    img_path = row['marked_crystal_image'].replace('/Users/tobkro/tmp/20240111', '/data/visitors/biomax/20240919/20240317/fragmax/lab')
     if img_path:  # Check if the image path is not empty or None
         img = mpimg.imread(img_path)
         plt.imshow(img)
