@@ -99,6 +99,7 @@ for i, header in enumerate(headers):
 pdf.ln(10)
 
 for index, row in df.iterrows():
+    print(f">>>> index: {index}")
     # Determine start position of the image
     #    image_x = pdf.get_x() + column_width * 2 + 100
     image_x = pdf.get_x() + column_widths[0] + column_widths[1]
@@ -119,6 +120,7 @@ for index, row in df.iterrows():
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
         temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
         pdf.image(temp_image_path, x=image_x, y=image_y, w=image_width_mm, h=image_height_mm)
@@ -129,7 +131,7 @@ for index, row in df.iterrows():
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
         temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
-        print(temp_image_path)
+        print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
         pdf.image(temp_image_path, x=image_x, y=image_a, w=image_width_mm, h=image_height_mm)
@@ -140,6 +142,7 @@ for index, row in df.iterrows():
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
         temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
         pdf.image(temp_image_path, x=image_x, y=image_b, w=image_width_mm, h=image_height_mm)
@@ -150,6 +153,7 @@ for index, row in df.iterrows():
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
         temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
         pdf.image(temp_image_path, x=image_x, y=image_c, w=image_width_mm, h=image_height_mm)
@@ -160,6 +164,7 @@ for index, row in df.iterrows():
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
         temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
         pdf.image(temp_image_path, x=image_x, y=image_d, w=image_width_mm, h=image_height_mm)
