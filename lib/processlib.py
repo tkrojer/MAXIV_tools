@@ -712,9 +712,12 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
     if match_list:
         proc_list = match_list
     else:
-        logger.error('did not find any MTZ file with Rmerge (low) below {0!s}; skipping sample...'.format(
+#        logger.error('did not find any MTZ file with Rmerge (low) below {0!s}; skipping sample...'.format(
+#            max_allowed_Rmerge_I_obs_low()))
+#        proc_list = []
+        logger.error('did not find any MTZ file with Rmerge (low) below {0!s}; will take it anyway...'.format(
             max_allowed_Rmerge_I_obs_low()))
-        proc_list = []
+        proc_list = match_list
     return proc_list
 
 
