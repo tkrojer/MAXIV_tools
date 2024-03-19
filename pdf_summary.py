@@ -93,7 +93,7 @@ class PDF(FPDF):
 #        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 
 # pdf = PDF()
-pdf = PDF(format=(400, 1400))  # Custom page size: width=210mm, height=400mm
+pdf = PDF(format=(1000, 1400))  # Custom page size: width=210mm, height=400mm
 pdf.add_page()
 pdf.set_font('Arial', '', 12)
 
