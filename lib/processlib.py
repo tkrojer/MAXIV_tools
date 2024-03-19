@@ -138,6 +138,8 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
                     crystal_snapshot_list.append(os.path.join(image_dir, img_name))
             if crystal_snapshot_list:
                 break
+    while len(crystal_snapshot_list) < 4:
+        crystal_snapshot_list.append('None')    # None is deliberately a string
     return crystal_snapshot_list
 
 
