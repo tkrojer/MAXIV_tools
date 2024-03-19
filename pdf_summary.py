@@ -8,10 +8,12 @@ from db import dal
 
 import pandas as pd
 from fpdf import FPDF
+import matplotlib
+matplotlib.use('Agg')  # Use the Agg backend, otherwise the backend does rely on qt which might not be set up correctly
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
-db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlitex"
+db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlite"
 tmp_dir = "/data/visitors/biomax/20240919/20240317/fragmax/tmp"
 dal.db_init(db_file)
 
@@ -127,6 +129,7 @@ for index, row in df.iterrows():
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
         temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        print(temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
         pdf.image(temp_image_path, x=image_x, y=image_a, w=image_width_mm, h=image_height_mm)
