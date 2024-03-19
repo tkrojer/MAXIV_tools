@@ -104,7 +104,7 @@ column_width = 60  # Column width for text in mm
 # Table header
 column_widths = [30, 140, 60, 60, 60, 60, 60, 30, 30, 30]  # Adjust the widths as necessary
 pdf.set_font('Arial', 'B', 12)
-headers = ["sample_id", "base_buffer", "marked_crystal_image"]
+headers = ["sample_id", "base_buffer", "marked_crystal_image", "img1", "img2", "img3", "img4", "reso", "i/sig(I)", "spg"]
 for i, header in enumerate(headers):
     pdf.cell(column_widths[i], 10, header, 1, 0, 'C')
 pdf.ln(10)
@@ -123,9 +123,9 @@ for index, row in df.iterrows():
     # Add text cells
     pdf.cell(column_widths[0], image_height_mm, str(row['sample_id']), border=1)
     pdf.cell(column_widths[1], image_height_mm, str(row['base_buffer']), border=1)
-    pdf.cell(column_widths[0], image_height_mm, str(row['reso_high']), border=1)
-    pdf.cell(column_widths[0], image_height_mm, str(row['I_sigI']), border=1)
-    pdf.cell(column_widths[0], image_height_mm, str(row['spg']), border=1)
+    pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
+    pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
+    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
 
     # Add the image
     img_path = row['marked_crystal_image'].replace('/Users/tobkro/tmp/20240111', '/data/visitors/biomax/20240919/20240317/fragmax/lab')
