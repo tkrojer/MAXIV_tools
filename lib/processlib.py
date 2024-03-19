@@ -115,6 +115,7 @@ def find_crystal_snapshots(logger, projectDir, sample, proposal, session, protei
 
 #    for img in glob.glob('/data/staff/ispybstorage/pyarch/visitors/{0!s}/{1!s}/raw/{2!s}/{3!s}/*.snapshot.jpeg'.format(
 #            proposal, session, protein, sample)):
+    logger.info(f"using the following glob string '{os.path.join(snapshot_dir, '*.snapshot.jpeg'.format(run))}'")
     for img in sorted(glob.glob(os.path.join(snapshot_dir, '*.snapshot.jpeg'.format(run)))):
         logger.info('copying {0!s}'.format(img))
         os.system('/bin/cp {0!s} .'.format(img))
