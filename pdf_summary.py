@@ -145,7 +145,7 @@ for index, row in df.iterrows():
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
-        pdf.image(temp_image_path, x=image_x, y=image_a, w=image_width_mm, h=image_height_mm)
+        pdf.image(temp_image_path, x=image_a, y=image_y, w=image_width_mm, h=image_height_mm)
 
     img_path = row['img2']
     if img_path:  # Check if the image path is not empty or None
@@ -156,7 +156,7 @@ for index, row in df.iterrows():
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
-        pdf.image(temp_image_path, x=image_x, y=image_b, w=image_width_mm, h=image_height_mm)
+        pdf.image(temp_image_path, x=image_b, y=image_y, w=image_width_mm, h=image_height_mm)
 
     img_path = row['img3']
     if img_path:  # Check if the image path is not empty or None
@@ -167,7 +167,7 @@ for index, row in df.iterrows():
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
-        pdf.image(temp_image_path, x=image_x, y=image_c, w=image_width_mm, h=image_height_mm)
+        pdf.image(temp_image_path, x=image_c, y=image_y, w=image_width_mm, h=image_height_mm)
 
     img_path = row['img4']
     if img_path:  # Check if the image path is not empty or None
@@ -178,7 +178,7 @@ for index, row in df.iterrows():
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
-        pdf.image(temp_image_path, x=image_x, y=image_d, w=image_width_mm, h=image_height_mm)
+        pdf.image(temp_image_path, x=image_d, y=image_y, w=image_width_mm, h=image_height_mm)
 
     # Add text cells
     pdf.cell(column_widths[7], image_height_mm, str(row['sample_id']), border=1)
