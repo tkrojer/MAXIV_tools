@@ -49,6 +49,9 @@ q = select([dal.mounted_crystals_table.c.mounted_crystal_code,
             dal.xray_dataset_table.c.crystal_snapshot_2,
             dal.xray_dataset_table.c.crystal_snapshot_3,
             dal.xray_dataset_table.c.crystal_snapshot_4,
+            dal.xray_dataset_table.c.is_dataset,
+            dal.xray_dataset_table.c.selected.label('xray_dataset_table_selected'),
+            dal.xray_processing_table.c.selected.label('xray_processing_table_selected'),
             dal.xray_processing_table.c.reflns_d_resolution_high,
             dal.xray_processing_table.c.reflns_outer_pdbx_netI_over_sigmaI,
             dal.xray_processing_table.c.reflns_inner_pdbx_Rmerge_I_obs,
@@ -57,6 +60,14 @@ q = select([dal.mounted_crystals_table.c.mounted_crystal_code,
 q = q.select_from(k)
 df = pd.read_sql_query(q, dal.engine)
 df = df.dropna()
+
+df = df[df["is_dataset"] != False]
+df = df[df["xray_dataset_table_selected"] != False]
+df = df[df["xray_processing_table_selected"] != False]
+
+df = df[df["selected"] != False]
+df = df.drop('xray_dataset_table_selected', axis=1)
+df = df.drop('xray_processing_table_selected', axis=1)
 
 df.rename(columns={'mounted_crystal_code': 'sample_id',
                    'crystal_snapshot_1': 'img1',
