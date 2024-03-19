@@ -123,9 +123,6 @@ for index, row in df.iterrows():
     # Add text cells
     pdf.cell(column_widths[0], image_height_mm, str(row['sample_id']), border=1)
     pdf.cell(column_widths[1], image_height_mm, str(row['base_buffer']), border=1)
-    pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
-    pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
-    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
 
     # Add the image
     img_path = row['marked_crystal_image'].replace('/Users/tobkro/tmp/20240111', '/data/visitors/biomax/20240919/20240317/fragmax/lab')
@@ -184,6 +181,9 @@ for index, row in df.iterrows():
         pdf.image(temp_image_path, x=image_d, y=image_y, w=image_width_mm, h=image_height_mm)
 
     # Add text cells
+    pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
+    pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
+    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
 #    pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
 #    pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
 #    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
