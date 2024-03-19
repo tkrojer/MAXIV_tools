@@ -141,7 +141,7 @@ for index, row in df.iterrows():
         img = mpimg.imread(img_path)
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        temp_image_path = f'{tmp_dir}/temp_image_{index}_1.png'
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
@@ -152,7 +152,7 @@ for index, row in df.iterrows():
         img = mpimg.imread(img_path)
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        temp_image_path = f'{tmp_dir}/temp_image_{index}_2.png'
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
@@ -163,7 +163,7 @@ for index, row in df.iterrows():
         img = mpimg.imread(img_path)
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        temp_image_path = f'{tmp_dir}/temp_image_{index}_3.png'
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
@@ -174,7 +174,7 @@ for index, row in df.iterrows():
         img = mpimg.imread(img_path)
         plt.imshow(img)
         plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+        temp_image_path = f'{tmp_dir}/temp_image_{index}_4.png'
         print(img_path, temp_image_path)
         plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
         plt.close()
