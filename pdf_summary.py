@@ -107,7 +107,8 @@ column_width = 60  # Column width for text in mm
 # Table header
 column_widths = [30, 140, 60, 60, 60, 60, 60, 30, 30, 30]  # Adjust the widths as necessary
 pdf.set_font('Arial', 'B', 12)
-headers = ["sample_id", "base_buffer", "marked_crystal_image", "img1", "img2", "img3", "img4", "reso", "i/sig(I)", "spg"]
+headers = ["sample_id", "base_buffer", "marked_crystal_image", "img1", "img2", "img3", "img4",
+           "resosolution\nhigh", "I/sig(I)\nhigh", "spg"]
 for i, header in enumerate(headers):
     pdf.cell(column_widths[i], 10, header, 1, 0, 'C')
 pdf.ln(10)
