@@ -176,6 +176,7 @@ class DataAccessLayer:
         Column('crystal_plate_column', String(55)),
         Column('crystal_plate_subwell', String(55)),
         Column('crystal_plate_well', String(55)),
+  	Column('marked_crystal_image', String(255)),
         Column('created_on', DateTime(), default=datetime.now),
         Column('updated_on', DateTime(), default=datetime.now, onupdate=datetime.now),
         UniqueConstraint('marked_crystal_code', name='unique_marked_crystal_code')
