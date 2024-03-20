@@ -81,6 +81,8 @@ def main(argv):
             modelFilePath = os.path.abspath(arg)
         elif opt in ("-s", "--sf"):
             sfFilePath = os.path.abspath(arg)
+        elif opt in ("-o", "--output"):
+            prefix = arg
 
     if os.path.isfile(modelFilePath) and os.path.isfile(sfFilePath) and prefix:
         validate_cif(modelFilePath, sfFilePath, prefix)
