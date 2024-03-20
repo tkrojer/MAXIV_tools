@@ -49,10 +49,10 @@ def validate_cif(modelFilePath, sfFilePath):
    #
    #
     lt = time.strftime("%Y%m%d%H%M%S", time.localtime())
-    #fnR = "xray-report-%s.pdf" % lt
-    fnR = "xray-report-%s.xml" % lt
-    #rD = val.getReport(fnR)
-    rD = val.getReportData(fnR)
+    fnR = "xray-report-%s.pdf" % lt
+#    fnR = "xray-report-%s.xml" % lt
+    rD = val.getReport(fnR)
+#    rD = val.getReportData(fnR)
 
     print("finished running validation")
 
