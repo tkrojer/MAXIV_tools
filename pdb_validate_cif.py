@@ -14,7 +14,6 @@ def displayStatus(sD, exitOnError=True):
         if 'status' in sD:
             print("OneDep status: %s\n" % sD['status'])
 
-
 def validate_cif(modelFilePath, sfFilePath, prefix):
     val = Validate(apiUrl=__apiUrl__)
     print("initiating new session")
@@ -24,11 +23,10 @@ def validate_cif(modelFilePath, sfFilePath, prefix):
     rD = val.inputModelXyzFile(modelFilePath)
     print(f"reading structure factors {sfFilePath}")
     rD = val.inputStructureFactorFile(sfFilePath)
-    print('status')
     displayStatus(rD)
     print('running validation; starting...')
     rD = val.run()
-    print('status')
+    print('status...')
     displayStatus(rD)
 
     #
@@ -37,8 +35,6 @@ def validate_cif(modelFilePath, sfFilePath, prefix):
     it = 0
     sl = 2
     while (True):
-       #    Pause -
-#       print('here')
        it += 1
        pause = it * it * sl
        time.sleep(pause)
@@ -46,17 +42,10 @@ def validate_cif(modelFilePath, sfFilePath, prefix):
        if rD['status'] in ['completed', 'failed']:
           break
        print("[%4d] Pausing for %4d (seconds)\n" % (it, pause))
-   #
-   #
-#    lt = time.strftime("%Y%m%d%H%M%S", time.localtime())
-#    fnR = "xray-report-%s.pdf" % lt
-##    fnR = "xray-report-%s.xml" % lt
-#    rD = val.getReport(fnR)
-##    rD = val.getReportData(fnR)
 
+    print("saving pdf and xml reports")
     pdf = f"xray-report-{prefix}.pdf"
     xml = f"xray-report-{prefix}.xml"
-    #    fnR = "xray-report-%s.xml" % lt
     rD = val.getReport(pdf)
     rD = val.getReportData(xml)
 
@@ -64,7 +53,6 @@ def validate_cif(modelFilePath, sfFilePath, prefix):
 
 
 def main(argv):
-    #    sample_id = None
     prefix = None
     modelFilePath = None
     sfFilePath = None
@@ -93,7 +81,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-#    sample_id = 'AR-F2XUniversal-P05D09a_1'
-#    modelFilePath = '/Users/tobkro/Scripts/PDB_query/pdb/AR-F2XUniversal-P02H11a_1-pandda-model_edited_refine_001.cif'
-#    sfFilePath = '/Users/tobkro/Scripts/PDB_query/pdb/AR-F2XUniversal-P02H11a_1_data_F.cif'
-
