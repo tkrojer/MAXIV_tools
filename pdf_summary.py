@@ -15,8 +15,8 @@ matplotlib.use('Agg')  # Use the Agg backend, otherwise the backend does rely on
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
-db_file = "/data/visitors/biomax/20240919/20240317/fragmax/lab/database/fragmax.sqlite"
-tmp_dir = "/data/visitors/biomax/20240919/20240317/fragmax/tmp"
+db_file = "/data/visitors/biomax/fragmax.sqlite"
+tmp_dir = "/data/visitors/biomax/tmp"
 blank = "/data/staff/biomax/tobias/software/MAXIV_tools/aux/blank_image.jpg"
 dal.db_init(db_file)
 
@@ -117,8 +117,8 @@ for i, header in enumerate(headers):
     pdf.cell(column_widths[i], 10, header, 1, 0, 'C')
 pdf.ln(10)
 
+# Table main
 for index, row in df.iterrows():
-    print(f">>>> index: {index}")
     # Determine start position of the image
     #    image_x = pdf.get_x() + column_width * 2 + 100
     image_x = pdf.get_x() + column_widths[0] + column_widths[1]
@@ -133,75 +133,103 @@ for index, row in df.iterrows():
     pdf.cell(column_widths[1], image_height_mm, str(row['base_buffer']), border=1)
 
     # Add the image
-    img_path = row['marked_crystal_image'].replace('/Users/tobkro/tmp/20240111', '/data/visitors/biomax/20240919/20240317/fragmax/lab')
-    if img_path:  # Check if the image path is not empty or None
-        if os.path.isfile(img_path):
-            img = mpimg.imread(img_path)
+    image_list = [
+                ['marked_crystal_image', image_x],
+                ['img1', image_a],
+                ['img2', image_b],
+                ['img3', image_c],
+                ['img4', image_d]
+                  ]
+    for image in image_list:
+        if image[0] == "marked_crystal_image":
+            img_path = row[image[0]].replace('/Users/tobkro/tmp/20240111', '/data/visitors/biomax/20240919/20240317/fragmax/lab')
         else:
-            img = mpimg.imread(blank)
-        plt.imshow(img)
-        plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
-        print(img_path, temp_image_path)
-        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
-        plt.close()
-        pdf.image(temp_image_path, x=image_x, y=image_y, w=image_width_mm, h=image_height_mm)
+            img_path = row[image[0]]
 
-    img_path = row['img1']
-    if img_path:  # Check if the image path is not empty or None
         if os.path.isfile(img_path):
             img = mpimg.imread(img_path)
         else:
             img = mpimg.imread(blank)
-        plt.imshow(img)
-        plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}_1.png'
-        print(img_path, temp_image_path)
-        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
-        plt.close()
-        pdf.image(temp_image_path, x=image_a, y=image_y, w=image_width_mm, h=image_height_mm)
 
-    img_path = row['img2']
-    if img_path:  # Check if the image path is not empty or None
-        if os.path.isfile(img_path):
-            img = mpimg.imread(img_path)
-        else:
-            img = mpimg.imread(blank)
-        plt.imshow(img)
-        plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}_2.png'
-        print(img_path, temp_image_path)
-        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
-        plt.close()
-        pdf.image(temp_image_path, x=image_b, y=image_y, w=image_width_mm, h=image_height_mm)
+        if img:
+            plt.imshow(img)
+            plt.axis('off')  # Do not display axis
+            temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+            print(img_path, temp_image_path)
+            plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
+            plt.close()
+            pdf.image(temp_image_path, x=image_x, y=image[1], w=image_width_mm, h=image_height_mm)
 
-    img_path = row['img3']
-    if img_path:  # Check if the image path is not empty or None
-        if os.path.isfile(img_path):
-            img = mpimg.imread(img_path)
-        else:
-            img = mpimg.imread(blank)
-        plt.imshow(img)
-        plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}_3.png'
-        print(img_path, temp_image_path)
-        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
-        plt.close()
-        pdf.image(temp_image_path, x=image_c, y=image_y, w=image_width_mm, h=image_height_mm)
-
-    img_path = row['img4']
-    if img_path:  # Check if the image path is not empty or None
-        if os.path.isfile(img_path):
-            img = mpimg.imread(img_path)
-        else:
-            img = mpimg.imread(blank)
-        plt.imshow(img)
-        plt.axis('off')  # Do not display axis
-        temp_image_path = f'{tmp_dir}/temp_image_{index}_4.png'
-        print(img_path, temp_image_path)
-        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
-        plt.close()
-        pdf.image(temp_image_path, x=image_d, y=image_y, w=image_width_mm, h=image_height_mm)
+#    # Add the image
+#    img_path = row['marked_crystal_image'].replace('/Users/tobkro/tmp/20240111', '/data/visitors/biomax/20240919/20240317/fragmax/lab')
+#    if img_path:  # Check if the image path is not empty or None
+#        if os.path.isfile(img_path):
+#            img = mpimg.imread(img_path)
+#        else:
+#            img = mpimg.imread(blank)
+#        plt.imshow(img)
+#        plt.axis('off')  # Do not display axis
+#        temp_image_path = f'{tmp_dir}/temp_image_{index}.png'
+#        print(img_path, temp_image_path)
+#        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
+#        plt.close()
+#        pdf.image(temp_image_path, x=image_x, y=image_y, w=image_width_mm, h=image_height_mm)
+#
+#    img_path = row['img1']
+#    if img_path:  # Check if the image path is not empty or None
+#        if os.path.isfile(img_path):
+#            img = mpimg.imread(img_path)
+#        else:
+#            img = mpimg.imread(blank)
+#        plt.imshow(img)
+#        plt.axis('off')  # Do not display axis
+#        temp_image_path = f'{tmp_dir}/temp_image_{index}_1.png'
+#        print(img_path, temp_image_path)
+#        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
+#        plt.close()
+#        pdf.image(temp_image_path, x=image_a, y=image_y, w=image_width_mm, h=image_height_mm)
+#
+#    img_path = row['img2']
+#    if img_path:  # Check if the image path is not empty or None
+#        if os.path.isfile(img_path):
+#            img = mpimg.imread(img_path)
+#        else:
+#            img = mpimg.imread(blank)
+#        plt.imshow(img)
+#        plt.axis('off')  # Do not display axis
+#        temp_image_path = f'{tmp_dir}/temp_image_{index}_2.png'
+#        print(img_path, temp_image_path)
+#        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
+#        plt.close()
+#        pdf.image(temp_image_path, x=image_b, y=image_y, w=image_width_mm, h=image_height_mm)
+#
+#    img_path = row['img3']
+#    if img_path:  # Check if the image path is not empty or None
+#        if os.path.isfile(img_path):
+#            img = mpimg.imread(img_path)
+#        else:
+#            img = mpimg.imread(blank)
+#        plt.imshow(img)
+#        plt.axis('off')  # Do not display axis
+#        temp_image_path = f'{tmp_dir}/temp_image_{index}_3.png'
+#        print(img_path, temp_image_path)
+#        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
+#        plt.close()
+#        pdf.image(temp_image_path, x=image_c, y=image_y, w=image_width_mm, h=image_height_mm)
+#
+#    img_path = row['img4']
+#    if img_path:  # Check if the image path is not empty or None
+#        if os.path.isfile(img_path):
+#            img = mpimg.imread(img_path)
+#        else:
+#            img = mpimg.imread(blank)
+#        plt.imshow(img)
+#        plt.axis('off')  # Do not display axis
+#        temp_image_path = f'{tmp_dir}/temp_image_{index}_4.png'
+#        print(img_path, temp_image_path)
+#        plt.savefig(temp_image_path, bbox_inches='tight', pad_inches=0)
+#        plt.close()
+#        pdf.image(temp_image_path, x=image_d, y=image_y, w=image_width_mm, h=image_height_mm)
 
     # Add text cells
     current_x = pdf.get_x() + 5 * image_width_mm
@@ -211,11 +239,8 @@ for index, row in df.iterrows():
     pdf.cell(column_widths[9], image_height_mm, str(row['comp']), border=1)
     pdf.cell(column_widths[10], image_height_mm, str(row['rmerge']), border=1)
     pdf.cell(column_widths[11], image_height_mm, str(row['spg']), border=1)
-#    pdf.cell(column_widths[7], image_height_mm, str(row['reso_high']), border=1)
-#    pdf.cell(column_widths[8], image_height_mm, str(row['I_sigI']), border=1)
-#    pdf.cell(column_widths[9], image_height_mm, str(row['spg']), border=1)
 
     # Move below the image/row for the next entry
     pdf.ln(image_height_mm)
 
-pdf.output('images_text_same_row.pdf')
+pdf.output('summary.pdf')
