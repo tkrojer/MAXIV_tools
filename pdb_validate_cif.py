@@ -76,9 +76,9 @@ def main(argv):
 
     if os.path.isfile(modelFilePath) and os.path.isfile(sfFilePath) and prefix:
         if modelFilePath.endswith('cif') and sfFilePath.endswith('cif'):
-            print("error: model and sf files must be in mmcif format")
-        else:
             validate_cif(modelFilePath, sfFilePath, prefix)
+        else:
+            print("error: model and sf files must be in mmcif format")
     else:
         print("pdb_validate_cif.py -m model.cif -s sf.cif -o output_prefix")
 
