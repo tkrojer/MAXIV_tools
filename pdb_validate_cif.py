@@ -40,6 +40,7 @@ def validate_cif(modelFilePath, sfFilePath, prefix):
        time.sleep(pause)
        rD = val.getStatus()
        if rD['status'] in ['completed', 'failed']:
+          print(f" => {rD['status']}")
           break
        print("[%4d] Pausing for %4d (seconds)\n" % (it, pause))
 
