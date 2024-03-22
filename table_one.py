@@ -88,7 +88,7 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
         ("favoured", f"{d['percent_rama_favoured']}"),
     ]
 
-    ligand_list = ciftools.get_ligand_rscc_as_dict(logger, xml, ligand_list)
+    ligand_list = ciftools.get_ligand_rscc_as_dict(logger, validate_xml, ligand_list)
     print(ligand_list)
     print(len(ligand_list))
 
