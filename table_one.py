@@ -27,6 +27,7 @@ def init_logger(logfile):
 def get_data_from_cif(logger, model_cif, process_cif, validate_xml):
     d = ciftools.get_empty_dict()
     doc = ciftools.get_cif_as_doc(logger, model_cif)
+    d = ciftools.get_refinement_program_from_doc_as_dict(logger, doc, d)
     d = ciftools.get_refine_stats_from_doc_as_dict(logger, doc, d)
     d = ciftools.get_atom_count_baverage_as_dict(logger, model_cif, d)
     if process_cif:

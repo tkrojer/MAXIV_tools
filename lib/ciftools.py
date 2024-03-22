@@ -150,14 +150,21 @@ def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
         d['bfac_ligand'] = round((sum(bfac_list_ligand) / len(bfac_list_ligand)), 2)
     if bfac_list_other:
         d['bfac_other'] = round((sum(bfac_list_other) / len(bfac_list_other)), 2)
+    return d
 
+def get_refinement_program_from_doc_as_dict(logger, doc, d):
+    logger.info("getting refinement statistics from cif doc object")
+    for block in doc:
+        if block.find_pair('_software.name'):
+            d['refinement_program'] = block.find_pair('_software.name')[1]
+        elif block.find_loop('_software.pdbx_ordinal'):
+            if block.find_loop('_software.name'):
+                d['refinement_program'] = list(block.find_loop('_software.name'))[0]
     return d
 
 def get_refine_stats_from_doc_as_dict(logger, doc, d):
     logger.info("getting refinement statistics from cif doc object")
     for block in doc:
-        if block.find_pair('_software.name'):
-            d['refinement_program'] = block.find_pair('_software.name')[1]
         if block.find_pair('_refine.ls_R_factor_R_work'):
             d['refine_ls_R_factor_R_work'] = round(float(block.find_pair('_refine.ls_R_factor_R_work')[1]), 2)
         if block.find_pair('_refine.ls_R_factor_R_free'):
@@ -191,7 +198,7 @@ def get_refine_stats_from_doc_as_dict(logger, doc, d):
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = round(float(list(table.find_row('t_bond_d'))[1]), 3)
                 d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('t_angle_deg'))[1]), 3)
-            elif d['refinement_program'] == 'buster':
+            elif d['refinement_program'] == 'phenix.refine':
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = round(float(list(table.find_row('f_bond_d'))[1]), 3)
                 d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('f_angle_d'))[1]), 3)
