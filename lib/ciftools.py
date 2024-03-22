@@ -202,7 +202,7 @@ def get_refine_stats_from_doc_as_dict(logger, doc, d):
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = round(float(list(table.find_row('r_bond_refined_d'))[1]), 3)
                 d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('r_angle_refined_deg'))[1]), 3)
-            elif d['refinement_program'] == 'buster':
+            elif d['refinement_program'].lower() == 'buster':
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = round(float(list(table.find_row('t_bond_d'))[1]), 3)
                 d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('t_angle_deg'))[1]), 3)
@@ -232,7 +232,7 @@ def get_ligand_rscc_as_dict(logger, xml, ligand_list):
         if item.tag == 'ModelledSubgroup':
             x = dict(item.items())
             if x['resname'] in ligand_list:
-                ligand = f"{x['resnum']} {x['chain']} {x['resnum']}"
+                ligand = f"{x['resname']} {x['chain']}({x['resnum']})"
                 ligand_data.append((ligand, f"{x['rscc']} / {x['avgoccu']}"),)
     return ligand_data
 
