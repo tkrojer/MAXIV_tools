@@ -96,9 +96,16 @@ def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
     try:
         structure = gemmi.read_structure(model_mmcif)
     except ValueError:
-        cif_block = gemmi.cif.read(model_mmcif)[0]
-        structure = gemmi.make_structure_from_block(cif_block)
-
+        logger.warning(f"cannot read {model_mmcif}")
+        model_pdb = model_mmcif.replace('.cif', '.pdb')
+        logger.info(f"checking if {model_pdb} exists")
+        if os.path.isfile(model_pdb):
+            logger.info(f"reading {model_pdb}")
+            structure = gemmi.read_structure(model_mmcif)
+        else:
+            logger.error('cannot read file')
+            return d
+        
     aa_list, hoh_list, lig_list = get_residue_categories()
 
     d['n_protein_atom'] = 0
