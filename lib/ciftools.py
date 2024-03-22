@@ -22,6 +22,7 @@ def get_process_stats_from_doc_as_dict(logger, doc, d):
     return d
 
 def get_wavelength(logger, block, d):
+    logger.info('trying to read wavelength')
     if block.find_pair('_diffrn_radiation_wavelength.wavelength'):
         logger.info('found wavelength')
         d['wavelength'] = float(block.find_pair('_diffrn_radiation_wavelength.wavelength')[1])
