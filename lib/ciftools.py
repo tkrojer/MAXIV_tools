@@ -1,5 +1,6 @@
 import gemmi
 from xml.etree import ElementTree
+import os
 
 def get_cif_as_doc(logger, ciffile):
     doc = None
@@ -105,7 +106,7 @@ def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
         else:
             logger.error('cannot read file')
             return d
-        
+
     aa_list, hoh_list, lig_list = get_residue_categories()
 
     d['n_protein_atom'] = 0
