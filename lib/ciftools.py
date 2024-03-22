@@ -197,8 +197,8 @@ def get_info_from_validation_xml_as_dict(logger, xml, d):
     tree = ElementTree.parse(xml)
     for item in tree.getroot():
         if item.tag == 'Entry':
-            d['percent_rama_outliers'] = dict(item.items())['percent_rama_outliers']
-            d['percent_rama_favoured'] = 100 - float(d['percent_rama_outliers'])
+            d['percent_rama_outliers'] = dict(item.items())['percent-rama-outliers']
+            d['percent_rama_favoured'] = 100 - float(d['percent-rama-outliers'])
             d['wilson_b_estimate'] = round(float(dict(item.items())['WilsonBestimate']), 1)
     return d
 
