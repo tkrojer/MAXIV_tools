@@ -35,8 +35,6 @@ def get_data_from_cif(logger, model_cif, process_cif, validate_xml):
     d = ciftools.get_process_stats_from_doc_as_dict(logger, doc, d)
     if validate_xml:
         d = ciftools.get_info_from_validation_xml_as_dict(logger, validate_xml, d)
-    if validate_xml and ligand_list:
-
     return d
 
 def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
