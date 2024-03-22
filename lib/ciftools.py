@@ -28,6 +28,7 @@ def get_overall_stats(logger, block, d):
         d['reflns_pdbx_netI_over_sigmaI'] = block.find_pair('_reflns.pdbx_netI_over_sigmaI')[1]
         d['reflns_pdbx_redundancy'] = block.find_pair('_reflns.pdbx_redundancy')[1]
         d['reflns_number_obs'] = block.find_pair('_reflns.number_obs')[1]
+        d['reflns_pdbx_number_measured_all'] = block.find_pair('_reflns.pdbx_number_measured_all')[1]
         d['reflns_percent_possible_obs'] = block.find_pair('_reflns.percent_possible_obs')[1]
         d['reflns_pdbx_Rmerge_I_obs'] = block.find_pair('_reflns.pdbx_Rmerge_I_obs')[1]
         d['reflns_pdbx_pdbx_Rrim_I_all'] = block.find_pair('_reflns.pdbx_Rrim_I_all')[1]
@@ -186,10 +187,14 @@ def get_refine_stats_from_doc_as_dict(logger, doc, d):
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = round(float(list(table.find_row('r_bond_refined_d'))[1]), 3)
                 d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('r_angle_refined_deg'))[1]), 3)
-            if d['refinement_program'] == 'buster':
+            elif d['refinement_program'] == 'buster':
                 table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
                 d['refine_r_bond_refined_d'] = round(float(list(table.find_row('t_bond_d'))[1]), 3)
                 d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('t_angle_deg'))[1]), 3)
+            elif d['refinement_program'] == 'buster':
+                table = block.find('_refine_ls_restr.', ['type', 'dev_ideal'])
+                d['refine_r_bond_refined_d'] = round(float(list(table.find_row('f_bond_d'))[1]), 3)
+                d['refine_r_angle_refined_deg'] = round(float(list(table.find_row('f_angle_d'))[1]), 3)
     return d
 
 def get_info_from_validation_xml_as_dict(logger, xml, d):
@@ -216,7 +221,7 @@ def get_empty_dict():
         'reflns_d_resolution_high': "",
         'reflns_outer_d_resolution_low': "",
         'reflns_number_obs': "",
-        "No. unique reflections": "",
+        "reflns_pdbx_number_measured_all": "",
         'reflns_pdbx_redundancy': "",
         'reflns_outer_pdbx_redundancy': "",
         'reflns_pdbx_netI_over_sigmaI': "",
