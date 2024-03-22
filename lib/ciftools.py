@@ -222,6 +222,20 @@ def get_info_from_validation_xml_as_dict(logger, xml, d):
             d['wilson_b_estimate'] = round(float(dict(item.items())['WilsonBestimate']), 1)
     return d
 
+def get_ligand_rscc_as_dict(logger, xml, ligand_list):
+    logger.info(f"reading {xml} from onedep validation")
+    tree = ElementTree.parse(xml)
+    ligand_data = [
+        ("Ligands (RSCC / OCC)", None),
+    ]
+    for item in tree.getroot():
+        if item.tag == 'ModelledSubgroup':
+            x = dict(item.items())
+            if x['resname'] == ligand_list:
+                ligand = f"{x['resnum']} {x['chain']} {x['resnum']}"
+                ligand_data.append((ligand, f"{x['resnum']} / {x['avgoccu']}"),)
+    return ligand_data
+
 def get_empty_dict():
     d = {
         "wavelength": "",

@@ -35,9 +35,11 @@ def get_data_from_cif(logger, model_cif, process_cif, validate_xml):
     d = ciftools.get_process_stats_from_doc_as_dict(logger, doc, d)
     if validate_xml:
         d = ciftools.get_info_from_validation_xml_as_dict(logger, validate_xml, d)
+    if validate_xml and ligand_list:
+
     return d
 
-def make_workbook(logger, model_cif, process_cif, validate_xml):
+def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
     d = get_data_from_cif(logger, model_cif, process_cif, validate_xml)
     # Create a new Excel file and add a worksheet
     simplified_workbook = xlsxwriter.Workbook('table_one.xlsx')
@@ -48,7 +50,7 @@ def make_workbook(logger, model_cif, process_cif, validate_xml):
         ("Data Collection", None),
         ("PDB ID", "XXX"),
         ("Beamline", "BioMAX"),
-        ("Wavelength (Å)", "XXX"),
+        ("Wavelength (Å)", f"{d['wavelength']}"),
         ("Space Group", f"{d['sym_space_group']}"),
         ("Cell dimensions", None),
         ("a, b, c (Å)", f"{d['cell_length_a']}, {d['cell_length_b']}, {d['cell_length_c']}"),
@@ -83,8 +85,14 @@ def make_workbook(logger, model_cif, process_cif, validate_xml):
         ("Bond angles (°)", f"{d['refine_r_angle_refined_deg']}"),
         ("Ramachandran plot (%)", None),
         ("favoured", f"{d['percent_rama_favoured']}"),
-        ("outliers", f"{d['percent_rama_outliers']}")
+        ("outliers", f"{d['percent_rama_outliers']}"),
+        ("Ligands (%)", None),
+        ("favoured", f"{d['percent_rama_favoured']}"),
     ]
+
+    ligand_list = get_ligand_rscc_as_dict(logger, xml, ligand_list)
+    print(ligand_list)
+    print(len(ligand_list))
 
     # Populate the worksheet with the structure and data without the middle column
     for row_num, (structure, value) in enumerate(structure_data):
@@ -102,9 +110,10 @@ def main(argv):
     model_cif = None
     process_cif = None
     validate_xml = None
+    ligand_list = ['LIG', 'DRG']
 
     try:
-        opts, args = getopt.getopt(argv,"m:c:x:h",["model=", "cif=", "xml=", "help"])
+        opts, args = getopt.getopt(argv,"m:c:x:l:h",["model=", "cif=", "xml=", "ligands=", "help"])
     except getopt.GetoptError:
         sys.exit(2)
 
@@ -118,9 +127,11 @@ def main(argv):
             process_cif = os.path.abspath(arg)
         elif opt in ("-x", "--xml"):
             validate_xml = os.path.abspath(arg)
+        elif opt in ("-l", "--ligands"):
+            for a in arg.split(','): ligand_list.append(a)
 
     if model_cif:
-        make_workbook(logger, model_cif, process_cif, validate_xml)
+        make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list)
 
 
 if __name__ == "__main__":
