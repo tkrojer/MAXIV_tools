@@ -89,6 +89,8 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
     ]
 
     ligand_list = ciftools.get_ligand_rscc_as_dict(logger, validate_xml, ligand_list)
+    print(ligand_list)
+    print(len(ligand_list))
     if len(ligand_list) > 1:
         structure_data.extend(ligand_list)
 
