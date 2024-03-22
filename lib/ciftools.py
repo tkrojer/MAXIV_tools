@@ -231,7 +231,7 @@ def get_ligand_rscc_as_dict(logger, xml, ligand_list):
     for item in tree.getroot():
         if item.tag == 'ModelledSubgroup':
             x = dict(item.items())
-            if x['resname'] == ligand_list:
+            if x['resname'] in ligand_list:
                 ligand = f"{x['resnum']} {x['chain']} {x['resnum']}"
                 ligand_data.append((ligand, f"{x['resnum']} / {x['avgoccu']}"),)
     return ligand_data
