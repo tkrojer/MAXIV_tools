@@ -93,7 +93,12 @@ def get_residue_categories():
 def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
     logger.info(f"reading {model_mmcif}")
 #    structure = gemmi.read_structure(model_mmcif, merge_chain_parts=True)
-    structure = gemmi.read_structure(model_mmcif)
+    try:
+        structure = gemmi.read_structure(model_mmcif)
+    except ValueError:
+        cif_block = gemmi.cif.read(model_mmcif)[0]
+        structure = gemmi.make_structure_from_block(cif_block)
+
     aa_list, hoh_list, lig_list = get_residue_categories()
 
     d['n_protein_atom'] = 0
