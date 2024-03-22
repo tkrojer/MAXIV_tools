@@ -15,9 +15,16 @@ def get_process_stats_from_doc_as_dict(logger, doc, d):
     logger.info("getting data processing statistics from cif doc object")
     for block in doc:
 #        d = get_software_info(logger, block, d)
+        d = get_wavelength(logger, block, d)
         d = get_overall_stats(logger, block, d)
         d = get_lowres_stats(logger, block, d)
         d = get_highres_stats(logger, block, d)
+    return d
+
+def get_wavelength(logger, block, d):
+    if block.find_pair('_diffrn_radiation_wavelength.wavelength'):
+        logger.info('found wavelength')
+        d['wavelength'] = float(block.find_pair('_diffrn_radiation_wavelength.wavelength')[1])
     return d
 
 def get_overall_stats(logger, block, d):
@@ -216,7 +223,7 @@ def get_info_from_validation_xml_as_dict(logger, xml, d):
 
 def get_empty_dict():
     d = {
-#        "Wavelength (Å)": "",
+        "wavelength": "",
         'sym_space_group': "",
         'cell_length_a': "",
         'cell_length_b': "",
