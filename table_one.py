@@ -92,7 +92,7 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
     print(ligand_list)
     print(len(ligand_list))
     if len(ligand_list) > 1:
-        print(here)
+        print("here")
         structure_data.extend(ligand_list)
     print(structure_data)
 
