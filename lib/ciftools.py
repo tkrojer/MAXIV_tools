@@ -102,7 +102,7 @@ def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
         logger.info(f"checking if {model_pdb} exists")
         if os.path.isfile(model_pdb):
             logger.info(f"reading {model_pdb}")
-            structure = gemmi.read_structure(model_mmcif)
+            structure = gemmi.read_structure(model_pdb)
         else:
             logger.error('cannot read file')
             return d
