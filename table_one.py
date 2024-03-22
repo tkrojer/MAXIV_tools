@@ -42,7 +42,7 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
     # Create a new Excel file and add a worksheet
     simplified_workbook = xlsxwriter.Workbook('table_one.xlsx')
     simplified_worksheet = simplified_workbook.add_worksheet()
-    print(d)
+
     # Data as observed from the simplified spreadsheet, adjusted to remove the middle column
     structure_data = [
         ("Data Collection", None),
@@ -88,7 +88,7 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
         ("favoured", f"{d['percent_rama_favoured']}"),
     ]
 
-    ligand_list = get_ligand_rscc_as_dict(logger, xml, ligand_list)
+    ligand_list = ciftools.get_ligand_rscc_as_dict(logger, xml, ligand_list)
     print(ligand_list)
     print(len(ligand_list))
 
