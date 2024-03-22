@@ -233,7 +233,7 @@ def get_ligand_rscc_as_dict(logger, xml, ligand_list):
             x = dict(item.items())
             if x['resname'] in ligand_list:
                 ligand = f"{x['resnum']} {x['chain']} {x['resnum']}"
-                ligand_data.append((ligand, f"{x['resnum']} / {x['avgoccu']}"),)
+                ligand_data.append((ligand, f"{x['rscc']} / {x['avgoccu']}"),)
     return ligand_data
 
 def get_empty_dict():

@@ -84,8 +84,6 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
         ("Ramachandran plot (%)", None),
         ("favoured", f"{d['percent_rama_favoured']}"),
         ("outliers", f"{d['percent_rama_outliers']}"),
-        ("Ligands (%)", None),
-        ("favoured", f"{d['percent_rama_favoured']}"),
     ]
 
     ligand_list = ciftools.get_ligand_rscc_as_dict(logger, validate_xml, ligand_list)
