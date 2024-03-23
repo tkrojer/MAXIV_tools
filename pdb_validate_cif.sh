@@ -8,7 +8,7 @@ sf=""
 output=""
 
 # Parse arguments
-while getopts "i:o:x:" opt; do
+while getopts "m:s:o:" opt; do
   case $opt in
     m) model=$OPTARG ;;
     s) sf=$OPTARG ;;
