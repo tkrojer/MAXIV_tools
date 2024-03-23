@@ -90,6 +90,10 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
     if len(ligand_list) > 1:
         structure_data.extend(ligand_list)
 
+    if d['high_bfac_outliers_water']:
+        logger.info('list of waters with high b-factors')
+        logger.info(d['high_bfac_outliers_water'])
+
     # Populate the worksheet with the structure and data without the middle column
     for row_num, (structure, value) in enumerate(structure_data):
         simplified_worksheet.write(row_num, 0, structure)  # Writing the structure/category

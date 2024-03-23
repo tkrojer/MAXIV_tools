@@ -1,6 +1,7 @@
 import gemmi
 from xml.etree import ElementTree
 import os
+import statistics
 
 def get_cif_as_doc(logger, ciffile):
     doc = None
@@ -14,7 +15,6 @@ def get_cif_as_doc(logger, ciffile):
 def get_process_stats_from_doc_as_dict(logger, doc, d):
     logger.info("getting data processing statistics from cif doc object")
     for block in doc:
-#        d = get_software_info(logger, block, d)
         d = get_wavelength(logger, block, d)
         d = get_overall_stats(logger, block, d)
         d = get_lowres_stats(logger, block, d)
@@ -128,6 +128,8 @@ def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
     d['bfac_ligand'] = 0
     d['bfac_other'] = 0
 
+    d['high_bfac_outliers_water'] = []
+
     bfac_list_protein = []
     bfac_list_water = []
     bfac_list_ligand = []
@@ -139,25 +141,37 @@ def get_atom_count_baverage_as_dict(logger, model_mmcif, d):
                 for atom in residue:
                     if residue.name in aa_list:
                         bfac_list_protein.append(atom.b_iso)
-                        d['n_protein_atom'] += 1
                     elif residue.name in lig_list:
                         bfac_list_ligand.append(atom.b_iso)
-                        d['n_ligand_atom'] += 1
                     elif residue.name in hoh_list:
-                        bfac_list_water.append(atom.b_iso)
-                        d['n_water_atom'] += 1
+                        bfac_list_water.append([f"{residue.name}-{chain.name}-{residue.seqid}", atom.b_iso])
                     else:
                         bfac_list_other.append(atom.b_iso)
-                        d['n_other_atom'] += 1
 
     if bfac_list_protein:
-        d['bfac_protein'] = round((sum(bfac_list_protein) / len(bfac_list_protein)), 2)
+        d['bfac_protein'] = statistics.mean(bfac_list_protein)
+        d['n_protein_atom'] = len(bfac_list_protein)
+#        d['bfac_protein'] = round((sum(bfac_list_protein) / len(bfac_list_protein)), 2)
     if bfac_list_water:
-        d['bfac_water'] = round((sum(bfac_list_water) / len(bfac_list_water)), 2)
+#        d['bfac_water'] = statistics.mean(bfac_list_water)
+        d['n_water_atom'] = len(bfac_list_water)
+        # Extract the bfac from the nested list
+        water_bfacs = [item[1] for item in bfac_list_water]
+        # Calculate the average and standard deviation
+        d['bfac_water'] = statistics.mean(water_bfacs)
+        std_dev = statistics.stdev(water_bfacs)
+        # Identify elements that are greater than twice the standard deviation from the average and above average
+        d['high_bfac_outliers_water'] = [item for item in bfac_list_water if abs(item[1] - d['bfac_water']) > 2 * std_dev and item[1] - d['bfac_water'] > 0]
+    #        d['bfac_water'] = round((sum(bfac_list_water) / len(bfac_list_water)), 2)
     if bfac_list_ligand:
-        d['bfac_ligand'] = round((sum(bfac_list_ligand) / len(bfac_list_ligand)), 2)
+        d['bfac_ligand'] = statistics.mean(bfac_list_ligand)
+        d['n_ligand_atom'] = len(bfac_list_ligand)
+#        d['bfac_ligand'] = round((sum(bfac_list_ligand) / len(bfac_list_ligand)), 2)
     if bfac_list_other:
-        d['bfac_other'] = round((sum(bfac_list_other) / len(bfac_list_other)), 2)
+        d['bfac_other'] = statistics.mean(bfac_list_other)
+        d['n_other_atom'] = len(bfac_list_other)
+
+    #        d['bfac_other'] = round((sum(bfac_list_other) / len(bfac_list_other)), 2)
     return d
 
 def get_refinement_program_from_doc_as_dict(logger, doc, d):
