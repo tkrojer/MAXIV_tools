@@ -18,4 +18,4 @@ while getopts "i:o:x:" opt; do
 done
 
 # Call the Python script with the parsed arguments
-ccp4-python pdb_validate_cif.py -m "$model" -s "$sf" -o "$output"
+ccp4-python /data/staff/biomax/tobias/software/MAXIV_tools/pdb_validate_cif.py -m "$model" -s "$sf" -o "$output"
