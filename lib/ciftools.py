@@ -257,6 +257,7 @@ def get_outliers_as_dict(logger, xml):
     for item in tree.getroot():
         if item.tag == 'ModelledSubgroup':
             x = dict(item.items())
+            print(x)
             if x['rama'].lower() == "outlier":
                 outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", "ramachandran"])
             if float(x['rscc']) < 0.7:
