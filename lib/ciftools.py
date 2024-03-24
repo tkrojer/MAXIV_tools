@@ -301,9 +301,9 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
                             scm += f"   20\n"
                             scm += f'   "{description}")\n'
                             break
-        f = open('refine.scm', 'w')
-        f.write(scm)
-        f.close()
+    f = open('refine.scm', 'w')
+    f.write(scm)
+    f.close()
 
 def get_empty_dict():
     d = {
