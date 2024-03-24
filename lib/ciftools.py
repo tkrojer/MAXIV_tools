@@ -250,6 +250,58 @@ def get_ligand_rscc_as_dict(logger, xml, ligand_list):
                 ligand_data.append((ligand, f"{x['rscc']} / {x['avgoccu']}"),)
     return ligand_data
 
+def get_outliers_as_dict(logger, xml):
+    logger.info(f"lokking for outliers in {xml} from onedep validation")
+    tree = ElementTree.parse(xml)
+    outliers = []
+    for item in tree.getroot():
+        if item.tag == 'ModelledSubgroup':
+            x = dict(item.items())
+            if x['rama'].lower() == "outlier":
+                outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", "ramachandran"])
+            if float(x['rscc']) < 0.7:
+                outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"rscc={x['rscc']}"])
+            if float(x['avgoccu']) != 1.000:
+                outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"avgoccu={x['avgoccu']}"])
+    return outliers
+
+def prepare_outlier_list_for_coot(logger, outliers):
+    logger.info('writing scm file for coot with outliers')
+    try:
+        structure = gemmi.read_structure(model_mmcif)
+    except ValueError:
+        logger.warning(f"cannot read {model_mmcif}")
+        model_pdb = model_mmcif.replace('.cif', '.pdb')
+        logger.info(f"checking if {model_pdb} exists")
+        if os.path.isfile(model_pdb):
+            logger.info(f"reading {model_pdb}")
+            structure = gemmi.read_structure(model_pdb)
+        else:
+            logger.error('cannot read file')
+            return d
+
+    scm = "; Views\n"
+    for o in outliers:
+        resname = o[0].split('-')[0]
+        chain = o[0].split('-')[1]
+        resnum = o[0].split('-')[2]
+        description = o[1]
+
+        for model in structure:
+            for chain in model:
+                for residue in chain:
+                    if resname == residue.name and resnum == residue.seqid and chain == chain.name:
+                        for atom in residue:
+                            xyz = atom.pos.tolist
+                            scm += f"(add-view (list    {xyz[0]} {xyz[1]} {xyz[2]})\n"
+                            scm += f"   (list 0 0 0 1)\n"
+                            scm += f"   20\n"
+                            scm += f'   "{description}")\n'
+                            break
+        f = open('refine.scm', 'w')
+        f.write(scm)
+        f.close()
+
 def get_empty_dict():
     d = {
         "wavelength": "",

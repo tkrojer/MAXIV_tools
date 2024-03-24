@@ -94,6 +94,13 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
         logger.info('list of waters with high b-factors')
         logger.info(d['high_bfac_outliers_water'])
 
+    outliers = get_outliers_as_dict(logger, xml)
+    if outliers:
+        logger.warning(f"outliers; {outliers}")
+        ciftools.prepare_outlier_list_for_coot(logger, outliers)
+    else:
+        logger.info('no outliers found')
+
     # Populate the worksheet with the structure and data without the middle column
     for row_num, (structure, value) in enumerate(structure_data):
         simplified_worksheet.write(row_num, 0, structure)  # Writing the structure/category
