@@ -4,12 +4,15 @@ import os
 import statistics
 
 def get_cif_as_doc(logger, ciffile):
+    logger.info(f"trying to read {ciffile}")
     doc = None
     try:
         logger.info(f"reading {ciffile} as doc")
         doc = gemmi.cif.read_file(ciffile)
     except ValueError:
         logger.error(f'gemmi ValueError when reading {ciffile}')
+    except PermissionError:
+        logger.error(f'gemmi PermissionError when reading {ciffile}')
     return doc
 
 def get_process_stats_from_doc_as_dict(logger, doc, d):

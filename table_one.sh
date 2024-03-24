@@ -18,5 +18,5 @@ while getopts "m:c:x:" opt; do
   esac
 done
 
-# Call the Python script with the parsed arguments
+x# Call the Python script with the parsed arguments
 python /data/staff/biomax/tobias/software/MAXIV_tools/table_one.py -m "$model" -c "$cif" -x "$xml"
