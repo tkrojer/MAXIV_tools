@@ -285,6 +285,7 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
 
     scm = "; Views\n"
     for o in outliers:
+        print(o[0])
         resname = o[0].split('-')[0]
         chainO = o[0].split('-')[1]
         resnum = o[0].split('-')[2]
