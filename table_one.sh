@@ -1,6 +1,7 @@
 #!/bin/bash
 
-module load gopresto CCP4
+module load Anaconda3
+source activate MAXIV_tools
 
 # Initialize variables for arguments
 model=""
