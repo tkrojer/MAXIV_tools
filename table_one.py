@@ -97,7 +97,7 @@ def make_workbook(logger, model_cif, process_cif, validate_xml, ligand_list):
     outliers = ciftools.get_outliers_as_dict(logger, validate_xml)
     if outliers:
         logger.warning(f"outliers; {outliers}")
-        ciftools.prepare_outlier_list_for_coot(logger, outliers)
+        ciftools.prepare_outlier_list_for_coot(logger, outliers, model_cif)
     else:
         logger.info('no outliers found')
 

@@ -268,7 +268,7 @@ def get_outliers_as_dict(logger, xml):
                     outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"avgoccu={x['avgoccu']}"])
     return outliers
 
-def prepare_outlier_list_for_coot(logger, outliers):
+def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
     logger.info('writing scm file for coot with outliers')
     try:
         structure = gemmi.read_structure(model_mmcif)
