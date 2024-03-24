@@ -291,11 +291,12 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
         chainO = o[0].split('-')[1]
         resnum = o[0].split('-')[2]
         description = o[1]
-        logger.info(f"{resnum}, {chainO}, {resnum}")
+        logger.info(f"{resname}, {chainO}, {resnum}")
         for model in structure:
             for chain in model:
                 for residue in chain:
                     if resname == residue.name and resnum == residue.seqid and chainO == chain.name:
+                        logger.info('fehfeiuhfeghfuywifrgiwgrie')
                         for atom in residue:
                             xyz = atom.pos.tolist
                             scm += f"(add-view (list    {xyz[0]} {xyz[1]} {xyz[2]})\n"
