@@ -19,4 +19,4 @@ while getopts "m:c:x:" opt; do
 done
 
 # Call the Python script with the parsed arguments
-ccp4-python /data/staff/biomax/tobias/software/MAXIV_tools/table_one.py -m "$model" -c "$cif" -x "$xml"
+python /data/staff/biomax/tobias/software/MAXIV_tools/table_one.py -m "$model" -c "$cif" -x "$xml"
