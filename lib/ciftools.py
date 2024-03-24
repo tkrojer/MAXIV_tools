@@ -257,13 +257,15 @@ def get_outliers_as_dict(logger, xml):
     for item in tree.getroot():
         if item.tag == 'ModelledSubgroup':
             x = dict(item.items())
-            print(x)
-            if x['rama'].lower() == "outlier":
-                outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", "ramachandran"])
-            if float(x['rscc']) < 0.7:
-                outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"rscc={x['rscc']}"])
-            if float(x['avgoccu']) != 1.000:
-                outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"avgoccu={x['avgoccu']}"])
+            if 'rama' in x:
+                if x['rama'].lower() == "outlier":
+                    outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", "ramachandran"])
+            if 'rscc' in x:
+                if float(x['rscc']) < 0.7:
+                    outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"rscc={x['rscc']}"])
+            if 'avgoccu' in x:
+                if float(x['avgoccu']) != 1.000:
+                    outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"avgoccu={x['avgoccu']}"])
     return outliers
 
 def prepare_outlier_list_for_coot(logger, outliers):
