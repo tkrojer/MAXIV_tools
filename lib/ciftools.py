@@ -286,12 +286,12 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
     scm = "; Views\n"
     print(outliers)
     for o in outliers:
-        print(o[0])
+#        print(o[0])
         resname = o[0].split('-')[0]
         chainO = o[0].split('-')[1]
         resnum = o[0].split('-')[2]
         description = o[1]
-        print(resnum, chainO, resnum)
+#        print(resnum, chainO, resnum)
         for model in structure:
             for chain in model:
                 for residue in chain:
