@@ -12,8 +12,8 @@ xml=""
 while getopts "m:c:x:" opt; do
   case $opt in
     m) model=$OPTARG ;;
-    s) cif=$OPTARG ;;
-    o) xml=$OPTARG ;;
+    c) cif=$OPTARG ;;
+    x) xml=$OPTARG ;;
     \?) echo "Invalid option -$OPTARG" >&2 ;;
   esac
 done
