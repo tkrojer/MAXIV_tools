@@ -257,15 +257,16 @@ def get_outliers_as_dict(logger, xml):
     for item in tree.getroot():
         if item.tag == 'ModelledSubgroup':
             x = dict(item.items())
+            resi = f"{x['resname']}-{x['chain']}-{x['resnum']}"
             if 'rama' in x:
                 if x['rama'].lower() == "outlier":
-                    outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", "ramachandran"])
+                    outliers.append([resi, f"{resi} - rama outlier"])
             if 'rscc' in x:
                 if float(x['rscc']) < 0.7:
-                    outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"rscc={x['rscc']}"])
+                    outliers.append([resi, f"{resi} - rscc={x['rscc']}"])
             if 'avgoccu' in x:
                 if float(x['avgoccu']) != 1.000:
-                    outliers.append([f"{x['resname']}-{x['chain']}-{x['resnum']}", f"avgoccu={x['avgoccu']}"])
+                    outliers.append([resi, f"{resi} - avgoccu={x['avgoccu']}"])
     return outliers
 
 def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
@@ -286,7 +287,6 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
     scm = "; Views\n"
     logger.error(outliers)
     for o in outliers:
-#        print(o[0])
         resname = o[0].split('-')[0]
         chainO = o[0].split('-')[1]
         resnum = o[0].split('-')[2]
@@ -296,9 +296,7 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
             for chain in model:
                 for residue in chain:
                     logger.info(f"{resname} {residue.name} -- {resnum} {residue.seqid} -- {chainO} {chain.name}")
-#                    if resname == residue.name and resnum == residue.seqid:
                     if resname == residue.name and resnum == str(residue.seqid) and chainO == chain.name:
-                        logger.info('fehfeiuhfeghfuywifrgiwgrie')
                         for atom in residue:
                             xyz = atom.pos.tolist()
                             logger.info(f"{xyz}")
