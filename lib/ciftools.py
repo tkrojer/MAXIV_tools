@@ -295,6 +295,7 @@ def prepare_outlier_list_for_coot(logger, outliers, model_mmcif):
         for model in structure:
             for chain in model:
                 for residue in chain:
+                    logger.info(f"{residue.name} {residue.seqid} {chain.name}")
                     if resname == residue.name and resnum == residue.seqid and chainO == chain.name:
                         logger.info('fehfeiuhfeghfuywifrgiwgrie')
                         for atom in residue:
