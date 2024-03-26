@@ -233,12 +233,12 @@ def get_pipeline_path(pipeline):
         log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
         cif_extension = 'DataFiles/xia2.mmcif.bz2'
         mtz_unmerged = 'DataFiles/AUTOMATIC_DEFAULT_scaled_unmerged.mtz'
-    elif pipeline == 'xia2dials_old':
-        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
-        mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
-        log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
-        cif_extension = 'DataFiles/xia2.mmcif.bz2'
-        mtz_unmerged = 'DataFiles/AUTOMATIC_DEFAULT_scaled_unmerged.mtz'
+#    elif pipeline == 'xia2dials_old':
+#        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
+#        mtz_extension = 'DataFiles/AUTOMATIC_DEFAULT_free.mtz'
+#        log_extension = 'LogFiles/AUTOMATIC_DEFAULT_SCALE.log'
+#        cif_extension = 'DataFiles/xia2.mmcif.bz2'
+#        mtz_unmerged = 'DataFiles/AUTOMATIC_DEFAULT_scaled_unmerged.mtz'
     elif pipeline == 'xia2xds':
 #        mtzpath = os.path.join('xia2DIALS', 'cn*', 'Xia2DIALSv1_*noanom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
         mtzpath = os.path.join('xia2XDS', 'cn*', 'Xia2DIALSv1_*anom', 'DataFiles', 'AUTOMATIC_DEFAULT_free.mtz')
