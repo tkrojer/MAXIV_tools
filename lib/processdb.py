@@ -58,9 +58,16 @@ def read_master_file(logger, master_file, d_xray_dataset_table_dict, foundDatase
         #    list(f.keys()) there is most likely only 1 key 'entry'
         dset = f['entry']
     #    d_xray_dataset_table_dict['detector_distance'] = dset['instrument']['detector']['distance'].value
-        d_xray_dataset_table_dict['detector_distance'] = dset['instrument']['detector']['distance'][()]
-    #    d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'].value
-        d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'][()]
+        try:
+            d_xray_dataset_table_dict['detector_distance'] = dset['instrument']['detector']['distance'][()]
+        except ValueError:
+            d_xray_dataset_table_dict['detector_distance'] = dset['instrument']['detector']['detector_distance'][()]
+            #    d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'].value
+        try:
+            d_xray_dataset_table_dict['wavelength'] = dset['sample']['beam']['incident_wavelength'][()]
+        except ValueError:
+            d_xray_dataset_table_dict['wavelength'] = dset['instrument']['beam']['incident_wavelength'][()]
+
         d_xray_dataset_table_dict['n_images'] = dset['sample']['goniometer']['omega'].shape[0]
         d_xray_dataset_table_dict['omega_range_total'] = dset['sample']['goniometer']['omega_range_total'][()]
         if d_xray_dataset_table_dict['omega_range_total'] > 30.0:
