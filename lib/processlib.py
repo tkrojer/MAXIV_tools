@@ -383,7 +383,7 @@ def write_mmcif_header(logger, cif, cif_name, collection_date, wavelength):
             else:
                 cifLines += previous_line
             previous_line = line
-    f = open(cif_name.replace(' ', '').replace('.bz2', ''), 'w')
+    f = open('process_header.cif', 'w')
     f.write(cifLines)
     f.close()
     logger.warning('done writing mmcif header file')
@@ -397,9 +397,14 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
     cif_name = cif.split('/')[len(cif.split('/'))-1]
     unm_name = unm_mtz.split('/')[len(unm_mtz.split('/')) - 1]
     if not os.path.isfile(mtz_name):
+        logger.info(f'copying {mtz}')
         os.system('/bin/cp {0!s} .'.format(mtz))
     if not os.path.isfile(log_name):
+        logger.info(f'copying {log}')
         os.system('/bin/cp {0!s} .'.format(log))
+    if not os.path.isfile(cif_name):
+        logger.info(f'copying {cif}')
+        os.system('/bin/cp {0!s} .'.format(cif))
     logger.info('unmerged_mtz: {0!s}'.format(unm_mtz))
     if unm_mtz:
         logger.info('unmerged mtz exists')
