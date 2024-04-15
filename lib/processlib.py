@@ -1218,7 +1218,7 @@ def pipeline_cmd(pipeline, proc_dict, master_file):
     elif pipeline.startswith('xia2xds'):
         cmd = 'xia2 pipeline=3dii image={0!s} {1!s}'.format(master_file, extra_cmd_xia)
     elif pipeline.startswith('autoproc'):
-        cmd = 'process -h5 {0!s} -nthreads 48 {1!s} SILICON="42.5736" '.format(master_file, extra_cmd_autoproc)
+        cmd = 'process -h5 {0!s} -nthreads 48 {1!s} autoPROC_XdsKeyword_SILICON="42.5736" '.format(master_file, extra_cmd_autoproc)
     return cmd
 
 
