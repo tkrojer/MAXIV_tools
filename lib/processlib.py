@@ -208,7 +208,7 @@ def get_pipeline_path(pipeline):
     #        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
 #        mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate-unique.mtz')
         mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate.mtz')
-        mtz_extension = 'HDF5_1/truncate-unique.mtz'
+        mtz_extension = 'HDF5_1/truncate.mtz'
         log_extension = 'HDF5_1/aimless.log'
         cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
         mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
