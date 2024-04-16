@@ -240,7 +240,7 @@ def review_missing_datasets(logger, missing_dict, dal):
 def reprocess_datasets(logger, processDir, projectDir, reprocesscsv, overwrite, proc_dict, dal):
 #    proposal, session, protein, beamline, category = processlib.get_proposal_and_session_and_protein(processDir)
     sampleList = processlib.get_sample_list(logger, reprocesscsv)
-    n_jobs = 7  # hardcoded so that we don't hog the cluster
+    n_jobs = 10  # hardcoded so that we don't hog the cluster
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     pipeline = proc_dict['pipeline'] + '_manual'
     script_dict = processlib.get_script_dict(pipeline, n_jobs, now)

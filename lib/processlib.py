@@ -206,12 +206,13 @@ def get_pipeline_path(pipeline):
         mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
     elif pipeline == 'autoproc_manual':
     #        mtzpath = os.path.join('autoPROC', 'cn*', 'AutoPROCv1_*noanom*', 'HDF5_1', 'truncate-unique.mtz')
-#        mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate-unique.mtz')
-#        mtz_extension = 'HDF5_1/truncate-unique.mtz'
-        mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate.mtz')
-        mtz_extension = 'HDF5_1/truncate.mtz'
+        mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate-unique.mtz')
+        mtz_extension = 'HDF5_1/truncate-unique.mtz'
+#        mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate.mtz')
+#        mtz_extension = 'HDF5_1/truncate.mtz'
         log_extension = 'HDF5_1/aimless.log'
-        cif_extension = 'HDF5_1/aimless.mrfana20.cif'
+        cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
+#        cif_extension = 'HDF5_1/aimless.mrfana20.cif'
         mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
     elif pipeline == 'staraniso':
         mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'staraniso_alldata-unique.mtz')
@@ -1218,9 +1219,10 @@ def modules_to_load(pipeline):
         module = 'module load gopresto CCP4\n'
     elif pipeline.startswith('autoproc'):
 #        module = 'module load gopresto BUSTER\n'
-        module = 'module load gopresto XDS\n'
-        module += 'module load gopresto CCP4\n'
-        module += 'source /mxn/groups/sw/mxsw/autoPROC_20240123/setup.sh\n'
+        module = 'module load gopresto autoPROC/20240123-PReSTO-10.0\n'
+#        module = 'module load gopresto XDS\n'
+#        module += 'module load gopresto CCP4\n'
+#        module += 'source /mxn/groups/sw/mxsw/autoPROC_20240123/setup.sh\n'
     return module
 
 

@@ -32,7 +32,7 @@ def get_data_from_cif(logger, model_cif, process_cif, validate_xml):
     d = ciftools.get_atom_count_baverage_as_dict(logger, model_cif, d)
     if process_cif:
         doc = ciftools.get_cif_as_doc(logger, process_cif)
-    d = ciftools.get_process_stats_from_doc_as_dict(logger, doc, d)
+        d = ciftools.get_process_stats_from_doc_as_dict(logger, doc, d)
     if validate_xml:
         d = ciftools.get_info_from_validation_xml_as_dict(logger, validate_xml, d)
     return d
