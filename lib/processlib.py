@@ -482,6 +482,31 @@ def mtz_info(mtzfile):
     mtzDict['lattice'] = mtz.spacegroup.hm[0]
     return mtzDict
 
+def update_mrfana_cif(logger, ciffile):
+    logger.warning('updating mrfana20 cif file...')
+    os.chdir(ciffile[:ciffile.rfind('/')])
+    out = "data_mrfana\n"
+    found = False
+    for line in open(os.path.realpath(ciffile)):
+        if line.startswith('_reflns.details'):
+            out += '_reflns.details ?\n'
+            continue
+        if line.startswith(';') and not found:
+            found = True
+            continue
+        if line.startswith(';') and found:
+            found = False
+            continue
+        if not found:
+            out += line
+
+    f = open('aimless.mrfana20.edited.cif', 'w')
+    f.write(out)
+    f.close()
+    if os.path.isfile('process.cif'):
+        os.system('/bin/rm process.cif')
+    os.system('ln -s aimless.mrfana20.edited.cif process.cif')
+    logger.warning('finished updating mrfana20 cif file')
 
 def cif_info(logger, ciffile):
     cifDict = {}
@@ -489,7 +514,12 @@ def cif_info(logger, ciffile):
         doc = gemmi.cif.read_file(ciffile)
     except ValueError:
         logger.error('gemmi throws a ValueError for {0!s}'.format(ciffile))
-        return cifDict
+        if "mrfana20" in os.path.realpath(ciffile):
+            logger.warning('this looks like a file from mrfana...')
+            update_mrfana_cif(logger, ciffile)
+            doc = gemmi.cif.read_file(ciffile)
+        else:
+            return cifDict
     for block in doc:
 #        if block.find_pair('_symmetry.space_group_name_H-M'):
 #            cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
