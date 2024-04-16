@@ -211,7 +211,7 @@ def get_pipeline_path(pipeline):
         mtzpath = os.path.join('autoproc_manual', 'HDF5_1', 'truncate.mtz')
         mtz_extension = 'HDF5_1/truncate.mtz'
         log_extension = 'HDF5_1/aimless.log'
-        cif_extension = 'Data_2_autoPROC_TRUNCATE_all.cif'
+        cif_extension = 'HDF5_1/aimless.mrfana20.cif'
         mtz_unmerged = 'HDF5_1/aimless_unmerged.mtz'
     elif pipeline == 'staraniso':
         mtzpath = os.path.join('MAXIVFastProcessingTask_0', 'AutoPROCTask_*', 'AutoPROCExecTask_*', 'AutoPROCExec_*', 'staraniso_alldata-unique.mtz')
