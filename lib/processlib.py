@@ -731,8 +731,9 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
     if match_list:
         proc_list = match_list
     else:
-        proc_list = []
         logger.warning('none of the PDB files appears to be similar to any of the auto-processing MTZ files')
+#        proc_list = []
+        logger.info('will carry over all valid auto-processing files to the next stage')
     return proc_list
 
 
@@ -774,6 +775,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
 #        proc_list = []
         logger.warning('did not find any MTZ file with Rmerge (low) below {0!s}; will take it anyway...'.format(
             max_allowed_Rmerge_I_obs_low()))
+        logger.info('will still cary over all valid files...')
     return proc_list
 
 
