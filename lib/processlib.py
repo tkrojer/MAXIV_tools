@@ -709,6 +709,7 @@ def read_reference_pdb_files(logger, projectDir):
 def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_dict):
     logger.info('checking if PDB files in 0-model folder are similar to the processing MTZ files...')
     match_list = []
+    match_found = False
     if ref_dict:
         for d in proc_list:
             logger.info('current pipeline {0!s}'.format(d['autoproc_pipeline']))
@@ -743,11 +744,12 @@ def retain_results_with_similar_ucvol_and_pg_as_ref_pdb(logger, proc_list, ref_d
 #        proc_dict = match_dict
     if match_list:
         proc_list = match_list
+        match_found = True
     else:
         logger.warning('none of the PDB files appears to be similar to any of the auto-processing MTZ files')
 #        proc_list = []
         logger.info('will carry over all valid auto-processing files to the next stage')
-    return proc_list
+    return proc_list, match_found
 
 
 #def retain_results_with_good_low_reso_rmerge(logger, proc_dict):
