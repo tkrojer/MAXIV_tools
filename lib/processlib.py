@@ -515,6 +515,7 @@ def make_cif_header_only(logger, ciffile):
     os.chdir(ciffile[:ciffile.rfind('/')])
     logger.info('trying to read process_header.cif instead')
     if os.path.isfile('process_header.cif'):
+        logger.info('reading process_header.cif')
         doc = gemmi.cif.read_file('process_header.cif')
     return doc
 
