@@ -279,7 +279,15 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         doc = gemmi.cif.read_file(ciffile)
     except ValueError:
         logger.error('gemmi ValueError in processdb/get_process_stats_from_mmcif_as_dict reading {0!s}'.format(ciffile))
-        return d
+        process_header = os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+                       'process_header.cif')
+        logger.info(f"trying to read {process_header} instead...")
+        if os.path.isfile(process_header):
+            logger.info(f"reading {process_header}")
+            doc = gemmi.cif.read_file(ciffile)
+        else
+            logger.info(f"file does not exist: {process_header}")
+            return d
 
     d = get_cell_sym_info(mtz, d)
 
