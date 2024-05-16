@@ -285,7 +285,7 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         if os.path.isfile(process_header):
             logger.info(f"reading {process_header}")
             doc = gemmi.cif.read_file(ciffile)
-        else
+        else:
             logger.info(f"file does not exist: {process_header}")
             return d
 
