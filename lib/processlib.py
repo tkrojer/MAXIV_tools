@@ -392,6 +392,7 @@ def write_mmcif_header(logger, cif, cif_name, collection_date, wavelength):
     logger.warning('done writing mmcif header file')
 
 
+
 def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
                                  mtz, log, cif, collection_date, wavelength, unm_mtz):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline))
@@ -417,7 +418,7 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
 #            run_mrfana(logger, unm_name)
     # taking out this line; will keep entire cif file, not just header
 #    if not os.path.isfile(cif_name):
-#        write_mmcif_header(logger, cif, cif_name, collection_date, wavelength)
+    write_mmcif_header(logger, cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
     mtz = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
                        'process.mtz')
@@ -509,6 +510,14 @@ def update_mrfana_cif(logger, ciffile):
     os.system('ln -s aimless.mrfana20.edited.cif process.cif')
     logger.warning('finished updating mrfana20 cif file')
 
+def make_cif_header_only(logger, ciffile):
+    doc = None
+    os.chdir(ciffile[:ciffile.rfind('/')])
+    logger.info('trying to read process_header.cif instead')
+    if os.path.isfile('process_header.cif'):
+        doc = gemmi.cif.read_file('process_header.cif')
+    return doc
+
 def cif_info(logger, ciffile):
     cifDict = {}
     try:
@@ -520,7 +529,10 @@ def cif_info(logger, ciffile):
             update_mrfana_cif(logger, ciffile)
             doc = gemmi.cif.read_file(ciffile)
         else:
-            return cifDict
+            logger.warning(f'there is something wrong with {ciffile}')
+            doc = make_cif_header_only(logger, ciffile)
+            if not doc:
+                return cifDict
     for block in doc:
 #        if block.find_pair('_symmetry.space_group_name_H-M'):
 #            cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
