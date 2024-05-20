@@ -113,7 +113,7 @@ def initial_refinement_exists(logger, projectDir, sample, software, overwrite):
 def prepare_script_for_init_refine(logger, projectDir, sample, mtzin, pdbref, mtzref, now, submitList, counter, software, cifref, cpd_id):
     logger.info('preparing script for initial refinement')
     cmd = maxiv_header(software)
-    cmd += modules_to_load(software)
+    cmd += modules_to_load(software, cifref)
     cmd += init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id)
     os.chdir(os.path.join(projectDir, 'tmp'))
     submitList.append('{0!s}_{1!s}_{2!s}.sh'.format(software, now, counter))
@@ -132,9 +132,14 @@ def maxiv_header(software):
     return header
 
 
-def modules_to_load(software):
+def modules_to_load(software, cifref):
     if software == 'dimple':
-        module = 'module load gopresto CCP4\n'
+        if cifref:
+            # dimple/ refmac in newer ccp4 versions cannot cope with LIG, DRG or INH ids:
+            # "Refmac:  Problem with ligand name: name clash with existing library entries"
+            module = 'module load gopresto CCP4/7.1.018-SHELX-ARP-8.0-5-PReSTO\n'
+        else:
+            module = 'module load gopresto CCP4\n'
     elif software == 'pipedream':
         module = 'module load gopresto BUSTER\n'
     elif software == 'phenix':
@@ -145,7 +150,11 @@ def modules_to_load(software):
 def init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref, cifref, cpd_id):
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
-        cmd += 'dimple {0!s} {1!s} {2!s} {3!s}\n'.format(mtzin, pdbref, mtzref, software)
+        if cifref:
+            lig = "-libin {0!s}".format(cifref)
+        else:
+            lig = ""
+        cmd += 'dimple {0!s} {1!s} {2!s} {3!s} {4!s}\n'.format(mtzin, pdbref, mtzref, lig, software)
     elif software == 'pipedream':
         if cifref:
             lig = "-l {0!s}".format(cifref)
