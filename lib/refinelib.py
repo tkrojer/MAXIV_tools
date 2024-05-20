@@ -151,7 +151,7 @@ def init_refine_cmd(logger, software, projectDir, sample, mtzin, pdbref, mtzref,
     cmd = 'cd {0!s}\n'.format(os.path.join(projectDir, '2-initial_refine', sample))
     if software == 'dimple':
         if cifref:
-            lig = "-libin {0!s}".format(cifref)
+            lig = "--libin {0!s}".format(cifref)
         else:
             lig = ""
         cmd += 'dimple {0!s} {1!s} {2!s} {3!s} {4!s}\n'.format(mtzin, pdbref, mtzref, lig, software)
