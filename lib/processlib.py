@@ -89,12 +89,22 @@ def create_proposal_session_run_folder(logger, projectDir, sample, proposal, ses
         os.mkdir('{0!s}-{1!s}-{2!s}'.format(proposal, session, run))
 
 
-def create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline):
+def create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline, overwrite):
+    cont = True
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run)))
     if not os.path.isdir(pipeline):
         logger.info('creating folder {0!s}'.format(pipeline))
         os.mkdir(pipeline)
-
+    else:
+        logger.warning('folder {0!s} exists'.format(pipeline))
+        if overwrite:
+            logger.warning('overwrite is True; removing existing folder and creating a new one')
+            os.system('rm -fr {0!s}'.format(pipeline))
+            os.mkdir(pipeline)
+        else:
+            logger.warning('overwrite is False; skipping')
+            cont = False
+    return cont
 
 def create_image_folder(logger, projectDir, sample, proposal, session, run):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run)))
