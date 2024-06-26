@@ -300,6 +300,16 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.info('found CIF file: ' + ciffile)
     else:
         logger.error('cannot find CIF file')
+        logger.info('seems like something went wrong with autoproc')
+        logger.info('checking HDF5_1 folder for mrfana cif file...')
+        new_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
+        logger.info('looking for mrfana ciffile' + new_ciffile)
+        if os.path.isfile(new_ciffile):
+            logger.info('found ' + new_ciffile)
+            ciffile = new_ciffile
+        else:
+            logger.error('cannot find ' + new_ciffile)
+
 
     logger.info('looking for unmerged mtz file: {0!s}'.format(mtzfile.replace(mtz_extension, mtz_unmerged)))
     if os.path.isfile(mtzfile.replace(mtz_extension, mtz_unmerged)):
@@ -544,7 +554,9 @@ def cif_info(logger, ciffile):
             logger.warning(f'there is something wrong with {ciffile}')
             doc = make_cif_header_only(logger, ciffile)
             if not doc:
+                logger.error('could not read cif header either')
                 return cifDict
+    logger.info('iterating through doc...')
     for block in doc:
 #        if block.find_pair('_symmetry.space_group_name_H-M'):
 #            cifDict['space_group'] = str(block.find_pair('_symmetry.space_group_name_H-M')[1])
