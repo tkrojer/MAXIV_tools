@@ -443,12 +443,15 @@ def set_selected_autoprocessing_result(logger, dal, sample, best):
     d['selected'] = True
     # removed as constraint because is currently Null, but is "" in best dictionary
     # dal.xray_processing_table.c.data_scaling_software == best['data_scaling_software'],
+#    u = dal.xray_processing_table.update().values(d).where(and_(
+#        dal.xray_processing_table.c.mounted_crystal_code == sample,
+#        dal.xray_processing_table.c.data_reduction_software == best['data_reduction_software'],
+#        dal.xray_processing_table.c.autoproc_pipeline == best['autoproc_pipeline'],
+#        dal.xray_processing_table.c.automatic_processed == best['automatic_processed'],
+#        dal.xray_processing_table.c.staraniso == best['staraniso']))
     u = dal.xray_processing_table.update().values(d).where(and_(
         dal.xray_processing_table.c.mounted_crystal_code == sample,
-        dal.xray_processing_table.c.data_reduction_software == best['data_reduction_software'],
-        dal.xray_processing_table.c.autoproc_pipeline == best['autoproc_pipeline'],
-        dal.xray_processing_table.c.automatic_processed == best['automatic_processed'],
-        dal.xray_processing_table.c.staraniso == best['staraniso']))
+        dal.xray_processing_table.c.processing_id == best['processing_id']))
     logger.info(d)
     logger.info(best)
     logger.info(u.compile(dialect=sqlite.dialect()))
