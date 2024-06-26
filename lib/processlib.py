@@ -795,7 +795,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
 #            logger.error('{0!s} - Rmerge(low): {1!s}'.format(f, proc_dict[f]['Rmerge_I_obs_low']))
                 logger.warning('low resolution Rmerge is too high: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
         except ValueError:
-            logger.error(f"value for reflns_inner_pdbx_Rmerge_I_obs is: {reflns_inner_pdbx_Rmerge_I_obs}")
+            logger.error(f"value for reflns_inner_pdbx_Rmerge_I_obs cannot be converted to string: {d}")
     if match_list:
         proc_list = match_list
     else:
