@@ -159,6 +159,10 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     if '_manual' in pipeline:
                         d_xray_processing_table_dict['automatic_processed'] = False
                 if os.path.isfile(db_file) and ciffile:
+                    if processdb.cif_exists(dal, ciffile) and not overwrite:
+                        logger.info('cif file exisits in database and overwrite is False; skipping...')
+                        continue
+
                     processdb.insert_into_xray_processing_table(logger, dal, d_xray_processing_table_dict, overwrite)
                     logger.info('finding highest resolution')
 #                    print(d_xray_processing_table_dict)

@@ -346,12 +346,20 @@ def insert_into_xray_processing_table(logger, dal, d, overwrite):
                 logger.warning('entry exists; overwrite=True, updating records')
                 u = dal.xray_processing_table.update().values(d).where(and_(
                     dal.xray_processing_table.c.mounted_crystal_code == d['mounted_crystal_code'],
-                    dal.xray_processing_table.c.data_reduction_software == d['processing_cif_file']))
+                    dal.xray_processing_table.c.processing_cif_file == d['processing_cif_file']))
                 dal.connection.execute(u)
             else:
                 logger.warning('entry exists; skipping...')
         else:
             logger.error(str(e))
+
+def cif_exists(dal, ciffile):
+    q = select([dal.xray_processing_table.c.mounted_crystal_code]).where(
+        dal.xray_processing_table.c.processing_cif_file == ciffile)
+    rp = dal.connection.execute(q)
+    result = rp.fetchall()
+    return result
+
 
 def get_result_list_of_dicts(result):
     result_list = []
