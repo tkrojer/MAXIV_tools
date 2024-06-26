@@ -796,6 +796,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
                 logger.warning('low resolution Rmerge is too high: {0!s}'.format(d['reflns_inner_pdbx_Rmerge_I_obs']))
         except ValueError:
             logger.error(f"value for reflns_inner_pdbx_Rmerge_I_obs cannot be converted to string: {d}")
+            logger.warning("removing item from proc_list")
             proc_list.remove(d)
     if match_list:
         proc_list = match_list
@@ -806,6 +807,7 @@ def retain_results_with_good_low_reso_rmerge(logger, proc_list):
         logger.warning('did not find any MTZ file with Rmerge (low) below {0!s}; will take it anyway...'.format(
             max_allowed_Rmerge_I_obs_low()))
         logger.info('will still cary over all valid files...')
+        logger.info(proc_list)
     return proc_list
 
 
