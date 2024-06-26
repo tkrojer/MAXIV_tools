@@ -280,7 +280,8 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     unm_mtz = None
     mtz = mtz_info(mtzfile)
     wavelength = mtz['wavelength']
-    create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline)
+    overwrite = False
+    create_pipeline_folder(logger, projectDir, sample, proposal, session, run, pipeline, overwrite)
 
     logger.info('log_extension: {0!s}'.format(log_extension))
     logger.info('mtz_extension: {0!s}'.format(mtz_extension))

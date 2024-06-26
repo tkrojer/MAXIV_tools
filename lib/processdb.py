@@ -333,7 +333,7 @@ def read_mrfana_cif(logger, d):
     return d
 
 
-def insert_into_xray_processing_table(logger, dal, d):
+def insert_into_xray_processing_table(logger, dal, d, overwrite):
     logger.info('saving xray_processing_table to database')
     try:
 #        print(d)
@@ -342,7 +342,14 @@ def insert_into_xray_processing_table(logger, dal, d):
         dal.connection.execute(ins)
     except sqlalchemy.exc.IntegrityError as e:
         if "UNIQUE constraint failed" in str(e):
-            logger.warning('entry exists; skipping'.format(d['mounted_crystal_code']))
+            if overwrite:
+                logger.warning('entry exists; overwrite=True, updating records')
+                u = dal.xray_processing_table.update().values(d).where(and_(
+                    dal.xray_processing_table.c.mounted_crystal_code == d['mounted_crystal_code'],
+                    dal.xray_processing_table.c.data_reduction_software == d['processing_cif_file']))
+                dal.connection.execute(u)
+            else:
+                logger.warning('entry exists; skipping...')
         else:
             logger.error(str(e))
 
