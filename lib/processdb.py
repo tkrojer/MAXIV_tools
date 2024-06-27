@@ -160,6 +160,13 @@ def get_software_info(logger, block, d):
             elif item in autoproc_pipeline_list:
                 d['autoproc_pipeline'] = item
                 d['autoproc_pipeline_version'] = version[n]
+    # there are cases where the Data cif file is not created and since we are only using autoproc
+    if 'autoproc_pipeline' not in d:
+        d['autoproc_pipeline'] = 'autoPROC'
+    if 'data_scaling_software' not in d:
+        d['data_scaling_software'] = 'AIMLESS'
+    if 'data_reduction_software' not in d:
+        d['data_reduction_software'] = 'XDS'
     logger.info(f"current dict: {d}")
     return d
 
