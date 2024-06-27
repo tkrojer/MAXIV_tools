@@ -323,7 +323,8 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength, unm_mtz, mrfana_ciffile)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
-    status = get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile)
+    proc_header = mtzfile.replace(mtz_extension, 'process_header.cif')
+    status = get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile, proc_header)
     logger.info('current status: ' + status)
     return status, logfile, ciffile, mtzfile, mrfana_ciffile
 
@@ -629,14 +630,13 @@ def cif_info(logger, ciffile):
     return cifDict
 
 
-def get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile):
+def get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile, proc_header):
 #    if mtzfile and (ciffile or mrfana_ciffile):
-    if mtzfile and mrfana_ciffile:
+    if mtzfile and os.path.isfile(proc_header):
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
-            if ciffile:
-                proc_header = ciffile.replace('process.cif', 'process_header.cif')
+            if os.path.isfile(proc_header):
                 cif = cif_info(logger, proc_header)
             elif mrfana_ciffile:
                 cif = cif_info(logger, mrfana_ciffile)
