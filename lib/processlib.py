@@ -630,11 +630,13 @@ def cif_info(logger, ciffile):
 
 
 def get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile):
-    if mtzfile and (ciffile or mrfana_ciffile):
+#    if mtzfile and (ciffile or mrfana_ciffile):
+    if mtzfile and mrfana_ciffile:
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
-            cif = cif_info(logger, ciffile)
+#            cif = cif_info(logger, ciffile)
+            cif = cif_info(logger, mrfana_ciffile)
             if 'Rmerge_I_obs_low' in cif:
                 if float(cif['Rmerge_I_obs_low']) > 0.15:
                     logger.error('Rmerge of {0!s} is higher than 15%'.format(cif['Rmerge_I_obs_low']))
@@ -1062,21 +1064,21 @@ def skip_sample_if_already_selected(logger, projectDir, sample, sample_folder, o
     return process_not_exists
 
 
-def read_data_collection_stats(logger, ciffile, proc_dict):
-    subfolder = ciffile.split('/')[0]
-    pipeline = ciffile.split('/')[1]
-    mtzfile = os.path.join(ciffile.replace('.cif', '.mtz'))
-    if os.path.isfile(mtzfile):
-        logger.info('found {0!s} file'.format(mtzfile))
-        mtz = mtz_info(mtzfile)
-        mtz['pipeline'] = pipeline
-        mtz['subfolder'] = subfolder
-        cif = cif_info(logger, ciffile)
-        mtz.update(cif)
-        proc_dict[os.path.join(ciffile)] = mtz
-    else:
-        logger.error('process.mtz does not exist in folder')
-    return proc_dict
+#def read_data_collection_stats(logger, ciffile, proc_dict):
+#    subfolder = ciffile.split('/')[0]
+#    pipeline = ciffile.split('/')[1]
+#    mtzfile = os.path.join(ciffile.replace('.cif', '.mtz'))
+#    if os.path.isfile(mtzfile):
+#        logger.info('found {0!s} file'.format(mtzfile))
+#        mtz = mtz_info(mtzfile)
+#        mtz['pipeline'] = pipeline
+#        mtz['subfolder'] = subfolder
+#        cif = cif_info(logger, ciffile)
+#        mtz.update(cif)
+#        proc_dict[os.path.join(ciffile)] = mtz
+#    else:
+#        logger.error('process.mtz does not exist in folder')
+#    return proc_dict
 
 
 def start_logging(logger, script):
