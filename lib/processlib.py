@@ -552,9 +552,15 @@ def cif_info(logger, ciffile):
             doc = gemmi.cif.read_file(ciffile)
         else:
             logger.warning(f'there is something wrong with {ciffile}')
-            doc = make_cif_header_only(logger, ciffile)
+            newciffile = ciffile.replace('process.cif', 'HDF5_1//aimless.mrfana20.cif')
+            logger.info(f'checking if mrfana cif file exisits: {newciffile}')
+            if os.path.isfile(newciffile):
+                logger.info('file exists; trying to read it...')
+                doc = gemmi.cif.read_file(newciffile)
+#            doc = make_cif_header_only(logger, ciffile)
             if not doc:
-                logger.error('could not read cif header either')
+                logger.error('could not read mrfana cif either')
+#                logger.error('could not read cif header either')
                 return cifDict
     logger.info('iterating through doc...')
     for block in doc:
