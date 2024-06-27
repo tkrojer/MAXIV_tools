@@ -304,7 +304,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.info('seems like something went wrong with autoproc; this may not be a problem but check messages below')
 
     logger.info('checking HDF5_1 folder for mrfana cif file...')
-    logger.info('looking for mrfana ciffile' + mrfana_ciffile)
+    logger.info('looking for mrfana ciffile' + str(mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")))
     if os.path.isfile(mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")):
         mrfana_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
         logger.info('found ' + mrfana_ciffile)
