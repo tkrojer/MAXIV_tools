@@ -559,17 +559,17 @@ def make_cif_header_only(logger, ciffile):
 def cif_info(logger, ciffile):
     cifDict = {}
     try:
-        if ciffile:
-            proc_header = ciffile.replace('process.cif', 'process_header.cif')
-        else:
-            logger.error('ciffile is None; skipping...')
-            return cifDict
-        if os.path.isfile(proc_header):
-            logger.info(f"trying to read {proc_header} with gemmi")
-            doc = gemmi.cif.read_file(proc_header)
-        else:
-            logger.info(f"trying to read {ciffile} with gemmi")
-            doc = gemmi.cif.read_file(ciffile)
+#        if ciffile:
+#            proc_header = ciffile.replace('process.cif', 'process_header.cif')
+#        else:
+#            logger.error('ciffile is None; skipping...')
+#            return cifDict
+#        if os.path.isfile(proc_header):
+#            logger.info(f"trying to read {proc_header} with gemmi")
+#            doc = gemmi.cif.read_file(proc_header)
+#        else:
+        logger.info(f"trying to read {ciffile} with gemmi")
+        doc = gemmi.cif.read_file(ciffile)
     except ValueError:
         logger.error('gemmi throws a ValueError for {0!s}'.format(ciffile))
         if "mrfana20" in os.path.realpath(ciffile):
@@ -635,8 +635,11 @@ def get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile):
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
-#            cif = cif_info(logger, ciffile)
-            cif = cif_info(logger, mrfana_ciffile)
+            if ciffile:
+                proc_header = ciffile.replace('process.cif', 'process_header.cif')
+                cif = cif_info(logger, proc_header)
+            elif mrfana_ciffile:
+                cif = cif_info(logger, mrfana_ciffile)
             if 'Rmerge_I_obs_low' in cif:
                 if float(cif['Rmerge_I_obs_low']) > 0.15:
                     logger.error('Rmerge of {0!s} is higher than 15%'.format(cif['Rmerge_I_obs_low']))
