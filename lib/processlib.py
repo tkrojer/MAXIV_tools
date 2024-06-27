@@ -559,7 +559,11 @@ def make_cif_header_only(logger, ciffile):
 def cif_info(logger, ciffile):
     cifDict = {}
     try:
-        proc_header = ciffile.replace('process.cif', 'process_header.cif')
+        if ciffile:
+            proc_header = ciffile.replace('process.cif', 'process_header.cif')
+        else:
+            logger.error('ciffile is None; skipping...')
+            return cifDict
         if os.path.isfile(proc_header):
             logger.info(f"trying to read {proc_header} with gemmi")
             doc = gemmi.cif.read_file(proc_header)
