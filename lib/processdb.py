@@ -138,7 +138,7 @@ def get_cell_sym_info(mtz, d):
     return d
 
 def get_software_info(logger, block, d):
-    logger('reading software info from file')
+    logger.info('reading software info from file')
     data_reduction_software_list = ['XDS', 'DIALS']
     data_scaling_software_list = ['AIMLESS', 'DIALS']
     autoproc_pipeline_list = ['autoPROC', 'xia2']
@@ -159,6 +159,7 @@ def get_software_info(logger, block, d):
             elif item in autoproc_pipeline_list:
                 d['autoproc_pipeline'] = item
                 d['autoproc_pipeline_version'] = version[n]
+    logger.info(f"current dict: {d}")
     return d
 
 def get_overall_stats(block, d):
