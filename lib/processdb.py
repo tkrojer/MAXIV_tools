@@ -360,7 +360,11 @@ def insert_into_xray_processing_table(logger, dal, d, overwrite):
                 logger.warning('entry exists; overwrite=True, updating records')
                 u = dal.xray_processing_table.update().values(d).where(and_(
                     dal.xray_processing_table.c.mounted_crystal_code == d['mounted_crystal_code'],
-                    dal.xray_processing_table.c.processing_cif_file == d['processing_cif_file']))
+                    dal.xray_processing_table.c.data_reduction_software == d['data_reduction_software'],
+                    dal.xray_processing_table.c.data_scaling_software == d['data_scaling_software'],
+                    dal.xray_processing_table.c.autoproc_pipeline == d['autoproc_pipeline'],
+                    dal.xray_processing_table.c.automatic_processed == d['automatic_processed'],
+                    dal.xray_processing_table.c.staraniso == d['staraniso']))
                 dal.connection.execute(u)
             else:
                 logger.warning('entry exists; skipping...')
