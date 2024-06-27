@@ -283,22 +283,25 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
                                   'process_header.cif')
     logger.info('ciffile: {0!s}'.format(os.path.realpath(process_header)))
 
-    try:
-#        doc = gemmi.cif.read_file(ciffile)
-#        doc = gemmi.cif.read_file(mrfana_ciffile)
+    if os.path.isfile(process_header):
         doc = gemmi.cif.read_file(process_header)
 
-    except ValueError:
-        logger.error('gemmi ValueError in processdb/get_process_stats_from_mmcif_as_dict reading {0!s}'.format(ciffile))
-        process_header = os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
-                       'process_header.cif')
-        logger.info(f"trying to read {process_header} instead...")
-        if os.path.isfile(process_header):
-            logger.info(f"reading {process_header}")
-            doc = gemmi.cif.read_file(process_header)
-        else:
-            logger.info(f"file does not exist: {process_header}")
-            return d
+#    try:
+##        doc = gemmi.cif.read_file(ciffile)
+##        doc = gemmi.cif.read_file(mrfana_ciffile)
+#        doc = gemmi.cif.read_file(process_header)
+#
+#    except ValueError:
+#        logger.error('gemmi ValueError in processdb/get_process_stats_from_mmcif_as_dict reading {0!s}'.format(ciffile))
+#        process_header = os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+#                       'process_header.cif')
+#        logger.info(f"trying to read {process_header} instead...")
+#        if os.path.isfile(process_header):
+#            logger.info(f"reading {process_header}")
+#            doc = gemmi.cif.read_file(process_header)
+#        else:
+#            logger.info(f"file does not exist: {process_header}")
+#            return d
 
     d = get_cell_sym_info(mtz, d)
 
@@ -307,16 +310,16 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
         d = get_overall_stats(block, d)
         d = get_lowres_stats(block, d)
         d = get_highres_stats(block, d)
-        if '_manual' in pipeline:
-            break   # there are 4 blocks in Data_2_autoPROC_TRUNCATE_all.cif
+#        if '_manual' in pipeline:
+#            break   # there are 4 blocks in Data_2_autoPROC_TRUNCATE_all.cif
                     # but script edits the automatically processed files so that only the header of the first
                     # block remains; note: xia2 has two blocks, the first being a summary, the second
                     # containing details for all resolution shells
 
 #        break   # only interested in first block; xia2 has a second, somewhat redundant block
-    if os.path.isfile(os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
-                       'unmerged_total.cif')):
-        d = read_mrfana_cif(logger, d)
+#    if os.path.isfile(os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+#                       'unmerged_total.cif')):
+#        d = read_mrfana_cif(logger, d)
     logger.info('process_dict: {0!s}'.format(d))
     return d
 
