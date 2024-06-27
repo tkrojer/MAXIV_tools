@@ -138,6 +138,7 @@ def get_cell_sym_info(mtz, d):
     return d
 
 def get_software_info(logger, block, d):
+    logger('reading software info from file')
     data_reduction_software_list = ['XDS', 'DIALS']
     data_scaling_software_list = ['AIMLESS', 'DIALS']
     autoproc_pipeline_list = ['autoPROC', 'xia2']
@@ -274,11 +275,17 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
 
     mtz = gemmi.read_mtz_file(mtzfile)
 #    logger.info('ciffile: {0!s}'.format(os.path.realpath(ciffile)))
-    logger.info('ciffile: {0!s}'.format(os.path.realpath(mrfana_ciffile)))
+#    logger.info('ciffile: {0!s}'.format(os.path.realpath(mrfana_ciffile)))
+    process_header = os.path.join(projectDir, '1-process', mounted_crystal_code,
+                                  '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
+                                  'process_header.cif')
+    logger.info('ciffile: {0!s}'.format(os.path.realpath(process_header)))
 
     try:
 #        doc = gemmi.cif.read_file(ciffile)
-        doc = gemmi.cif.read_file(mrfana_ciffile)
+#        doc = gemmi.cif.read_file(mrfana_ciffile)
+        doc = gemmi.cif.read_file(process_header)
+
     except ValueError:
         logger.error('gemmi ValueError in processdb/get_process_stats_from_mmcif_as_dict reading {0!s}'.format(ciffile))
         process_header = os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
