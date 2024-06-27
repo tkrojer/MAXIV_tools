@@ -143,6 +143,7 @@ def get_software_info(logger, block, d):
     data_scaling_software_list = ['AIMLESS', 'DIALS']
     autoproc_pipeline_list = ['autoPROC', 'xia2']
     if block.find_loop('_software.name'):
+        logger.info('found _software.name')
         software = list(block.find_loop('_software.name'))
         version = list(block.find_loop('_software.version'))
         logger.info('software list: {0!s}'.format(list(block.find_loop('_software.name'))))
