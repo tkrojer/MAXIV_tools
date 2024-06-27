@@ -279,6 +279,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     ciffile = None
     unm_mtz = None
     mrfana_ciffile = None
+    proc_header = mtzfile.replace(mtz_extension, 'process_header.cif')
     mtz = mtz_info(mtzfile)
     wavelength = mtz['wavelength']
     overwrite = False
@@ -323,7 +324,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength, unm_mtz, mrfana_ciffile)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
-    proc_header = mtzfile.replace(mtz_extension, 'process_header.cif')
+
     status = get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile, proc_header)
     logger.info('current status: ' + status)
     return status, logfile, ciffile, mtzfile, mrfana_ciffile
