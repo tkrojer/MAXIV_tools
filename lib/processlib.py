@@ -909,7 +909,10 @@ def retain_results_which_fit_selection_criterion(logger, dal, proc_list, select_
             logger.warning('MTZ does not match criteria, but added {0!s} with high resolution limit of {1!s} A'.format(
                 d['autoproc_pipeline'], reso_high))
             processing_outcome = "fail - not selected pipeline"
-            backup_list.append([d, float(reso_high)])
+            try:
+                backup_list.append([d, float(reso_high)])
+            except ValueError:
+                logger.error('seems like that the high resolution limit in the database cannot be converted to float')
         processdb.update_processing_outcome(logger, dal, processing_id, processing_outcome)
     if not match_list:
         logger.warning('none of the MTZ files fulfilled the selection criteria, but will select the one with highest resolution')
