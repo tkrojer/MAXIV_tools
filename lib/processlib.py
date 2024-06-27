@@ -278,6 +278,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     logfile = None
     ciffile = None
     unm_mtz = None
+    mrfana_ciffile = None
     mtz = mtz_info(mtzfile)
     wavelength = mtz['wavelength']
     overwrite = False
@@ -301,15 +302,15 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
     else:
         logger.error('cannot find CIF file')
         logger.info('seems like something went wrong with autoproc')
-        logger.info('checking HDF5_1 folder for mrfana cif file...')
-        new_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
-        logger.info('looking for mrfana ciffile' + new_ciffile)
-        if os.path.isfile(new_ciffile):
-            logger.info('found ' + new_ciffile)
-            ciffile = new_ciffile
-        else:
-            logger.error('cannot find ' + new_ciffile)
 
+    logger.info('checking HDF5_1 folder for mrfana cif file...')
+    mrfana_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
+    logger.info('looking for mrfana ciffile' + mrfana_ciffile)
+    if os.path.isfile(mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")):
+        mrfana_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
+        logger.info('found ' + mrfana_ciffile)
+    else:
+        logger.error('cannot find ' + mrfana_ciffile)
 
     logger.info('looking for unmerged mtz file: {0!s}'.format(mtzfile.replace(mtz_extension, mtz_unmerged)))
     if os.path.isfile(mtzfile.replace(mtz_extension, mtz_unmerged)):
@@ -319,13 +320,13 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.error('cannot find UNMERGED MTZ file')
 
     if logfile and ciffile:
-        mtzfile, logfile, ciffile = copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
-                                                mtzfile, logfile, ciffile, collection_date, wavelength, unm_mtz)
+        mtzfile, logfile, ciffile, mrfana_ciffile = copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
+                                                mtzfile, logfile, ciffile, collection_date, wavelength, unm_mtz, mrfana_ciffile)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
     status = get_status(logger, mtzfile, mtz, ciffile, status)
     logger.info('current status: ' + status)
-    return status, logfile, ciffile, mtzfile
+    return status, logfile, ciffile, mtzfile, mrfana_ciffile
 
 
 def get_timestamp_from_master_file(logger, sample_folder, run):
@@ -415,12 +416,13 @@ def write_mmcif_header(logger, cif, cif_name, collection_date, wavelength):
 
 
 def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, session, pipeline,
-                                 mtz, log, cif, collection_date, wavelength, unm_mtz):
+                                 mtz, log, cif, collection_date, wavelength, unm_mtz, mrfana_ciffile):
     os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline))
     mtz_name = mtz.split('/')[len(mtz.split('/'))-1]
     log_name = log.split('/')[len(log.split('/'))-1]
     cif_name = cif.split('/')[len(cif.split('/'))-1]
     unm_name = unm_mtz.split('/')[len(unm_mtz.split('/')) - 1]
+    mrf_name = mrfana_ciffile.split('/')[len(unm_mtz.split('/')) - 1]
     if not os.path.isfile(mtz_name):
         logger.info(f'copying {mtz}')
         os.system('/bin/cp {0!s} .'.format(mtz))
@@ -430,6 +432,11 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
     if not os.path.isfile(cif_name):
         logger.info(f'copying {cif}')
         os.system('/bin/cp {0!s} .'.format(cif))
+    if not os.path.isfile(mrf_name):
+        logger.info(f'copying {mrfana_ciffile}')
+        os.system('/bin/cp {0!s} .'.format(mrfana_ciffile))
+        check_first_line_of_aimless_mrfana_cif(logger, mrf_name, projectDir, sample, proposal, session, run, pipeline)
+
     logger.info('unmerged_mtz: {0!s}'.format(unm_mtz))
     if unm_mtz:
         logger.info('unmerged mtz exists')
@@ -447,8 +454,17 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
                        'process.log')
     cif = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
                        'process.cif')
-    return mtz, log, cif
+    return mtz, log, cif, mrfana_ciffile
 
+def check_first_line_of_aimless_mrfana_cif(logger, mrf_name, projectDir, sample, proposal, session, run, pipeline):
+    os.chdir(os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline))
+    logger.info('checking start line of mrfana...')
+    with open(mrf_name, 'r+') as f:
+        content = f.read()
+        if not content.startswith('data_mrfana'):
+            logger.info('inserting data_mrfana as first line...')
+            f.seek(0, 0)
+            f.write('data_mrfana\n' + content)
 
 def run_mrfana(logger, unm_name):
     if os.path.isfile('unmerged_total.cif'):

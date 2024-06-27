@@ -261,7 +261,7 @@ def update_processing_outcome(logger, dal, processing_id, processing_outcome):
         dal.xray_processing_table.c.processing_id == processing_id)
     dal.connection.execute(u)
 
-def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline, projectDir):
+def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline, projectDir, mrfana_ciffile):
     dataset_id = get_dataset_id(dal, logger, mounted_crystal_code, proposal, session, run)
 
     d = {   'dataset_id':           dataset_id,
@@ -273,10 +273,12 @@ def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, 
             'processing_log_file':  logfile }
 
     mtz = gemmi.read_mtz_file(mtzfile)
-    logger.info('ciffile: {0!s}'.format(os.path.realpath(ciffile)))
+#    logger.info('ciffile: {0!s}'.format(os.path.realpath(ciffile)))
+    logger.info('ciffile: {0!s}'.format(os.path.realpath(mrfana_ciffile)))
 
     try:
-        doc = gemmi.cif.read_file(ciffile)
+#        doc = gemmi.cif.read_file(ciffile)
+        doc = gemmi.cif.read_file(mrfana_ciffile)
     except ValueError:
         logger.error('gemmi ValueError in processdb/get_process_stats_from_mmcif_as_dict reading {0!s}'.format(ciffile))
         process_header = os.path.join(projectDir, '1-process', mounted_crystal_code, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,

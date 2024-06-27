@@ -145,7 +145,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                 logger.info('found auto-processed MTZ file: ' + mtzfile)
                 foundMTZ = True
                 n_manual += 1
-                status, logfile, ciffile, mtzfile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
+                status, logfile, ciffile, mtzfile, mrfana_ciffile = processlib.get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                       run, pipeline, collection_date,
                                                       mtz_extension, cif_extension, log_extension, status, mtz_unmerged)
                 if not search_manual:
@@ -155,7 +155,7 @@ def parse_sample_folder(logger, sample_folder, projectDir, sample, proposal, ses
                     d_xray_processing_table_dict = processdb.get_process_stats_from_mmcif_as_dict(logger, dal, ciffile, mtzfile,
                                                                                               logfile,
                                                                                               sample,
-                                                                                              proposal, session, run, pipeline, projectDir)
+                                                                                              proposal, session, run, pipeline, projectDir, mrfana_ciffile)
                     if '_manual' in pipeline:
                         d_xray_processing_table_dict['automatic_processed'] = False
                 if os.path.isfile(db_file) and ciffile:
