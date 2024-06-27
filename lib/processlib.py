@@ -301,10 +301,9 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
         logger.info('found CIF file: ' + ciffile)
     else:
         logger.error('cannot find CIF file')
-        logger.info('seems like something went wrong with autoproc')
+        logger.info('seems like something went wrong with autoproc; this may not be a problem but check messages below')
 
     logger.info('checking HDF5_1 folder for mrfana cif file...')
-    mrfana_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
     logger.info('looking for mrfana ciffile' + mrfana_ciffile)
     if os.path.isfile(mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")):
         mrfana_ciffile = mtzfile.replace(mtz_extension, "HDF5_1/aimless.mrfana20.cif")
@@ -324,7 +323,7 @@ def get_process_files(logger, mtzfile, projectDir, sample, proposal, session,
                                                 mtzfile, logfile, ciffile, collection_date, wavelength, unm_mtz, mrfana_ciffile)
     else:
         logger.error('MTZ file exists, but either LOG or CIF file missing')
-    status = get_status(logger, mtzfile, mtz, ciffile, status)
+    status = get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile)
     logger.info('current status: ' + status)
     return status, logfile, ciffile, mtzfile, mrfana_ciffile
 
@@ -626,8 +625,8 @@ def cif_info(logger, ciffile):
     return cifDict
 
 
-def get_status(logger, mtzfile, mtz, ciffile, status):
-    if mtzfile and ciffile:
+def get_status(logger, mtzfile, mtz, ciffile, status, mrfana_ciffile):
+    if mtzfile and (ciffile or mrfana_ciffile):
         mtzDict = mtz_info(mtzfile)
         if float(mtzDict['resolution_high']) < 2.5:
             status = 'OK'
