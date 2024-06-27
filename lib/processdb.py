@@ -267,6 +267,10 @@ def update_processing_outcome(logger, dal, processing_id, processing_outcome):
 def get_process_stats_from_mmcif_as_dict(logger, dal,ciffile, mtzfile, logfile, mounted_crystal_code, proposal, session, run, pipeline, projectDir, mrfana_ciffile):
     dataset_id = get_dataset_id(dal, logger, mounted_crystal_code, proposal, session, run)
 
+    if not os.path.isfile(ciffile):
+        if os.path.isfile(mrfana_ciffile):
+            ciffile = mrfana_ciffile
+
     d = {   'dataset_id':           dataset_id,
             'mounted_crystal_code': mounted_crystal_code,
             'automatic_processed':  True,
