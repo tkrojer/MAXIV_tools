@@ -560,7 +560,13 @@ def make_cif_header_only(logger, ciffile):
 def cif_info(logger, ciffile):
     cifDict = {}
     try:
-        doc = gemmi.cif.read_file(ciffile)
+        proc_header = ciffile.replace('process.cif', 'process_header.cif')
+        if os.path.isfile(proc_header):
+            logger.info(f"trying to read {proc_header} with gemmi")
+            doc = gemmi.cif.read_file(proc_header)
+        else:
+            logger.info(f"trying to read {ciffile} with gemmi")
+            doc = gemmi.cif.read_file(ciffile)
     except ValueError:
         logger.error('gemmi throws a ValueError for {0!s}'.format(ciffile))
         if "mrfana20" in os.path.realpath(ciffile):
@@ -569,7 +575,8 @@ def cif_info(logger, ciffile):
             doc = gemmi.cif.read_file(ciffile)
         else:
             logger.warning(f'there is something wrong with {ciffile}')
-            newciffile = ciffile.replace('process.cif', 'HDF5_1//aimless.mrfana20.cif')
+            newciffile = ciffile.replace('process.cif', 'aimless.mrfana20.cif')
+#            newciffile = ciffile.replace('process.cif', 'HDF5_1//aimless.mrfana20.cif')
             logger.info(f'checking if mrfana cif file exisits: {newciffile}')
             if os.path.isfile(newciffile):
                 logger.info('file exists; trying to read it...')
