@@ -446,7 +446,8 @@ def copy_files_to_project_folder(logger, projectDir, sample, run, proposal, sess
 #            run_mrfana(logger, unm_name)
     # taking out this line; will keep entire cif file, not just header
 #    if not os.path.isfile(cif_name):
-    write_mmcif_header(logger, cif, cif_name, collection_date, wavelength)
+    if not os.path.isfile('process_header.cif'):
+        write_mmcif_header(logger, cif, cif_name, collection_date, wavelength)
     create_process_symlink(mtz_name, log_name, cif_name)
     mtz = os.path.join(projectDir, '1-process', sample, '{0!s}-{1!s}-{2!s}'.format(proposal, session, run), pipeline,
                        'process.mtz')
